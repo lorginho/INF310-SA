@@ -2,8 +2,6 @@
 .git/
 *.zip
 otros/
-peinado/
-doc/
 
 # Ignorar carpeta de configuraciones de VSCode
 .vscode/
