@@ -15,7 +15,7 @@ Nota: ingresar al proyecto ya especificado y realizar lo siguiente:
 
 - Subir el proyecto terminado y funcional en un archivo .rar o .zip, realizar los push en sus ramas correspondiente en github.
 
-## Arbol binario: Implemetacion de metodos
+## Arbol binario: Implementacion de metodos
 
 Requisitos de finalización
 Apertura: martes, 26 de agosto de 2025, 07:00

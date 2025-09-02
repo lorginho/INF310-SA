@@ -1,5 +1,5 @@
 """
-Main.py
+main.py
 Punto de entrada principal de la aplicación
 Autor: Lorgio Añez J.
 Fecha: 2025-08-283
