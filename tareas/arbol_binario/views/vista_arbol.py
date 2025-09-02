@@ -2,7 +2,7 @@
 views/vista_arbol.py
 Vista para interfaz de usuario del árbol binario (MVC)
 Autor: Lorgio Añez J.
-Fecha: 2025-08-28
+Fecha: 2025-09-01
 Descripción: Vista que proporciona una interfaz de consola para interactuar con el árbol binario
 """
 
@@ -29,7 +29,8 @@ class VistaArbol:
             print("6. Recorrido In-Orden")
             print("7. Recorrido Post-Orden")
             print("8. Recorrido Pre-Orden")
-            print("9. Salir")
+            print("9. Recorrido por Amplitud")
+            print("10. Salir")
 
             opcion = input("Seleccione una opción: ")
 
@@ -50,6 +51,8 @@ class VistaArbol:
             elif opcion == "8":
                 self._recorrido_pre_orden()
             elif opcion == "9":
+                self._recorrido_amplitud()
+            elif opcion == "10":
                 print("Saliendo del programa...")
                 break
             else:
@@ -59,8 +62,10 @@ class VistaArbol:
         """Maneja la inserción de un nodo individual."""
         try:
             valor = int(input("Ingrese el valor a insertar: "))
-            self.controlador.insertar_nodo(valor)
-            print(f"Valor {valor} insertado correctamente.")
+            if self.controlador.insertar_nodo(valor):
+                print(f"Valor {valor} insertado correctamente.")
+            else:
+                print(f"Valor {valor} ya existe en el arbol. No se inserto.")
         except ValueError:
             print("Error: Por favor ingrese un valor entero válido.")
 
@@ -80,12 +85,19 @@ class VistaArbol:
                 print("No se ingresaron valores válidos.")
                 return
 
+            insertados = 0
+            duplicados = 0
+
             # Insertar todos los valores
             for valor in valores:
-                self.controlador.insertar_nodo(valor)
+                if self.controlador.insertar_nodo(valor):
+                    insertados += 1
+                else:
+                    duplicados += 1
 
-            print(
-                f"Se insertaron {len(valores)} nodos correctamente: {valores}")
+            print(f"Se insertaron {insertados} nodos correctamente.")
+            if duplicados > 0:
+                print(f"Se omitieron {duplicados} valores duplicados.")
 
         except ValueError:
             print(
@@ -132,3 +144,8 @@ class VistaArbol:
         """Maneja el recorrido pre-orden."""
         print("Recorrido Pre-Orden:", end=" ")
         self.controlador.pre_orden()
+
+    def _recorrido_amplitud(self):
+        """Maneja el recorrido por amplitud."""
+        resultado = self.controlador.amplitud()
+        print("Recorrido por Amplitud:", resultado)

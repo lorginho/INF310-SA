@@ -12,3 +12,4 @@ from views.vista_arbol import VistaArbol
 if __name__ == "__main__":
     vista = VistaArbol()
     vista.ejecutar()
+2

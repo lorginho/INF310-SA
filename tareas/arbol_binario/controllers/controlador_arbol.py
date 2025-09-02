@@ -2,7 +2,7 @@
 controllers/controlador_arbol.py
 Controlador para operaciones del árbol binario (MVC)
 Autor: Lorgio Añez J.
-Fecha: 2025-08-28
+Fecha: 2025-09-01
 Descripción: Controlador que gestiona las operaciones entre la vista y el modelo del árbol binario
 """
 
@@ -18,12 +18,15 @@ class ControladorArbol:
 
     def insertar_nodo(self, x):
         """
-        Inserta un nuevo nodo en el árbol.
+        Inserta un nuevo nodo en el árbol si no existe.
 
         Args:
             x: Valor a insertar.
+
+        Returns:
+            True si se inserto, False si ya existia.
         """
-        self.arbol.insertar_nodo(x)
+        return self.arbol.insertar_nodo(x)
 
     def es_vacio(self):
         """
@@ -79,3 +82,12 @@ class ControladorArbol:
         """
         self.arbol.pre_orden(self.arbol.get_raiz())
         print()
+
+    def amplitud(self):
+        """
+        Realiza un recorrido por amplitud del arbol.
+
+        Returns:
+            Lista con los valores del arbol en orden por niveles.            
+        """
+        return self.arbol.amplitud()

@@ -37,15 +37,23 @@ class ArbolBinario:
 
     def insertar_nodo(self, x):
         """
-        Inserta un nuevo nodo con el valor x en el árbol.
+        Inserta un nuevo nodo con el valor x en el árbol si no existe.
 
         Args:
             x: Valor a insertar en el árbol.
+
+        Returns:
+            True si se insertó, False si ya existía.
         """
+        if self.buscar_x(x) is not None:
+            return False  # El valor ya existe, no se inserta
+
         if self.raiz is None:
             self.raiz = Nodo(x)
+            return True
         else:
             self._insertar(self.raiz, x)
+            return True
 
     def _insertar(self, nodo, x):
         """
@@ -155,3 +163,30 @@ class ArbolBinario:
             print(nodo.get_dato(), end=" ")
             self.pre_orden(nodo.get_izquierdo())
             self.pre_orden(nodo.get_derecho())
+
+    def amplitud(self):
+        """
+        Recorrido por amplitud (nivel por nivel) del árbol.
+
+        Returns:
+            Lista con los valores del árbol en orden por niveles.
+        """
+        if self.raiz is None:
+            return []
+
+        resultado = []
+        # Usamos una cola (simulada con lista) para el recorrido
+        cola = [self.raiz]
+
+        while cola:
+            # Extraemos el primer elemento de la cola
+            nodo_actual = cola.pop(0)
+            resultado.append(nodo_actual.get_dato())
+
+            # Agregamos los hijos a la cola si existen
+            if nodo_actual.get_izquierdo() is not None:
+                cola.append(nodo_actual.get_izquierdo())
+            if nodo_actual.get_derecho() is not None:
+                cola.append(nodo_actual.get_derecho())
+
+        return resultado
