@@ -16,3 +16,6 @@ __pycache__/
 # Ignorar archivos del sistema
 .DS_Store
 Thumbs.db
+
+# Ignorar archivo de avance personal
+avance.md
