@@ -3,7 +3,8 @@ models/nodo.py
 Implementación de la clase Nodo para árboles binarios
 Autor: Lorgio Añez J.
 Fecha: 2025-08-28
-Descripción: Clase que representa un nodo en un árbol binario con métodos getter y setter
+Descripción: Clase que representa un nodo en un árbol binario 
+con métodos getter y setter
 """
 
 
@@ -17,9 +18,9 @@ class Nodo:
         Args:
             dato: Valor a almacenar en el nodo.
         """
-        self.dato = dato
-        self.izquierdo = None
-        self.derecho = None
+        self.__dato = dato
+        self.__izquierdo = None
+        self.__derecho = None
 
     def get_dato(self):
         """
@@ -28,7 +29,7 @@ class Nodo:
         Returns:
             Valor almacenado en el nodo.
         """
-        return self.dato
+        return self.__dato
 
     def set_dato(self, dato):
         """
@@ -37,7 +38,7 @@ class Nodo:
         Args:
             dato: Nuevo valor para el nodo.
         """
-        self.dato = dato
+        self.__dato = dato
 
     def get_izquierdo(self):
         """
@@ -46,7 +47,7 @@ class Nodo:
         Returns:
             Nodo hijo izquierdo o None si no existe.
         """
-        return self.izquierdo
+        return self.__izquierdo
 
     def set_izquierdo(self, izquierdo):
         """
@@ -55,7 +56,7 @@ class Nodo:
         Args:
             izquierdo: Nuevo nodo hijo izquierdo.
         """
-        self.izquierdo = izquierdo
+        self.__izquierdo = izquierdo
 
     def get_derecho(self):
         """
@@ -64,7 +65,7 @@ class Nodo:
         Returns:
             Nodo hijo derecho o None si no existe.
         """
-        return self.derecho
+        return self.__derecho
 
     def set_derecho(self, derecho):
         """
@@ -73,4 +74,4 @@ class Nodo:
         Args:
             derecho: Nuevo nodo hijo derecho.
         """
-        self.derecho = derecho
+        self.__derecho = derecho

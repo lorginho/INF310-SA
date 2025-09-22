@@ -21,16 +21,16 @@ class VistaArbol:
         """Método principal que inicia la interfaz de usuario."""
         while True:
             print("\n--- MENÚ ÁRBOL BINARIO ---")
-            print("1. Insertar Nodo Individual")
-            print("2. Insertar Múltiples Nodos")
-            print("3. Verificar si está vacío")
-            print("4. Verificar si es hoja")
-            print("5. Buscar valor")
-            print("6. Recorrido In-Orden")
-            print("7. Recorrido Post-Orden")
-            print("8. Recorrido Pre-Orden")
-            print("9. Recorrido por Amplitud")
-            print("10. Salir")
+            print("1. Insertar Nodo INDIVIDUAL")
+            print("2. Insertar MULTIPLES Nodos")
+            print("3. Verificar si está VACIO")
+            print("4. Verificar si es HOJA")
+            print("5. Buscar VALOR")
+            print("6. Recorrido IN-Orden Iz.Ra.De")
+            print("7. Recorrido PRE-Orden Ra.Iz.De")
+            print("8. Recorrido POST-Orden Iz.De.Ra")
+            print("9. Recorrido por AMPLITUD (Niveles)")
+            print("0. Salir")
 
             opcion = input("Seleccione una opción: ")
 
@@ -47,12 +47,12 @@ class VistaArbol:
             elif opcion == "6":
                 self._recorrido_in_orden()
             elif opcion == "7":
-                self._recorrido_post_orden()
-            elif opcion == "8":
                 self._recorrido_pre_orden()
+            elif opcion == "8":
+                self._recorrido_post_orden()
             elif opcion == "9":
                 self._recorrido_amplitud()
-            elif opcion == "10":
+            elif opcion == "0":
                 print("Saliendo del programa...")
                 break
             else:
@@ -132,18 +132,18 @@ class VistaArbol:
 
     def _recorrido_in_orden(self):
         """Maneja el recorrido in-orden."""
-        print("Recorrido In-Orden:", end=" ")
+        print("Recorrido In-Orden Iz.Ra.De:", end=" ")
         self.controlador.in_orden()
-
-    def _recorrido_post_orden(self):
-        """Maneja el recorrido post-orden."""
-        print("Recorrido Post-Orden:", end=" ")
-        self.controlador.post_orden()
 
     def _recorrido_pre_orden(self):
         """Maneja el recorrido pre-orden."""
-        print("Recorrido Pre-Orden:", end=" ")
+        print("Recorrido Pre-Orden Ra.Iz.De:", end=" ")
         self.controlador.pre_orden()
+
+    def _recorrido_post_orden(self):
+        """Maneja el recorrido post-orden."""
+        print("Recorrido Post-Orden Iz.De.Ra:", end=" ")
+        self.controlador.post_orden()
 
     def _recorrido_amplitud(self):
         """Maneja el recorrido por amplitud."""
