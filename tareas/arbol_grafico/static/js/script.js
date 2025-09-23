@@ -1,4 +1,28 @@
- // Configuración global
+/*
+static/js/script.js
+
+Autor: Lorgio Añez J.
+Fecha: 2025-09-23
+
+Descripción: 
+
+El archivo script.js es el principal, tambien unico :(, archivo JavaScript del frontend del proyecto.
+Conecta la interfaz gráfica con el backend, permitiendo que el usuario interactúe
+visualmente y en tiempo real con el árbol binario.
+
+Sus funciones principales son:
+
+Gestionar la interacción del usuario con la interfaz web (formularios, botones, eventos de teclado).
+Comunicar la interfaz con el backend Flask mediante peticiones AJAX (fetch) 
+a los endpoints definidos en el controlador.
+Actualizar dinámicamente la visualización del árbol binario en SVG, dibujando nodos y ramas 
+según los datos recibidos del backend.
+Mostrar mensajes, estadísticas y resultados de las operaciones realizadas sobre el árbol.
+Controlar animaciones y estados de la aplicación para una experiencia de usuario fluida.
+*/
+
+
+// Configuración global, "apariencia" de los nodos
 const CONFIG = {
     nodeRadius: 25,
     horizontalSpacing: 75,
@@ -595,6 +619,7 @@ async function verificarRama() {
 
 function salir() {
 
+    // Sale de la Aplicacion al cerrar la Ventana del Navegador
     window.close();
 
 }

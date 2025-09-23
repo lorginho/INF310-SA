@@ -1,3 +1,24 @@
+"""
+archivo: app.py
+Punto de entrada principal del proyecto Flask
+Autor: Lorgio Añez J.
+Fecha: 2025-09-23
+
+Descripción: app.py arranca la aplicación web, conecta los controladores
+y sirve la interfaz de usuario, permitiendo que el proyecto funcione 
+como una aplicación web interactiva.
+
+
+A Detalle: 
+
+Crear la aplicación Flask y configurarla.
+Registrar el blueprint del controlador (arbol_bp),que contiene las rutas
+para operar sobre el árbol binario.
+Definir la ruta raíz / que muestra la página principal (index.html).
+Iniciar el servidor web cuando se ejecuta el archivo directamente.
+
+"""
+
 from flask import Flask, render_template, request, jsonify
 from controllers.arbol_controller import arbol_bp
 

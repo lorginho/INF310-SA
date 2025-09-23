@@ -3,7 +3,27 @@ controllers/arbol_controller.py
 Controlador para operaciones del árbol binario (MVC)
 Autor: Lorgio Añez J.
 Fecha: 2025-09-23
-Descripción: Controlador que gestiona las operaciones entre la vista y el modelo del árbol binario
+Descripción: Controlador que gestiona las operaciones 
+entre la vista ( Template ) y el modelo del árbol binario
+
+A Detalle: 
+
+El archivo arbol_controller.py funciona como controlador en una arquitectura
+MVC (Modelo-Vista-Controlador) para tu proyecto de árbol binario usando Flask.
+Sus funciones principales son:
+
+Recibir y procesar solicitudes HTTP relacionadas con operaciones sobre el 
+árbol binario (insertar, eliminar, buscar, limpiar, obtener recorridos, estadísticas, 
+estructura y manipulación de ramas).
+Conectar la vista (frontend o cliente) con el modelo (ArbolBinario), gestionando
+la lógica de negocio y devolviendo respuestas en formato JSON.
+Exponer endpoints REST para que otras partes del sistema 
+por ejemplo, una interfaz web) puedan interactuar con el árbol binario de manera sencilla.
+En resumen:
+arbol_controller.py es el intermediario que recibe peticiones del usuario,
+ejecuta operaciones sobre el árbol binario y responde con los resultados, 
+facilitando la comunicación entre la interfaz de usuario y la lógica del árbol.
+
 """
 
 from flask import Blueprint, request, jsonify
@@ -223,7 +243,39 @@ def eliminar_rama():
 
 @arbol_bp.route('/info-rama/<int:valor>', methods=['GET'])
 def info_rama(valor):
-    """Obtiene información sobre una rama específica."""
+    """
+    Obtiene información sobre una rama específica del árbol.
+    Documentacion Extendida
+
+    Parámetros
+    ----------
+    valor : int (en la URL)
+        Valor del nodo raíz de la rama que se desea consultar.
+
+    Respuestas
+    ----------
+    200 OK
+        Devuelve un JSON con la información de la rama, con el formato:
+        {
+            "valor_raiz": <int>,      # El valor del nodo solicitado
+            "rama": <list>,           # Lista de nodos que conforman la rama
+            "cantidad_nodos": <int>,  # Número de nodos en la rama
+            "altura_rama": <int>      # Altura de la rama calculada
+        }
+
+    404 Not Found
+        Si no existe un nodo con el valor solicitado, devuelve:
+        {
+            "error": "Nodo no encontrado"
+        }
+
+    500 Internal Server Error
+        Si ocurre un error inesperado en la ejecución, devuelve:
+        {
+            "error": "<detalle del error>"
+        }
+    """
+
     try:
         rama = arbol.obtener_rama(valor)
         if rama is None:
