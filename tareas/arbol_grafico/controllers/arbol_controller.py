@@ -9,7 +9,8 @@ entre la vista ( Template ) y el modelo del árbol binario
 A Detalle: 
 
 El archivo arbol_controller.py funciona como controlador en una arquitectura
-MVC (Modelo-Vista-Controlador) para tu proyecto de árbol binario usando Flask.
+MVC (Modelo-Vista-Controlador) para el proyecto de árbol binario usando Flask.
+
 Sus funciones principales son:
 
 Recibir y procesar solicitudes HTTP relacionadas con operaciones sobre el 
@@ -18,7 +19,8 @@ estructura y manipulación de ramas).
 Conectar la vista (frontend o cliente) con el modelo (ArbolBinario), gestionando
 la lógica de negocio y devolviendo respuestas en formato JSON.
 Exponer endpoints REST para que otras partes del sistema 
-por ejemplo, una interfaz web) puedan interactuar con el árbol binario de manera sencilla.
+como ser la interfaz web pueda interactuar con el árbol binario de manera sencilla.
+
 En resumen:
 arbol_controller.py es el intermediario que recibe peticiones del usuario,
 ejecuta operaciones sobre el árbol binario y responde con los resultados, 
