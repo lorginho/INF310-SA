@@ -4,7 +4,7 @@ Implementación del ADT Árbol Binario de Búsqueda
 Autor: Lorgio Añez J.
 Fecha: 2025-08-28
 Descripción: Clase que representa un árbol binario con métodos para insertar, buscar y recorrer nodos
-Ñ"""
+"""
 
 
 from models.nodo import Nodo

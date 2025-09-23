@@ -1,10 +1,12 @@
 README.md
 Implementación Grafica del ADT Árbol Binario de Búsqueda
-Autor: Lorgio Añez J.
+Autor: `Lorgio Añez J.`
 Fecha: 2025-09-22
-Descripción: AplicaciOn que representa un árbol binario con métodos para insertar, buscar, eliminar, recorrer nodos, etc. La representacion del Arbol
+Descripción: `Aplicacion que representa un árbol binario` con métodos para insertar, buscar, eliminar, recorrer nodos, etc. La representacion del Arbol
 se realiza graficamente en una aplicacin WEB, con arquitectura MVC.
 Materia: Estructura de Datos II, INF310
+
+![alt text](image.png)
 
 ## Tarea Unidad 1: Crear interfaz grafica
 
@@ -108,3 +110,43 @@ Una instancia global: Todos los usuarios ven el mismo árbol
 - Frontend: HTML5, CSS3, JavaScript vanilla
 - Comunicación: API REST JSON
 - Visualización: SVG nativo
+
+## Explicacion en Detalle
+
+### Arquitectura MVC (Modelo-Vista-Controlador):
+
+Es un patrón de diseño de software que separa la lógica de la aplicación en tres componentes interconectados.
+
+- Modelo: Se encarga de la lógica de negocio y la gestión de datos (base de datos, consultas, etc.).
+
+- Vista: Es la interfaz de usuario (lo que ve el usuario), en este caso construida con HTML5, CSS3 y JavaScript vanilla.
+
+- Controlador: Actúa como intermediario entre el Modelo y la Vista. Recibe las peticiones del usuario (desde la Vista), interactúa con el Modelo y devuelve la respuesta adecuada a la Vista.
+
+### Backend: Flask (Python):
+
+Flask es un framework ligero de Python para desarrollar aplicaciones web.
+
+Se utiliza para crear el servidor backend, que maneja las peticiones HTTP, la lógica del servidor, y la comunicación con la base de datos si la hay.
+
+### Frontend: HTML5, CSS3, JavaScript vanilla:
+
+- HTML5: Es el lenguaje de marcado para estructurar el contenido web.
+
+- CSS3: Se usa para estilizar y dar diseño a las páginas web.
+
+- JavaScript vanilla: Significa JavaScript puro, sin librerías o frameworks adicionales (como React, Angular, etc.). Se utiliza para añadir interactividad al frontend.
+
+### Comunicación: API REST JSON:
+
+La comunicación entre el frontend y el backend se realiza mediante una API REST (Representational State Transfer), que es un estilo de arquitectura para diseñar redes de comunicación.
+
+Los datos se intercambian en formato JSON (JavaScript Object Notation), que es un formato ligero y fácil de leer y escribir tanto para humanos como para máquinas.
+
+### Visualización: SVG nativo:
+
+SVG (Scalable Vector Graphics) es un formato de gráficos vectoriales que se utiliza para visualizar imágenes y gráficos en la web.
+
+`"Nativo"` significa que se utiliza directamente SVG (por ejemplo, mediante etiquetas `<svg>` en HTML) para renderizar gráficos, en lugar de usar librerías o componentes preconstruidos. Esto permite gráficos escalables y de alta calidad.
+
+- En resumen, esta aplicación web está construida con una arquitectura MVC, utilizando Flask en el backend y tecnologías web estándar (HTML5, CSS3, JavaScript) en el frontend. La comunicación entre frontend y backend es a través de una API REST con JSON, y para la visualización de gráficos se utiliza SVG nativo.
