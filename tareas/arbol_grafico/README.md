@@ -1,10 +1,11 @@
 README.md
-Implementación Grafica del ADT Árbol Binario de Búsqueda
-Autor: `Lorgio Añez J.`
-Fecha: 2025-09-22
-Descripción: `Aplicacion que representa un árbol binario` con métodos para insertar, buscar, eliminar, recorrer nodos, etc. La representacion del Arbol
-se realiza graficamente en una aplicacin WEB, con arquitectura MVC.
-Materia: Estructura de Datos II, INF310
+
+- Implementación Grafica del ADT Árbol Binario de Búsqueda
+- Autor: `Lorgio Añez J.`
+- Fecha: 2025-09-22
+- Descripción: `Aplicacion que representa un árbol binario` con métodos para insertar, buscar, eliminar, recorrer nodos, etc. La representacion del Arbol
+  se realiza graficamente en una aplicacin WEB, con arquitectura MVC.
+- Materia: Estructura de Datos II, INF310
 
 ![alt text](image.png)
 
