@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Árbol Binario de Búsqueda</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🌳 Visualizador de Árbol Binario</h1>
+        </header>
+
+        <div class="main-content">
+            <!-- Panel Izquierdo - Controles -->
+            <div class="panel left-panel">
+                <div class="section">
+                    <h3>Ingreso de Nodos</h3>
+                    <div class="input-group">
+                        <input type="text" id="nodoIndividual" placeholder="Nodo individual (ej: 5)">
+                        <button onclick="insertarIndividual()">Insertar</button>
+                    </div>
+                    <div class="input-group">
+                        <input type="text" id="nodoSerie" placeholder="Serie (ej: 5 3 7 2 4)">
+                        <button onclick="insertarSerie()">Insertar Serie</button>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>Operaciones</h3>
+                    <div class="input-group">
+                        <input type="text" id="eliminarNodo" placeholder="Nodo a eliminar">
+                        <button onclick="eliminarNodo()">Eliminar</button>
+                    </div>
+                    <div class="input-group">
+                            <input type="text" id="eliminarRama" placeholder="Nodo para eliminar rama">
+                            <button onclick="eliminarRama()">Eliminar Rama</button>
+                    </div>
+                    <div class="input-group">
+                        <input type="text" id="buscarNodo" placeholder="Nodo a buscar">
+                        <button onclick="buscarNodo()">Buscar</button>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>Recorridos</h3>
+                    <button onclick="realizarRecorrido('inorden')">Inorden</button>
+                    <button onclick="realizarRecorrido('preorden')">Preorden</button>
+                    <button onclick="realizarRecorrido('postorden')">Postorden</button>
+                    <button onclick="realizarRecorrido('amplitud')">Por Niveles</button>
+                </div>
+
+                <div class="section">
+                    <h3>Utilidades</h3>
+                    <button onclick="limpiarArbol()">Limpiar Árbol</button>
+                    <button onclick="generarAleatorio()">Árbol Aleatorio</button>
+                    <button style="background-color: rgb(131, 93, 93);" onclick="salir()">Salir</button> 
+                </div>
+            </div>
+
+            <!-- Panel Central - Visualización -->
+            <div class="panel center-panel">
+                <div id="arbol-container">
+                    <svg id="arbol-svg" width="100%" height="100%"></svg>
+                </div>
+                <div id="mensajes"></div>
+            </div>
+
+            <!-- Panel Derecho - Información -->
+            <div class="panel right-panel">
+                <div class="section">
+                    <h3>Resultados</h3>
+                    <div id="resultados" class="resultados-area"></div>
+                </div>
+
+                <div class="section">
+                    <h3>Estadísticas</h3>
+                    <div id="estadisticas" class="estadisticas-area">
+                        <p>Árbol vacío</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+</body>
+</html>
