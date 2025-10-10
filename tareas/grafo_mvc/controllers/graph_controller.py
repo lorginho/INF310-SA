@@ -37,37 +37,25 @@ Flujo Principal:
 5. Muestra resultados através de la Vista
 
 """
-import random
-import string
+"""
 from models.graph_model import GraphModel
 from views.graph_view import GraphView
+"""
+
+import random
+import string
 
 
 class GraphController:
     def __init__(self):
         """Inicializa el controlador con modelo y vista"""
-        self.modelo = None
+        from models.graph_model import GraphModel
+        from views.graph_view import GraphView
+
+        self.modelo = GraphModel(dirigido=False)
         self.vista = GraphView()
         self.tipo_grafo_actual = "no dirigido"
-        self.inicializar_grafo(dirigido=False)
-
-    def inicializar_grafo(self, dirigido=False):
-        """Inicializa un nuevo grafo"""
-        self.modelo = GraphModel(dirigido=dirigido)
-        self.tipo_grafo_actual = "dirigido" if dirigido else "no dirigido"
-        self.vista.mostrar_exito(
-            f"Nuevo grafo {self.tipo_grafo_actual} creado")
-
-    def cambiar_tipo_grafo(self):
-        """Permite cambiar entre grafo dirigido y no dirigido"""
-        if self.modelo.obtener_vertices():
-            self.vista.mostrar_error(
-                "No se puede cambiar el tipo con vértices existentes. Use 'Limpiar Grafo' primero.")
-            return
-
-        nuevo_tipo = not self.modelo.es_dirigido()
-        self.inicializar_grafo(nuevo_tipo)
-        self.vista.mostrar_exito(f"Grafo cambiado a {self.tipo_grafo_actual}")
+        self.vista.mostrar_exito("Nuevo grafo no dirigido creado")
 
     def ejecutar(self):
         """Bucle principal de la aplicación"""
@@ -93,9 +81,11 @@ class GraphController:
                     self.cambiar_tipo_grafo()
                 elif opcion == '9':
                     self.limpiar_grafo()
-                elif opcion == '10':  # Nueva opción
+                elif opcion == '10':
                     self.poblar_grafo_aleatorio()
                 elif opcion == '11':
+                    self.ejecutar_dfs()
+                elif opcion == '12':
                     self.vista.mostrar_mensaje("¡Hasta luego!")
                     break
                 else:
@@ -104,81 +94,21 @@ class GraphController:
             except Exception as e:
                 self.vista.mostrar_error(f"Error inesperado: {str(e)}")
 
-    def poblar_grafo_aleatorio(self):
-        """Puebla el grafo con vértices y aristas aleatorias"""
-        if self.modelo.obtener_vertices():
-            self.vista.mostrar_error(
-                "El grafo ya tiene vértices. Use 'Limpiar Grafo' primero.")
+    def ejecutar_dfs(self):
+        """Ejecuta el algoritmo DFS"""
+        if not self.modelo.obtener_vertices():
+            self.vista.mostrar_error("El grafo está vacío")
             return
 
-        num_vertices, num_aristas = self.vista.obtener_parametros_poblacion()
+        vertice_inicio = self.vista.obtener_vertice_inicio_dfs()
 
-        if num_vertices is None or num_aristas is None:
+        if vertice_inicio not in self.modelo.obtener_vertices():
+            self.vista.mostrar_error(
+                f"El vértice '{vertice_inicio}' no existe")
             return
 
-        # Generar vértices
-        vertices_creados = self._generar_vertices_aleatorios(num_vertices)
-        self.vista.mostrar_progreso_poblacion(vertices_creados, 0)
-
-        # Generar aristas
-        aristas_creadas = self._generar_aristas_aleatorias(num_aristas)
-
-        self.vista.mostrar_exito(
-            f"Grafo poblado con {vertices_creados} vértices y {aristas_creadas} aristas")
-
-    def _generar_vertices_aleatorios(self, num_vertices):
-        """Genera vértices aleatorios con nombres únicos"""
-        nombres_vertices = []
-
-        # Generar nombres de vértices (A, B, C,... o V1, V2, V3,...)
-        if num_vertices <= 26:
-            # Usar letras A-Z
-            nombres_vertices = [chr(65 + i) for i in range(num_vertices)]
-        else:
-            # Usar V1, V2, V3,...
-            nombres_vertices = [f"V{i+1}" for i in range(num_vertices)]
-
-        # Agregar vértices al modelo
-        for nombre in nombres_vertices:
-            self.modelo.agregar_vertice(nombre)
-
-        return len(nombres_vertices)
-
-    def _generar_aristas_aleatorias(self, num_aristas):
-        """Genera aristas aleatorias entre los vértices existentes"""
-        vertices = self.modelo.obtener_vertices()
-        if len(vertices) < 2 and num_aristas > 0:
-            self.vista.mostrar_error(
-                "Se necesitan al menos 2 vértices para crear aristas")
-            return 0
-
-        aristas_creadas = 0
-        max_intentos = num_aristas * 3  # Límite para evitar bucles infinitos
-        intentos = 0
-
-        while aristas_creadas < num_aristas and intentos < max_intentos:
-            # Seleccionar vértices aleatorios
-            vertice1 = random.choice(vertices)
-            vertice2 = random.choice(vertices)
-
-            # En grafos no dirigidos, evitar bucles
-            if not self.modelo.es_dirigido() and vertice1 == vertice2:
-                intentos += 1
-                continue
-
-            # Intentar agregar la arista
-            if self.modelo.agregar_arista(vertice1, vertice2):
-                aristas_creadas += 1
-                self.vista.mostrar_progreso_poblacion(
-                    len(vertices), aristas_creadas)
-
-            intentos += 1
-
-        if aristas_creadas < num_aristas:
-            self.vista.mostrar_error(
-                f"Solo se pudieron crear {aristas_creadas} de {num_aristas} aristas solicitadas")
-
-        return aristas_creadas
+        resultado = self.modelo.dfs(vertice_inicio)
+        self.vista.mostrar_resultado_dfs(resultado, vertice_inicio)
 
     def agregar_vertice(self):
         """Maneja la operación de agregar vértice"""
@@ -208,7 +138,7 @@ class GraphController:
         else:
             self.vista.mostrar_error(f"Vértice '{vertice}' no encontrado")
 
-    def agregar_arista2(self):
+    def agregar_arista(self):
         """Maneja la operación de agregar arista"""
         vertices = self.modelo.obtener_vertices()
         if len(vertices) < 2:
@@ -222,36 +152,6 @@ class GraphController:
             self.vista.mostrar_error("Ambos vértices son requeridos")
             return
 
-        if vertice1 == vertice2:
-            self.vista.mostrar_error("No se puede crear un bucle (self-loop)")
-            return
-
-        if self.modelo.agregar_arista(vertice1, vertice2):
-            if self.modelo.es_dirigido():
-                self.vista.mostrar_exito(
-                    f"Arista dirigida ({vertice1} → {vertice2}) agregada exitosamente")
-            else:
-                self.vista.mostrar_exito(
-                    f"Arista no dirigida ({vertice1} - {vertice2}) agregada exitosamente")
-        else:
-            self.vista.mostrar_error(
-                f"Error al agregar arista ({vertice1}-{vertice2})")
-
-    def agregar_arista(self):
-        """Maneja la operación de agregar arista"""
-        vertices = self.modelo.obtener_vertices()
-        if len(vertices) < 1:  # Cambiado de 2 a 1
-            self.vista.mostrar_error(
-                "Se necesita al menos 1 vértice para agregar una arista")
-            return
-
-        vertice1, vertice2 = self.vista.obtener_entrada_arista()
-
-        if not vertice1 or not vertice2:
-            self.vista.mostrar_error("Ambos vértices son requeridos")
-            return
-
-        # PERMITIR BUCLE EN GRAFOS DIRIGIDOS
         if vertice1 == vertice2 and not self.modelo.es_dirigido():
             self.vista.mostrar_error(
                 "No se puede crear un bucle en grafos no dirigidos")
@@ -318,8 +218,91 @@ class GraphController:
         datos_grafo = self.modelo.obtener_datos_grafo()
         self.vista.mostrar_informacion_grafo(datos_grafo)
 
+    def cambiar_tipo_grafo(self):
+        """Permite cambiar entre grafo dirigido y no dirigido"""
+        if self.modelo.obtener_vertices():
+            self.vista.mostrar_error(
+                "No se puede cambiar el tipo con vértices existentes. Use 'Limpiar Grafo' primero.")
+            return
+
+        nuevo_tipo = not self.modelo.es_dirigido()
+        from models.graph_model import GraphModel
+        self.modelo = GraphModel(dirigido=nuevo_tipo)
+        self.tipo_grafo_actual = "dirigido" if nuevo_tipo else "no dirigido"
+        self.vista.mostrar_exito(f"Grafo cambiado a {self.tipo_grafo_actual}")
+
     def limpiar_grafo(self):
         """Limpia todo el grafo"""
         dirigido = self.modelo.es_dirigido()
-        self.inicializar_grafo(dirigido)
+        from models.graph_model import GraphModel
+        self.modelo = GraphModel(dirigido=dirigido)
         self.vista.mostrar_exito("Grafo limpiado exitosamente")
+
+    def poblar_grafo_aleatorio(self):
+        """Puebla el grafo con vértices y aristas aleatorias"""
+        if self.modelo.obtener_vertices():
+            self.vista.mostrar_error(
+                "El grafo ya tiene vértices. Use 'Limpiar Grafo' primero.")
+            return
+
+        num_vertices, num_aristas = self.vista.obtener_parametros_poblacion()
+
+        if num_vertices is None or num_aristas is None:
+            return
+
+        # Generar vértices
+        vertices_creados = self._generar_vertices_aleatorios(num_vertices)
+        self.vista.mostrar_progreso_poblacion(vertices_creados, 0)
+
+        # Generar aristas
+        aristas_creadas = self._generar_aristas_aleatorias(num_aristas)
+
+        self.vista.mostrar_exito(
+            f"Grafo poblado con {vertices_creados} vértices y {aristas_creadas} aristas")
+
+    def _generar_vertices_aleatorios(self, num_vertices):
+        """Genera vértices aleatorios con nombres únicos"""
+        nombres_vertices = []
+
+        if num_vertices <= 26:
+            nombres_vertices = [chr(65 + i) for i in range(num_vertices)]
+        else:
+            nombres_vertices = [f"V{i+1}" for i in range(num_vertices)]
+
+        for nombre in nombres_vertices:
+            self.modelo.agregar_vertice(nombre)
+
+        return len(nombres_vertices)
+
+    def _generar_aristas_aleatorias(self, num_aristas):
+        """Genera aristas aleatorias entre los vértices existentes"""
+        vertices = self.modelo.obtener_vertices()
+        if len(vertices) < 2 and num_aristas > 0:
+            self.vista.mostrar_error(
+                "Se necesitan al menos 2 vértices para crear aristas")
+            return 0
+
+        aristas_creadas = 0
+        max_intentos = num_aristas * 3
+        intentos = 0
+
+        while aristas_creadas < num_aristas and intentos < max_intentos:
+            vertice1 = random.choice(vertices)
+            vertice2 = random.choice(vertices)
+
+            if not self.modelo.es_dirigido() and vertice1 == vertice2:
+                intentos += 1
+                continue
+
+            if self.modelo.agregar_arista(vertice1, vertice2):
+                aristas_creadas += 1
+                self.vista.mostrar_progreso_poblacion(
+                    len(vertices), aristas_creadas)
+
+            intentos += 1
+
+        if aristas_creadas < num_aristas:
+            self.vista.mostrar_error(
+                f"Solo se pudieron crear {aristas_creadas} de {num_aristas} aristas")
+
+        return aristas_creadas

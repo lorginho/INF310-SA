@@ -32,6 +32,7 @@ Características:
 """
 
 import random
+import string
 
 
 class GraphView:
@@ -39,49 +40,19 @@ class GraphView:
     def mostrar_menu(tipo_actual):
         """Muestra las opciones del menú principal"""
         print(f"\n=== SISTEMA GRAFOS MVC (Grafo {tipo_actual}) ===")
-        print(" 1. Agregar Vértice")
-        print(" 2. Eliminar Vértice")
-        print(" 3. Agregar Arista")
-        print(" 4. Eliminar Arista")
-        print(" 5. Mostrar Lista de Adyacencia")
-        print(" 6. Mostrar Matriz de Adyacencia")
-        print(" 7. Mostrar Información del Grafo")
-        print(" 8. Cambiar Tipo de Grafo")
-        print(" 9. Limpiar Grafo")
-        print("10. Poblar Grafo Aleatoriamente")  # Nueva opción
-        print("11. Salir")
-        return input("Seleccione opción (1-11): ")
-
-    @staticmethod
-    def obtener_parametros_poblacion():
-        """Obtiene parámetros para población aleatoria"""
-        print("\n=== POBLAR GRAFO ALEATORIAMENTE ===")
-
-        try:
-            num_vertices = int(input("Número de vértices (3-15): "))
-            if num_vertices < 3 or num_vertices > 15:
-                raise ValueError(
-                    "El número de vértices debe estar entre 3 y 15")
-
-            # Calcular máximo de aristas posibles
-            max_aristas = num_vertices * (num_vertices - 1)
-
-            num_aristas = int(input(f"Número de aristas (0-{max_aristas}): "))
-            if num_aristas < 0 or num_aristas > max_aristas:
-                raise ValueError(
-                    f"El número de aristas debe estar entre 0 y {max_aristas}")
-
-            return num_vertices, num_aristas
-
-        except ValueError as e:
-            print(f"Error: {e}")
-            return None, None
-
-    @staticmethod
-    def mostrar_progreso_poblacion(vertices_creados, aristas_creadas):
-        """Muestra el progreso de la población aleatoria"""
-        print(f"Vértices creados: {vertices_creados}")
-        print(f"Aristas creadas: {aristas_creadas}")
+        print("1. Agregar Vértice")
+        print("2. Eliminar Vértice")
+        print("3. Agregar Arista")
+        print("4. Eliminar Arista")
+        print("5. Mostrar Lista de Adyacencia")
+        print("6. Mostrar Matriz de Adyacencia")
+        print("7. Mostrar Información del Grafo")
+        print("8. Cambiar Tipo de Grafo")
+        print("9. Limpiar Grafo")
+        print("10. Poblar Grafo Aleatoriamente")
+        print("11. DFS - Recorrido en Profundidad")
+        print("12. Salir")
+        return input("Seleccione opción (1-12): ")
 
     @staticmethod
     def mostrar_lista_adyacencia(datos_grafo):
@@ -148,6 +119,36 @@ class GraphView:
         return vertice1, vertice2
 
     @staticmethod
+    def obtener_parametros_poblacion():
+        """Obtiene parámetros para población aleatoria"""
+        print("\n=== POBLAR GRAFO ALEATORIAMENTE ===")
+
+        try:
+            num_vertices = int(input("Número de vértices (3-15): "))
+            if num_vertices < 3 or num_vertices > 15:
+                raise ValueError(
+                    "El número de vértices debe estar entre 3 y 15")
+
+            max_aristas = num_vertices * (num_vertices - 1)
+
+            num_aristas = int(input(f"Número de aristas (0-{max_aristas}): "))
+            if num_aristas < 0 or num_aristas > max_aristas:
+                raise ValueError(
+                    f"El número de aristas debe estar entre 0 y {max_aristas}")
+
+            return num_vertices, num_aristas
+
+        except ValueError as e:
+            print(f"Error: {e}")
+            return None, None
+
+    @staticmethod
+    def mostrar_progreso_poblacion(vertices_creados, aristas_creadas):
+        """Muestra el progreso de la población aleatoria"""
+        print(f"Vértices creados: {vertices_creados}")
+        print(f"Aristas creadas: {aristas_creadas}")
+
+    @staticmethod
     def mostrar_mensaje(mensaje):
         """Muestra mensaje al usuario"""
         print(f"\n{mensaje}")
@@ -167,10 +168,18 @@ class GraphView:
         """Muestra mensaje cuando el grafo está vacío"""
         print("\nEl grafo está vacío")
 
+    # MÉTODOS DFS
     @staticmethod
-    def preguntar_cambio_tipo(tipo_actual):
-        """Pregunta al usuario si quiere cambiar el tipo de grafo"""
-        print(f"\nTipo actual: {tipo_actual}")
-        print("¿Desea cambiar a grafo dirigido? (s/n): ")
-        respuesta = input().strip().lower()
-        return respuesta == 's'
+    def obtener_vertice_inicio_dfs():
+        """Obtiene el vértice de inicio para DFS"""
+        return input("Ingrese vértice de inicio para DFS: ").strip().upper()
+
+    @staticmethod
+    def mostrar_resultado_dfs(resultado, vertice_inicio):
+        """Muestra el resultado del DFS"""
+        print(f"\n--- DFS DESDE {vertice_inicio} ---")
+        if not resultado:
+            print("No se encontraron vértices alcanzables")
+        else:
+            print("Recorrido: " + " → ".join(resultado))
+            print(f"Total de vértices visitados: {len(resultado)}")

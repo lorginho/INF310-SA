@@ -36,10 +36,10 @@ class GraphModel:
         """
         Modelo que representa la estructura de datos del grafo
         """
-        self.vertices = vertices if vertices else []  # Lista de vértices
-        self.dirigido = dirigido        # Booleano para tipo
-        self.lista_adyacencia = {}      # Diccionario de listas
-        self.matriz_adyacencia = []     # Lista de listas (matriz)
+        self.vertices = vertices if vertices else []
+        self.dirigido = dirigido
+        self.lista_adyacencia = {}
+        self.matriz_adyacencia = []
 
         if self.vertices:
             self._inicializar_estructuras()
@@ -85,7 +85,7 @@ class GraphModel:
 
         return True
 
-    def agregar_arista2(self, vertice1, vertice2, peso=1):
+    def agregar_arista(self, vertice1, vertice2, peso=1):
         if vertice1 not in self.vertices or vertice2 not in self.vertices:
             return False
 
@@ -102,28 +102,6 @@ class GraphModel:
         # Actualizar matriz de adyacencia
         self.matriz_adyacencia[idx1][idx2] = peso
         if not self.dirigido:
-            self.matriz_adyacencia[idx2][idx1] = peso
-
-        return True
-
-    def agregar_arista(self, vertice1, vertice2, peso=1):
-        if vertice1 not in self.vertices or vertice2 not in self.vertices:
-            return False
-
-        idx1 = self.vertices.index(vertice1)
-        idx2 = self.vertices.index(vertice2)
-
-        # Actualizar lista de adyacencia
-        if vertice2 not in self.lista_adyacencia[vertice1]:
-            self.lista_adyacencia[vertice1].append(vertice2)
-
-        # En grafos no dirigidos, agregar la arista recíproca (excepto para bucles)
-        if not self.dirigido and vertice1 != vertice2 and vertice1 not in self.lista_adyacencia[vertice2]:
-            self.lista_adyacencia[vertice2].append(vertice1)
-
-        # Actualizar matriz de adyacencia
-        self.matriz_adyacencia[idx1][idx2] = peso
-        if not self.dirigido and vertice1 != vertice2:
             self.matriz_adyacencia[idx2][idx1] = peso
 
         return True
@@ -183,3 +161,31 @@ class GraphModel:
             'matriz_adyacencia': self.obtener_matriz_adyacencia(),
             'dirigido': self.dirigido
         }
+
+    # ALGORITMO DFS - SIMPLIFICADO
+    def dfs(self, vertice_inicio):
+        """
+        Realiza recorrido en profundidad (DFS) desde un vértice
+        Retorna: Lista de vértices en orden de visita
+        """
+        if vertice_inicio not in self.vertices:
+            return []
+
+        visitados = set()
+        resultado = []
+        self._dfs_recursivo(vertice_inicio, visitados, resultado)
+        return resultado
+
+    def _dfs_recursivo(self, vertice_actual, visitados, resultado):
+        """Método helper recursivo para DFS"""
+        if vertice_actual in visitados:
+            return
+
+        # Marcar como visitado y agregar al resultado
+        visitados.add(vertice_actual)
+        resultado.append(vertice_actual)
+
+        # Visitar todos los vecinos no visitados
+        for vecino in self.lista_adyacencia.get(vertice_actual, []):
+            if vecino not in visitados:
+                self._dfs_recursivo(vecino, visitados, resultado)
