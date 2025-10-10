@@ -91,3 +91,12 @@ class ControladorArbol:
             Lista con los valores del arbol en orden por niveles.            
         """
         return self.arbol.amplitud()
+
+    def cantidad_nodos(self):
+        """
+        Devuelve la cantidad total de nodos en el árbol.
+
+        Returns:
+            int: Número de nodos en el árbol.
+        """
+        return self.arbol.cantidad_nodos()

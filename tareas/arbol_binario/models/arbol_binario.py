@@ -191,3 +191,26 @@ class ArbolBinario:
                 cola.append(nodo_actual.get_derecho())
 
         return resultado
+
+    def cantidad_nodos(self):
+        """
+        Devuelve la cantidad total de nodos en el árbol.
+
+        Returns:
+            int: Número de nodos en el árbol.
+        """
+        return self._contar_nodos(self.raiz)
+
+    def _contar_nodos(self, nodo):
+        """
+        Método auxiliar recursivo para contar nodos.
+
+        Args:
+            nodo: Nodo actual en la recursión.
+
+        Returns:
+            int: Número de nodos bajo este nodo.
+        """
+        if nodo is None:
+            return 0
+        return 1 + self._contar_nodos(nodo.get_izquierdo()) + self._contar_nodos(nodo.get_derecho())

@@ -30,6 +30,7 @@ class VistaArbol:
             print("7. Recorrido PRE-Orden Ra.Iz.De")
             print("8. Recorrido POST-Orden Iz.De.Ra")
             print("9. Recorrido por AMPLITUD (Niveles)")
+            print("10. Mostrar CANTIDAD de Nodos")
             print("0. Salir")
 
             opcion = input("Seleccione una opción: ")
@@ -52,6 +53,8 @@ class VistaArbol:
                 self._recorrido_post_orden()
             elif opcion == "9":
                 self._recorrido_amplitud()
+            elif opcion == "10":
+                self._mostrar_cantidad_nodos()
             elif opcion == "0":
                 print("Saliendo del programa...")
                 break
@@ -149,3 +152,8 @@ class VistaArbol:
         """Maneja el recorrido por amplitud."""
         resultado = self.controlador.amplitud()
         print("Recorrido por Amplitud:", resultado)
+
+    def _mostrar_cantidad_nodos(self):
+        """Muestra la cantidad total de nodos en el árbol."""
+        cantidad = self.controlador.cantidad_nodos()
+        print(f"Cantidad total de nodos en el árbol: {cantidad}")
