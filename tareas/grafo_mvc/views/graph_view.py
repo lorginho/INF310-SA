@@ -51,8 +51,8 @@ class GraphView:
         print("9. Limpiar Grafo")
         print("10. Poblar Grafo Aleatoriamente")
         print("11. DFS - Recorrido en Profundidad")
-        print("12. Salir")
-        return input("Seleccione opción (1-12): ")
+        print("0. Salir")
+        return input("Seleccione opción (1-11) Salir(0): ")
 
     @staticmethod
     def mostrar_lista_adyacencia(datos_grafo):

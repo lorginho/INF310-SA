@@ -85,7 +85,7 @@ class GraphController:
                     self.poblar_grafo_aleatorio()
                 elif opcion == '11':
                     self.ejecutar_dfs()
-                elif opcion == '12':
+                elif opcion == '0':
                     self.vista.mostrar_mensaje("¡Hasta luego!")
                     break
                 else:
