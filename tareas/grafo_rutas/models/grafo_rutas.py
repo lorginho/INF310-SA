@@ -1,3 +1,13 @@
+"""
+models/grafo_rutas.py
+Autor: Lorgio Añez J.
+Fecha: 2025-10-23
+Descripción: Clase que representa un Grafo de Rutas para conectar ciudades
+de Bolivia, creando ciudades y rutas entre ellas, calculando distancias y 
+rutas optimas, etc
+"""
+
+
 import heapq
 
 

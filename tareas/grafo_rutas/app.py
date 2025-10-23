@@ -1,3 +1,23 @@
+"""
+archivo: app.py
+Punto de entrada principal del proyecto Flask
+Autor: Lorgio Añez J.
+Fecha: 2025-10-23
+
+Descripción: app.py arranca la aplicación web, conecta los controladores
+y sirve la interfaz de usuario, permitiendo que el proyecto funcione 
+como una aplicación web interactiva.
+
+
+A Detalle: 
+
+Crear la aplicación Flask y configurarla.
+Definir la ruta raíz / que muestra la página principal (mapa.html).
+Iniciar el servidor web cuando se ejecuta el archivo directamente.
+
+"""
+
+
 from flask import Flask, render_template, jsonify, request
 from controllers.mapa_controller import MapaController  # ✅ Usar el Controlador
 
