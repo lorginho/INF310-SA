@@ -55,3 +55,141 @@
     font-weight: bold;
     text-shadow: 1px 1px 2px white;
 }
+
+/* LAYOUT PRINCIPAL */
+.layout {
+    display: flex;
+    gap: 15px;
+    align-items: flex-start;
+}
+
+.sidebar {
+    width: 280px;
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+}
+
+.mapa-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+/* FORMULARIO */
+.form-section {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #ced4da;
+}
+
+.form-section h3 {
+    margin: 0 0 15px 0;
+    color: #495057;
+}
+
+.form-section input {
+    width: 100%;
+    padding: 8px;
+    margin: 5px 0;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.form-section button {
+    width: 100%;
+    padding: 10px;
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.form-section button:hover {
+    background: #218838;
+}
+
+/* CONTROLES RUTA */
+.controles {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #ced4da;
+}
+
+.controles h3 {
+    margin: 0 0 15px 0;
+    color: #495057;
+}
+
+.controles select {
+    width: 100%;
+    padding: 8px;
+    margin: 5px 0;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.botones-ruta {
+    display: flex;
+    gap: 5px;
+    margin-top: 10px;
+}
+
+.botones-ruta button {
+    flex: 1;
+    padding: 8px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.botones-ruta button:hover {
+    background: #0056b3;
+}
+
+.botones-ruta button:last-child {
+    background: #6c757d;
+}
+
+.botones-ruta button:last-child:hover {
+    background: #545b62;
+}
+
+/* SECCIONES DERECHA */
+.resultado-section {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #ced4da;
+}
+
+.resultado-section h3 {
+    margin: 0 0 15px 0;
+    color: #495057;
+}
+
+.ciudades-lista {
+    padding: 15px;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #ced4da;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.ciudades-lista h3 {
+    margin: 0 0 15px 0;
+    color: #495057;
+}

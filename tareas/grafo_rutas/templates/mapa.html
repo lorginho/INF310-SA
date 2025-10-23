@@ -7,45 +7,91 @@
 <body>
     <div class="container">
         <h1>🗺️ Sistema de Rutas de Bolivia</h1>
-        <p class="subtitulo">Versión Simplificada - 9 Ciudades Cargadas</p>
         
-        <div class="controles">
-            <select id="origen">
-                <option value="">Ciudad Origen</option>
-            </select>
-            <select id="destino">
-                <option value="">Ciudad Destino</option>
-            </select>
-            <button onclick="calcularRuta()">📍 Calcular Ruta</button>
-            <button onclick="limpiarRuta()">🗑️ Limpiar</button>
-        </div>
+        <div class="layout">
+            <!-- SIDEBAR IZQUIERDO - CONTROLES -->
+            <div class="sidebar left-sidebar">
+                <!-- FORMULARIO AGREGAR CIUDAD -->
+                <div class="form-section">
+                    <h3>➕ Agregar Ciudad</h3>
+                    <form id="form-ciudad">
+                        <input type="text" id="nombre-ciudad" placeholder="Nombre de ciudad" required>
+                        <input type="number" id="x-ciudad" placeholder="Coordenada X" min="0" max="800" required>
+                        <input type="number" id="y-ciudad" placeholder="Coordenada Y" min="0" max="600" required>
+                        <button type="submit">Agregar Ciudad</button>
+                    </form>
+                </div>
 
-        <!-- Área de información y estado -->
-        <div class="info-estado">
-            <div class="estado-item">
-                <strong>Estado:</strong> <span id="estado">Cargando...</span>
+                <!-- FORMULARIO AGREGAR RUTA -->
+                <div class="form-section">
+                    <h3>🛣️ Agregar Ruta</h3>
+                    <form id="form-ruta">
+                        <select id="ciudad1-ruta" required>
+                            <option value="">Ciudad Origen</option>
+                        </select>
+                        <select id="ciudad2-ruta" required>
+                            <option value="">Ciudad Destino</option>
+                        </select>
+                        <input type="number" id="peso-ruta" placeholder="Distancia (km)" min="1" required>
+                        <button type="submit">Agregar Ruta</button>
+                    </form>
+                </div>
+
+                <!-- CONTROLES CALCULAR RUTA -->
+                <div class="controles">
+                    <h3>📍 Calcular Ruta</h3>
+                    <select id="origen">
+                        <option value="">Ciudad Origen</option>
+                    </select>
+                    <select id="destino">
+                        <option value="">Ciudad Destino</option>
+                    </select>
+                    <div class="botones-ruta">
+                        <button onclick="calcularRuta()">Calcular Ruta</button>
+                        <button onclick="limpiarRuta()">Limpiar</button>
+                    </div>
+                </div>
+
+                <!-- INFO ESTADO -->
+                <div class="info-estado">
+                    <h3>📊 Estado</h3>
+                    <div class="estado-item">
+                        <strong>Estado:</strong> <span id="estado">Cargando...</span>
+                    </div>
+                    <div class="estado-item">
+                        <strong>Ciudades:</strong> <span id="contador-ciudades">0</span>
+                    </div>
+                    <div class="estado-item">
+                        <strong>Rutas:</strong> <span id="contador-rutas">0</span>
+                    </div>
+                </div>
             </div>
-            <div class="estado-item">
-                <strong>Ciudades:</strong> <span id="contador-ciudades">0</span>
+
+            <!-- MAPA SVG (CENTRO) -->
+            <div class="mapa-container">
+                <svg id="mapa" width="800" height="600" viewBox="0 0 800 600">
+                    <g id="rutas"></g>
+                    <g id="ciudades"></g>
+                    <g id="ruta-calculada"></g>
+                </svg>
             </div>
-            <div class="estado-item">
-                <strong>Rutas:</strong> <span id="contador-rutas">0</span>
+
+            <!-- SIDEBAR DERECHO - INFORMACIÓN -->
+            <div class="sidebar right-sidebar">
+                <!-- RESULTADOS -->
+                <div class="resultado-section">
+                    <h3>📋 Resultados</h3>
+                    <div id="resultado">
+                        ✅ Sistema listo para calcular rutas
+                    </div>
+                </div>
+
+                <!-- LISTA CIUDADES -->
+                <div class="ciudades-lista">
+                    <h3>🏙️ Ciudades</h3>
+                    <div id="lista-ciudades"></div>
+                </div>
             </div>
-        </div>
-
-        <div class="resultado" id="resultado">
-            <strong>✅ 9 ciudades de Bolivia cargadas correctamente</strong>
-        </div>
-
-        <svg id="mapa" width="800" height="600" viewBox="0 0 800 600">
-            <g id="rutas"></g>
-            <g id="ciudades"></g>
-            <g id="ruta-calculada"></g>
-        </svg>
-
-        <div class="ciudades-lista">
-            <h3>🏙️ Ciudades Incluidas:</h3>
-            <div id="lista-ciudades"></div>
         </div>
     </div>
 

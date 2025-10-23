@@ -3,63 +3,17 @@ from views.mapa_view import MapaView
 
 
 class MapaController:
-    def __init__(self):
-        self.modelo = GrafoRutas()
-        self.vista = MapaView()
-        self._inicializar_datos()
-        print("✅ Controlador inicializado con", len(
-            self.modelo.ciudades), "ciudades")  # DEBUG
+    def __init__(self, modelo=None, vista=None):
+        # ✅ MVC CORRECTO: Controlador no sabe de datos específicos
+        self.modelo = modelo or GrafoRutas.crear_grafo_bolivia()  # Factory method
+        self.vista = vista or MapaView()
+        print("✅ Controlador MVC inicializado correctamente")
 
-    def _inicializar_datos(self):
-        """Inicializa con datos de Bolivia - VERSIÓN CORREGIDA"""
-        ciudades_bolivia = [
-            ('La Paz', 200, 150),
-            ('Cochabamba', 300, 250),
-            ('Santa Cruz', 450, 200),
-            ('Sucre', 350, 350),
-            ('Oruro', 250, 200),
-            ('Potosí', 320, 400),
-            ('Tarija', 400, 450),
-            ('Trinidad', 500, 100),
-            ('Cobija', 150, 50)
-        ]
-
-        rutas_bolivia = [
-            ('La Paz', 'Cochabamba', 380),
-            ('La Paz', 'Oruro', 200),
-            ('Cochabamba', 'Santa Cruz', 450),
-            ('Cochabamba', 'Sucre', 280),
-            ('Santa Cruz', 'Trinidad', 320),
-            ('Sucre', 'Potosí', 150),
-            ('Potosí', 'Tarija', 320),
-            ('Oruro', 'Sucre', 350),
-            ('La Paz', 'Cobija', 650)
-        ]
-
-        print("🔄 Inicializando ciudades...")  # DEBUG
-        for ciudad, x, y in ciudades_bolivia:
-            try:
-                self.modelo.agregar_ciudad(ciudad, x, y)
-                print(f"  ✅ Ciudad agregada: {ciudad}")
-            except Exception as e:
-                print(f"  ❌ Error agregando {ciudad}: {e}")
-
-        print("🔄 Inicializando rutas...")  # DEBUG
-        for ciudad1, ciudad2, peso in rutas_bolivia:
-            try:
-                self.modelo.agregar_ruta(ciudad1, ciudad2, peso)
-                print(f"  ✅ Ruta agregada: {ciudad1} - {ciudad2}")
-            except Exception as e:
-                print(f"  ❌ Error en ruta {ciudad1}-{ciudad2}: {e}")
-
-        print(
-            f"🎉 Inicialización completada: {len(self.modelo.ciudades)} ciudades, {len(self.modelo.conexiones)//2} rutas")
+    # ✅ ELIMINADO: _inicializar_datos - ya no existe
 
     def obtener_mapa(self):
         """Obtiene los datos del mapa formateados para la vista"""
         datos_modelo = self.modelo.obtener_estado()
-        # DEBUG
-        print(f"📊 Obteniendo mapa: {len(datos_modelo['ciudades'])} ciudades")
         return self.vista.formatear_datos_mapa(datos_modelo)
 
     def calcular_ruta(self, origen, destino):
@@ -109,3 +63,24 @@ class MapaController:
 
         except Exception as e:
             return self.vista.formatear_error(str(e))
+
+    def eliminar_ciudad(self, nombre):
+        """Elimina una ciudad existente"""
+        try:
+            self.modelo.eliminar_ciudad(nombre)
+            return self.vista.formatear_exito("Ciudad eliminada correctamente")
+        except Exception as e:
+            return self.vista.formatear_error(str(e))
+
+
+def __init__(self, modelo=None, vista=None):
+    self.modelo = modelo or GrafoRutas.crear_grafo_bolivia()
+    self.vista = vista or MapaView()
+
+    # DEBUG DETALLADO
+    print(f"🔍 DEBUG - Ciudades en modelo: {len(self.modelo.ciudades)}")
+    print(f"🔍 DEBUG - Conexiones en modelo: {len(self.modelo.conexiones)}")
+    print(
+        f"🔍 DEBUG - Ciudades específicas: {list(self.modelo.ciudades.keys())}")
+
+    print("✅ Controlador MVC inicializado correctamente")

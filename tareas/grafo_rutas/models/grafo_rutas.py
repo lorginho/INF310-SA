@@ -2,9 +2,89 @@ import heapq
 
 
 class GrafoRutas:
-    def __init__(self):
+    def __init__(self, datos_iniciales=None):
         self.ciudades = {}
         self.conexiones = {}
+        if datos_iniciales:
+            self.cargar_datos(datos_iniciales)
+
+    def cargar_datos(self, datos):
+        """Carga datos iniciales en el modelo"""
+        # Limpiar datos existentes
+        self.ciudades = {}
+        self.conexiones = {}
+
+        # Cargar ciudades
+        for ciudad, coordenadas in datos.get('ciudades', {}).items():
+            self.agregar_ciudad(ciudad, coordenadas[0], coordenadas[1])
+
+        # Cargar rutas
+        for conexion in datos.get('conexiones', []):
+            ciudad1, ciudad2 = conexion
+            clave = f"{ciudad1}-{ciudad2}"
+            peso = datos['pesos'].get(clave)
+            if peso:
+                self.agregar_ruta(ciudad1, ciudad2, peso)
+
+    @classmethod
+    def crear_grafo_bolivia(cls):
+        """Factory method para crear grafo con datos de Bolivia"""
+        datos_bolivia = {
+            'ciudades': {
+                'La Paz': [200, 180],
+                'Cochabamba': [300, 250],
+                'Santa Cruz': [450, 300],
+                'Sucre': [350, 350],
+                'Oruro': [200, 300],
+                'Potosí': [250, 400],
+                'Tarija': [400, 450],
+                'Trinidad': [400, 100],
+                'Cobija': [250, 50]
+            },
+            'conexiones': [
+                ['La Paz', 'Cochabamba'],
+                ['La Paz', 'Oruro'],
+                ['Cochabamba', 'Santa Cruz'],
+                ['Cochabamba', 'Sucre'],
+                ['Santa Cruz', 'Trinidad'],
+                ['Sucre', 'Potosí'],
+                ['Sucre', 'Tarija'],
+                ['La Paz', 'Cobija'],
+                ['Santa Cruz', 'Sucre'],
+                ['Oruro', 'Potosí'],
+                ['Cochabamba', 'Oruro']
+            ],
+            'pesos': {
+                'La Paz-Cochabamba': 375,
+                'Cochabamba-La Paz': 375,
+                'La Paz-Oruro': 240,
+                'Oruro-La Paz': 240,
+                'Cochabamba-Santa Cruz': 480,
+                'Santa Cruz-Cochabamba': 480,
+                'Cochabamba-Sucre': 340,
+                'Sucre-Cochabamba': 340,
+                'Santa Cruz-Trinidad': 420,
+                'Trinidad-Santa Cruz': 420,
+                'Sucre-Potosí': 150,
+                'Potosí-Sucre': 150,
+                'Sucre-Tarija': 320,
+                'Tarija-Sucre': 320,
+                'Oruro-Sucre': 350,
+                'Sucre-Oruro': 350,
+                'La Paz-Cobija': 650,
+                'Cobija-La Paz': 650,
+                'Santa Cruz-Sucre': 410,
+                'Sucre-Santa Cruz': 410,
+                'Oruro-Potosí': 220,
+                'Potosí-Oruro': 220,
+                'Cochabamba-Oruro': 180,
+                'Oruro-Cochabamba': 180
+            }
+        }
+
+        grafo = cls()
+        grafo.cargar_datos(datos_bolivia)
+        return grafo
 
     def agregar_ciudad(self, nombre, x, y):
         """Agrega una ciudad al grafo"""
@@ -123,9 +203,20 @@ class GrafoRutas:
         return camino
 
     def obtener_estado(self):
-        """Retorna el estado completo del modelo para la vista"""
+        """Retorna el estado completo del modelo para la vista - CORREGIDO"""
+        # ✅ CORRECCIÓN: Convertir tuplas a formatos serializables para JSON
+        conexiones_formateadas = []
+        pesos_formateados = {}
+
+        for (ciudad1, ciudad2), peso in self.conexiones.items():
+            # Formato para conexiones: lista de listas [["La Paz", "Cochabamba"], ...]
+            conexiones_formateadas.append([ciudad1, ciudad2])
+            # Formato para pesos: diccionario con claves string {"La Paz-Cochabamba": 380, ...}
+            clave = f"{ciudad1}-{ciudad2}"
+            pesos_formateados[clave] = peso
+
         return {
             'ciudades': self.ciudades.copy(),
-            'conexiones': list(self.conexiones.keys()),
-            'pesos': self.conexiones.copy()
+            'conexiones': conexiones_formateadas,  # ✅ Lista de listas
+            'pesos': pesos_formateados             # ✅ Diccionario con claves string
         }

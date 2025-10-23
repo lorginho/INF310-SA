@@ -5,12 +5,13 @@ class SistemaRutas {
         this.pesos = {};
         
         this.actualizarEstado("Inicializando...");
+        this.configurarFormularios();
         this.cargarMapa();
     }
 
     actualizarEstado(mensaje) {
         const estadoElement = document.getElementById('estado');
-        if (estadoElement) {
+        if (estadoElement) {  // ✅ CORREGIDO: "estadoElement"
             estadoElement.textContent = mensaje;
         }
     }
@@ -24,6 +25,26 @@ class SistemaRutas {
         }
         if (rutasElement) {
             rutasElement.textContent = this.conexiones.length;
+        }
+    }
+
+    configurarFormularios() {
+        // Configurar formulario de ciudad
+        const formCiudad = document.getElementById('form-ciudad');
+        if (formCiudad) {
+            formCiudad.addEventListener('submit', (event) => {
+                event.preventDefault();
+                this.agregarCiudad();
+            });
+        }
+
+        // Configurar formulario de ruta
+        const formRuta = document.getElementById('form-ruta');
+        if (formRuta) {
+            formRuta.addEventListener('submit', (event) => {
+                event.preventDefault();
+                this.agregarRuta();
+            });
         }
     }
 
@@ -66,13 +87,24 @@ class SistemaRutas {
     actualizarSelects() {
         const origen = document.getElementById('origen');
         const destino = document.getElementById('destino');
+        const ciudad1Ruta = document.getElementById('ciudad1-ruta');
+        const ciudad2Ruta = document.getElementById('ciudad2-ruta');
         
-        origen.innerHTML = '<option value="">Ciudad Origen</option>';
-        destino.innerHTML = '<option value="">Ciudad Destino</option>';
+        // Limpiar todos los selects
+        const selects = [origen, destino, ciudad1Ruta, ciudad2Ruta];
+        selects.forEach(select => {
+            if (select) {
+                select.innerHTML = '<option value="">Seleccionar ciudad</option>';
+            }
+        });
 
+        // Llenar con ciudades
         Object.keys(this.ciudades).forEach(ciudad => {
-            origen.innerHTML += `<option value="${ciudad}">${ciudad}</option>`;
-            destino.innerHTML += `<option value="${ciudad}">${ciudad}</option>`;
+            selects.forEach(select => {
+                if (select) {
+                    select.innerHTML += `<option value="${ciudad}">${ciudad}</option>`;
+                }
+            });
         });
     }
 
@@ -82,8 +114,16 @@ class SistemaRutas {
         
         Object.keys(this.ciudades).forEach(ciudad => {
             const div = document.createElement('div');
-            div.textContent = `• ${ciudad}`;
-            div.style.padding = '2px 0';
+            div.className = 'ciudad-item';
+            div.innerHTML = `
+                <span>• ${ciudad}</span>
+                <button onclick="window.sistemaRutas.eliminarCiudad('${ciudad}')" 
+                        class="btn-eliminar">🗑️</button>
+            `;
+            div.style.display = 'flex';
+            div.style.justifyContent = 'space-between';
+            div.style.alignItems = 'center';
+            div.style.padding = '5px 0';
             lista.appendChild(div);
         });
     }
@@ -305,6 +345,117 @@ class SistemaRutas {
             Object.keys(this.ciudades).length + ' ciudades y ' + 
             this.conexiones.length + ' rutas cargadas';
         this.actualizarEstado("Listo");
+    }
+
+    async agregarCiudad() {
+        const nombre = document.getElementById('nombre-ciudad').value.trim();
+        const x = document.getElementById('x-ciudad').value;
+        const y = document.getElementById('y-ciudad').value;
+
+        if (!nombre || !x || !y) {
+            alert('Por favor completa todos los campos');
+            return;
+        }
+
+        this.actualizarEstado("Agregando ciudad...");
+
+        try {
+            const response = await fetch('/api/ciudad', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nombre, x, y })
+            });
+
+            const resultado = await response.json();
+
+            if (resultado.status === 'ok') {
+                // Limpiar formulario
+                document.getElementById('form-ciudad').reset();
+                // Recargar mapa
+                await this.cargarMapa();
+                this.actualizarEstado("Ciudad agregada correctamente");
+            } else {
+                alert('Error: ' + resultado.message);
+                this.actualizarEstado("Error agregando ciudad");
+            }
+
+        } catch (error) {
+            alert('Error de conexión: ' + error.message);
+            this.actualizarEstado("Error de conexión");
+        }
+    }
+
+    async eliminarCiudad(nombre) {
+        if (!confirm(`¿Estás seguro de eliminar la ciudad "${nombre}" y todas sus rutas?`)) {
+            return;
+        }
+
+        this.actualizarEstado("Eliminando ciudad...");
+
+        try {
+            const response = await fetch('/api/ciudad', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nombre })
+            });
+
+            const resultado = await response.json();
+
+            if (resultado.status === 'ok') {
+                await this.cargarMapa();
+                this.actualizarEstado("Ciudad eliminada correctamente");
+            } else {
+                alert('Error: ' + resultado.message);
+                this.actualizarEstado("Error eliminando ciudad");
+            }
+
+        } catch (error) {
+            alert('Error de conexión: ' + error.message);
+            this.actualizarEstado("Error de conexión");
+        }
+    }
+
+    async agregarRuta() {
+        const ciudad1 = document.getElementById('ciudad1-ruta').value;
+        const ciudad2 = document.getElementById('ciudad2-ruta').value;
+        const peso = document.getElementById('peso-ruta').value;
+
+        if (!ciudad1 || !ciudad2 || !peso) {
+            alert('Por favor completa todos los campos');
+            return;
+        }
+
+        if (ciudad1 === ciudad2) {
+            alert('Las ciudades deben ser diferentes');
+            return;
+        }
+
+        this.actualizarEstado("Agregando ruta...");
+
+        try {
+            const response = await fetch('/api/ruta/nueva', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ciudad1, ciudad2, peso })
+            });
+
+            const resultado = await response.json();
+
+            if (resultado.status === 'ok') {
+                // Limpiar formulario
+                document.getElementById('form-ruta').reset();
+                // Recargar mapa
+                await this.cargarMapa();
+                this.actualizarEstado("Ruta agregada correctamente");
+            } else {
+                alert('Error: ' + resultado.message);
+                this.actualizarEstado("Error agregando ruta");
+            }
+
+        } catch (error) {
+            alert('Error de conexión: ' + error.message);
+            this.actualizarEstado("Error de conexión");
+        }
     }
 }
 
