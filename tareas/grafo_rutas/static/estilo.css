@@ -1,3 +1,4 @@
+/* Agregar estos estilos al archivo CSS existente */
 
 .info-estado {
     margin: 15px 0;
@@ -191,4 +192,46 @@
 .ciudades-lista h3 {
     margin: 0 0 15px 0;
     color: #495057;
+}
+
+/* LISTA RUTAS */
+.rutas-lista {
+    margin-top: 20px;
+    padding: 15px;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #ced4da;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.rutas-lista h3 {
+    margin: 0 0 15px 0;
+    color: #495057;
+}
+
+.ruta-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.ruta-item:last-child {
+    border-bottom: none;
+}
+
+.btn-eliminar {
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 4px 8px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.btn-eliminar:hover {
+    background: #c82333;
 }

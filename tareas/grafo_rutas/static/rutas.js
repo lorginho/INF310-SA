@@ -97,6 +97,7 @@ class SistemaRutas {
             // Actualizar interfaz
             this.actualizarSelects();
             this.mostrarListaCiudades();
+            this.mostrarListaRutas();
             this.dibujarMapa();
             
             document.getElementById('resultado').innerHTML = 
@@ -484,6 +485,67 @@ class SistemaRutas {
             this.actualizarEstado("Error de conexión");
         }
     }
+
+
+    // En la clase SistemaRutas, agregar estos métodos:
+
+    mostrarListaRutas() {
+        const lista = document.getElementById('lista-rutas');
+        lista.innerHTML = '';
+        
+        this.conexiones.forEach(([ciudad1, ciudad2]) => {
+            let peso = this.pesos[`${ciudad1}-${ciudad2}`] || this.pesos[`${ciudad2}-${ciudad1}`] || '?';
+            
+            const div = document.createElement('div');
+            div.className = 'ruta-item';
+            div.innerHTML = `
+                <span>${ciudad1} ↔ ${ciudad2} (${peso} km)</span>
+                <button onclick="window.sistemaRutas.eliminarRuta('${ciudad1}', '${ciudad2}')" 
+                        class="btn-eliminar">🗑️</button>
+            `;
+            div.style.display = 'flex';
+            div.style.justifyContent = 'space-between';
+            div.style.alignItems = 'center';
+            div.style.padding = '5px 0';
+            div.style.borderBottom = '1px solid #eee';
+            lista.appendChild(div);
+        });
+    }
+
+    async eliminarRuta(ciudad1, ciudad2) {
+        if (!confirm(`¿Estás seguro de eliminar la ruta entre ${ciudad1} y ${ciudad2}?`)) {
+            return;
+        }
+
+        this.actualizarEstado("Eliminando ruta...");
+
+        try {
+            const response = await fetch('/api/ruta', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ciudad1, ciudad2 })
+            });
+
+            const resultado = await response.json();
+
+            if (resultado.status === 'ok') {
+                await this.cargarMapa();
+                this.actualizarEstado("Ruta eliminada correctamente");
+            } else {
+                alert('Error: ' + resultado.message);
+                this.actualizarEstado("Error eliminando ruta");
+            }
+
+        } catch (error) {
+            alert('Error de conexión: ' + error.message);
+            this.actualizarEstado("Error de conexión");
+        }
+    }
+
+
+
+
+
 }
 
 // Inicializar cuando cargue la página

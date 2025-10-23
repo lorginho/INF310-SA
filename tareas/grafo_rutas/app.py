@@ -122,6 +122,24 @@ def agregar_ruta():
         return jsonify({'status': 'error', 'message': str(e)})
 
 
+@app.route('/api/ruta', methods=['DELETE'])
+def eliminar_ruta():
+    """Elimina una ruta entre ciudades"""
+    data = request.json
+    ciudad1 = data.get('ciudad1', '').strip()
+    ciudad2 = data.get('ciudad2', '').strip()
+
+    if not ciudad1 or not ciudad2:
+        return jsonify({'status': 'error', 'message': 'ciudad1 y ciudad2 son requeridos'})
+
+    try:
+        # Necesitamos agregar este método al controlador
+        resultado = controlador.eliminar_ruta(ciudad1, ciudad2)
+        return jsonify(resultado)
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)})
+
+
 if __name__ == '__main__':
     print("🚀 Servidor Flask - Arquitectura MVC COMPLETA")
     print("📍 Usando MapaController → GrafoRutas → MapaView")

@@ -5,15 +5,7 @@ Autor: Lorgio Añez J.
 Fecha: 2025-10-23
 Descripción: Controlador que gestiona las operaciones 
 entre la vista ( Template ) y el modelo del grafo_rutas
-
-A Detalle: 
-
-
-Sus funciones principales son:
-
-
 """
-
 
 from models.grafo_rutas import GrafoRutas
 from views.mapa_view import MapaView
@@ -24,9 +16,14 @@ class MapaController:
         # ✅ MVC CORRECTO: Controlador no sabe de datos específicos
         self.modelo = modelo or GrafoRutas.crear_grafo_bolivia()  # Factory method
         self.vista = vista or MapaView()
-        print("✅ Controlador MVC inicializado correctamente")
 
-    # ✅ ELIMINADO: _inicializar_datos - ya no existe
+        # DEBUG DETALLADO
+        print(f"🔍 DEBUG - Ciudades en modelo: {len(self.modelo.ciudades)}")
+        print(f"🔍 DEBUG - Conexiones en modelo: {len(self.modelo.conexiones)}")
+        print(
+            f"🔍 DEBUG - Ciudades específicas: {list(self.modelo.ciudades.keys())}")
+
+        print("✅ Controlador MVC inicializado correctamente")
 
     def obtener_mapa(self):
         """Obtiene los datos del mapa formateados para la vista"""
@@ -65,7 +62,7 @@ class MapaController:
             return self.vista.formatear_error(str(e))
 
     def agregar_ruta(self, datos):
-        """Agrega una nueva ruta"""
+        """Agregar una nueva ruta"""
         try:
             valido, error = self.vista.validar_datos_ruta(datos)
             if not valido:
@@ -89,15 +86,10 @@ class MapaController:
         except Exception as e:
             return self.vista.formatear_error(str(e))
 
-
-def __init__(self, modelo=None, vista=None):
-    self.modelo = modelo or GrafoRutas.crear_grafo_bolivia()
-    self.vista = vista or MapaView()
-
-    # DEBUG DETALLADO
-    print(f"🔍 DEBUG - Ciudades en modelo: {len(self.modelo.ciudades)}")
-    print(f"🔍 DEBUG - Conexiones en modelo: {len(self.modelo.conexiones)}")
-    print(
-        f"🔍 DEBUG - Ciudades específicas: {list(self.modelo.ciudades.keys())}")
-
-    print("✅ Controlador MVC inicializado correctamente")
+    def eliminar_ruta(self, ciudad1, ciudad2):
+        """Elimina una ruta existente"""
+        try:
+            self.modelo.eliminar_ruta(ciudad1, ciudad2)
+            return self.vista.formatear_exito("Ruta eliminada correctamente")
+        except Exception as e:
+            return self.vista.formatear_error(str(e))
