@@ -33,6 +33,7 @@ class SistemaRutas {
         
         this.actualizarEstado("Inicializando...");
         this.configurarFormularios();
+        this.configurarClicksMapa(); 
         this.cargarMapa();
     }
 
@@ -567,7 +568,62 @@ class SistemaRutas {
     }
 
 
+    configurarClicksMapa() {
+        const mapa = document.getElementById('mapa');
+        if (mapa) {
+            mapa.addEventListener('click', (event) => {
+                this.manejarClickMapa(event);
+            });
+            // Cambiar cursor para indicar que es clickeable
+            mapa.style.cursor = 'crosshair';
+        }
+    }
 
+    manejarClickMapa(event) {
+        const svg = document.getElementById('mapa');
+        const point = svg.createSVGPoint();
+        
+        // Obtener coordenadas relativas al SVG
+        point.x = event.clientX;
+        point.y = event.clientY;
+        const svgPoint = point.matrixTransform(svg.getScreenCTM().inverse());
+        
+        const x = Math.round(svgPoint.x);
+        const y = Math.round(svgPoint.y);
+        
+        // Pedir nombre de la ciudad
+        const nombre = prompt(`📍 Agregar nueva ciudad en coordenadas (${x}, ${y})\n\nIngresa el nombre de la ciudad:`);
+        
+        if (nombre && nombre.trim()) {
+            this.agregarCiudadDesdeClick(nombre.trim(), x, y);
+        }
+    }
+
+    async agregarCiudadDesdeClick(nombre, x, y) {
+        this.actualizarEstado("Agregando ciudad...");
+
+        try {
+            const response = await fetch('/api/ciudad', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nombre, x, y })
+            });
+
+            const resultado = await response.json();
+
+            if (resultado.status === 'ok') {
+                await this.cargarMapa();
+                this.actualizarEstado(`Ciudad "${nombre}" agregada correctamente`);
+            } else {
+                alert('Error: ' + resultado.message);
+                this.actualizarEstado("Error agregando ciudad");
+            }
+
+        } catch (error) {
+            alert('Error de conexión: ' + error.message);
+            this.actualizarEstado("Error de conexión");
+        }
+    }
 
 
 }

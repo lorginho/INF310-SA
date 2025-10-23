@@ -122,7 +122,15 @@ body {
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     display: block;    /* ✅ EVITAR ESPACIOS EXTRA */
+    cursor: crosshair;  /* ✅ CURSOR ESPECIAL PARA AGREGAR CIUDADES */
 }
+
+
+
+
+
+
+
 
 /* LETRAS MÁS GRANDES Y LEGIBLES */
 .nombre-ciudad {
