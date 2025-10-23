@@ -3,7 +3,7 @@ models/grafo_rutas.py
 Autor: Lorgio Añez J.
 Fecha: 2025-10-23
 Descripción: Clase que representa un Grafo de Rutas para conectar ciudades
-de Bolivia, creando ciudades y rutas entre ellas, calculando distancias y 
+de Bolivia, creando ciudades y rutas entre ellas, calculando distancias y
 rutas optimas, etc
 """
 
@@ -39,18 +39,23 @@ class GrafoRutas:
     @classmethod
     def crear_grafo_bolivia(cls):
         """Factory method para crear grafo con datos de Bolivia"""
+
         datos_bolivia = {
+
             'ciudades': {
-                'La Paz': [200, 180],
-                'Cochabamba': [300, 250],
-                'Santa Cruz': [450, 300],
-                'Sucre': [350, 350],
-                'Oruro': [200, 300],
-                'Potosí': [250, 400],
-                'Tarija': [400, 450],
-                'Trinidad': [400, 100],
-                'Cobija': [250, 50]
+                'La Paz': [200, 360],        # ✅ COORDENADAS ESCALADAS
+                'Cochabamba': [400, 500],
+                'Santa Cruz': [700, 600],
+                'Sucre': [500, 700],
+                'Oruro': [200, 600],
+                'Potosí': [300, 800],
+                'Tarija': [600, 900],
+                'Trinidad': [600, 200],
+                'Cobija': [300, 100]
             },
+
+
+
             'conexiones': [
                 ['La Paz', 'Cochabamba'],
                 ['La Paz', 'Oruro'],
@@ -64,6 +69,7 @@ class GrafoRutas:
                 ['Oruro', 'Potosí'],
                 ['Cochabamba', 'Oruro']
             ],
+
             'pesos': {
                 'La Paz-Cochabamba': 375,
                 'Cochabamba-La Paz': 375,

@@ -136,11 +136,15 @@ class SistemaRutas {
         });
     }
 
+
     mostrarListaCiudades() {
         const lista = document.getElementById('lista-ciudades');
         lista.innerHTML = '';
         
-        Object.keys(this.ciudades).forEach(ciudad => {
+        // ✅ ORDENAR CIUDADES ALFABÉTICAMENTE
+        const ciudadesOrdenadas = Object.keys(this.ciudades).sort();
+        
+        ciudadesOrdenadas.forEach(ciudad => {
             const div = document.createElement('div');
             div.className = 'ciudad-item';
             div.innerHTML = `
@@ -154,7 +158,12 @@ class SistemaRutas {
             div.style.padding = '5px 0';
             lista.appendChild(div);
         });
-    }
+    }    
+
+
+
+
+
 
     dibujarMapa() {
         this.actualizarEstado("Dibujando mapa...");
@@ -176,14 +185,14 @@ class SistemaRutas {
             const circulo = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
             circulo.setAttribute('cx', x);
             circulo.setAttribute('cy', y);
-            circulo.setAttribute('r', 12);
+            circulo.setAttribute('r', 16);  // ✅ RADIO MÁS GRANDE
             circulo.setAttribute('class', 'circulo-ciudad');
             circulo.setAttribute('id', `circulo-${nombre}`);
 
-            // Nombre de la ciudad
+            // Nombre de la ciudad - MÁS SEPARADO
             const texto = document.createElementNS('http://www.w3.org/2000/svg', 'text');
             texto.setAttribute('x', x);
-            texto.setAttribute('y', y - 18);
+            texto.setAttribute('y', y - 25);  // ✅ MÁS SEPARACIÓN (era 18)
             texto.setAttribute('class', 'nombre-ciudad');
             texto.setAttribute('text-anchor', 'middle');
             texto.textContent = nombre;
@@ -193,6 +202,7 @@ class SistemaRutas {
             ciudadesGroup.appendChild(grupo);
         });
     }
+
 
     dibujarRutas() {
         const rutasGroup = document.getElementById('rutas');
@@ -240,7 +250,7 @@ class SistemaRutas {
                 const midY = (coord1[1] + coord2[1]) / 2;
                 
                 texto.setAttribute('x', midX);
-                texto.setAttribute('y', midY - 8);
+                texto.setAttribute('y', midY - 12);
                 texto.setAttribute('class', 'peso-ruta');
                 texto.setAttribute('text-anchor', 'middle');
                 texto.textContent = peso;
@@ -489,11 +499,19 @@ class SistemaRutas {
 
     // En la clase SistemaRutas, agregar estos métodos:
 
+
     mostrarListaRutas() {
         const lista = document.getElementById('lista-rutas');
         lista.innerHTML = '';
         
-        this.conexiones.forEach(([ciudad1, ciudad2]) => {
+        // ✅ ORDENAR RUTAS ALFABÉTICAMENTE
+        const rutasOrdenadas = [...this.conexiones].sort(([ciudad1A, ciudad2A], [ciudad1B, ciudad2B]) => {
+            const rutaA = `${ciudad1A} ↔ ${ciudad2A}`;
+            const rutaB = `${ciudad1B} ↔ ${ciudad2B}`;
+            return rutaA.localeCompare(rutaB);
+        });
+        
+        rutasOrdenadas.forEach(([ciudad1, ciudad2]) => {
             let peso = this.pesos[`${ciudad1}-${ciudad2}`] || this.pesos[`${ciudad2}-${ciudad1}`] || '?';
             
             const div = document.createElement('div');
@@ -511,6 +529,12 @@ class SistemaRutas {
             lista.appendChild(div);
         });
     }
+
+
+
+
+
+
 
     async eliminarRuta(ciudad1, ciudad2) {
         if (!confirm(`¿Estás seguro de eliminar la ruta entre ${ciudad1} y ${ciudad2}?`)) {

@@ -1,5 +1,22 @@
 /* Agregar estos estilos al archivo CSS existente */
 
+/* FONDO DE LA VENTANA PRINCIPAL */
+body {
+    background: #f8f9fa;       /* ✅ GRIS MUY CLARO */
+    margin: 0;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+.container {
+    background: rgb(207, 192, 192);         /* ✅ CONTENEDOR PRINCIPAL BLANCO */
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+
+
 .info-estado {
     margin: 15px 0;
     padding: 15px;
@@ -13,7 +30,7 @@
 
 .estado-item {
     padding: 5px 10px;
-    background: white;
+    background: rgb(145, 172, 187);
     border-radius: 5px;
     border-left: 4px solid #2196f3;
 }
@@ -40,11 +57,11 @@
     fill: #5a3921;
     font-size: 10px;
     font-weight: bold;
-    background-color: rgba(255, 255, 255, 0.8);
+    background-color: rgba(131, 207, 143, 0.8);
 }
 
 .circulo-ciudad {
-    fill: #d52b1e;
+    fill: #69312d;
     stroke: #fdda00;
     stroke-width: 2;
 }
@@ -65,23 +82,78 @@
 
 .sidebar {
     width: 280px;
-    background: #f8f9fa;
+    background: #748ca3;
     padding: 15px;
     border-radius: 8px;
     border: 1px solid #dee2e6;
 }
 
+.left-sidebar {
+    width: 380px;              /* ✅ IZQUIERDO: 380px (era 280px) */
+}
+
+
+.right-sidebar {
+    width: 500px;              /* ✅ DERECHO MÁS ANCHO: 400px */
+}
+
+
+/* BORDE PARA EL MAPA - TAMAÑO MEJORADO */
 .mapa-container {
     flex: 1;
     display: flex;
     justify-content: center;
+    border: 3px solid #8B4513;
+    border-radius: 12px;
+    padding: 10px;
+    background: #7b9ab9;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    margin: 5px;
+    min-height: 100px;  /* ✅ ALTURA MÍNIMA PARA EL MAPA */
+    
+    width: 1620px;    /* ✅ ANCHO FIJO (1600 + padding) */
+    height: 1100px;   /* ✅ ALTO FIJO (1200 + padding) */
+    overflow: visible; /* ✅ PERMITIR QUE TODO SEA VISIBLE */
 }
+
+/* SVG MÁS GRANDE */
+#mapa {
+    background: rgb(177, 201, 206);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    display: block;    /* ✅ EVITAR ESPACIOS EXTRA */
+}
+
+/* LETRAS MÁS GRANDES Y LEGIBLES */
+.nombre-ciudad {
+    fill: #007a33;
+    font-size: 28px;           /* ✅ MÁS GRANDE (era 12px) */
+    font-weight: bold;
+    text-shadow: 2px 2px 4px white;  /* ✅ SOMBRA MÁS FUERTE */
+}
+
+.peso-ruta {
+    fill: #5a3921;
+    font-size: 24px;           /* ✅ MÁS GRANDE (era 10px) */
+    font-weight: bold;
+    background-color: rgba(255, 255, 255, 0.9);
+    text-shadow: 1px 1px 3px white;  /* ✅ SOMBRA PARA MEJOR LECTURA */
+}
+
+/* CIUDADES MÁS GRANDES */
+.circulo-ciudad {
+    fill: #642723;
+    stroke: #fdda00;
+    stroke-width: 3;
+    r: 18;                     /* ✅ MÁS GRANDE (era 12) */
+}
+
 
 /* FORMULARIO */
 .form-section {
     margin-bottom: 20px;
     padding: 15px;
-    background: white;
+    background: rgb(160, 184, 214);
     border-radius: 8px;
     border: 1px solid #ced4da;
 }
@@ -119,7 +191,7 @@
 .controles {
     margin-bottom: 20px;
     padding: 15px;
-    background: white;
+    background: rgb(157, 183, 218);
     border-radius: 8px;
     border: 1px solid #ced4da;
 }
@@ -170,7 +242,7 @@
 .resultado-section {
     margin-bottom: 20px;
     padding: 15px;
-    background: white;
+    background: rgb(159, 186, 207);
     border-radius: 8px;
     border: 1px solid #ced4da;
 }
@@ -182,7 +254,7 @@
 
 .ciudades-lista {
     padding: 15px;
-    background: white;
+    background: rgb(192, 191, 151);
     border-radius: 8px;
     border: 1px solid #ced4da;
     max-height: 400px;
@@ -198,7 +270,7 @@
 .rutas-lista {
     margin-top: 20px;
     padding: 15px;
-    background: white;
+    background: rgb(196, 204, 174);
     border-radius: 8px;
     border: 1px solid #ced4da;
     max-height: 300px;
@@ -223,7 +295,7 @@
 }
 
 .btn-eliminar {
-    background: #dc3545;
+    background: #0f0d0d;
     color: white;
     border: none;
     border-radius: 4px;
