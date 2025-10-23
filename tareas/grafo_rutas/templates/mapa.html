@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sistema de Rutas - Bolivia</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='estilo.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>🗺️ Sistema de Rutas de Bolivia</h1>
+        <p class="subtitulo">Versión Simplificada - 9 Ciudades Cargadas</p>
+        
+        <div class="controles">
+            <select id="origen">
+                <option value="">Ciudad Origen</option>
+            </select>
+            <select id="destino">
+                <option value="">Ciudad Destino</option>
+            </select>
+            <button onclick="calcularRuta()">📍 Calcular Ruta</button>
+            <button onclick="limpiarRuta()">🗑️ Limpiar</button>
+        </div>
+
+        <!-- Área de información y estado -->
+        <div class="info-estado">
+            <div class="estado-item">
+                <strong>Estado:</strong> <span id="estado">Cargando...</span>
+            </div>
+            <div class="estado-item">
+                <strong>Ciudades:</strong> <span id="contador-ciudades">0</span>
+            </div>
+            <div class="estado-item">
+                <strong>Rutas:</strong> <span id="contador-rutas">0</span>
+            </div>
+        </div>
+
+        <div class="resultado" id="resultado">
+            <strong>✅ 9 ciudades de Bolivia cargadas correctamente</strong>
+        </div>
+
+        <svg id="mapa" width="800" height="600" viewBox="0 0 800 600">
+            <g id="rutas"></g>
+            <g id="ciudades"></g>
+            <g id="ruta-calculada"></g>
+        </svg>
+
+        <div class="ciudades-lista">
+            <h3>🏙️ Ciudades Incluidas:</h3>
+            <div id="lista-ciudades"></div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='rutas.js') }}"></script>
+</body>
+</html>
