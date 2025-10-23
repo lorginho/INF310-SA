@@ -162,10 +162,6 @@ class SistemaRutas {
     }    
 
 
-
-
-
-
     dibujarMapa() {
         this.actualizarEstado("Dibujando mapa...");
         this.dibujarRutas();
@@ -321,6 +317,7 @@ class SistemaRutas {
         for (let i = 0; i < pasos.length; i++) {
             const [accion, ciudad, valor] = pasos[i];
             
+            // Pausas de 300ms entre pasos para seguimiento visual, se cambio a 500
             await new Promise(resolve => setTimeout(resolve, 300)); // Pausa de 300ms
             
             const circulo = document.getElementById(`circulo-${ciudad}`);
@@ -337,8 +334,9 @@ class SistemaRutas {
         
         // Restaurar colores después de la animación
         setTimeout(() => {
+            /*this.limpiarAnimaciones();*/
             this.limpiarAnimaciones();
-        }, 1000);
+        }, 10);
     }
 
     limpiarAnimaciones() {
@@ -346,8 +344,9 @@ class SistemaRutas {
         Object.keys(this.ciudades).forEach(ciudad => {
             const circulo = document.getElementById(`circulo-${ciudad}`);
             if (circulo) {
-                circulo.style.fill = '#d52b1e';
-                circulo.style.stroke = '#fdda00';
+                //circulo.style.fill = '#d52b1e';
+                circulo.style.fill = '#4745b1ff';
+                circulo.style.stroke = '#f2f700';
             }
         });
     }
@@ -625,7 +624,7 @@ class SistemaRutas {
         }
     }
 
-
+    
 }
 
 // Inicializar cuando cargue la página
