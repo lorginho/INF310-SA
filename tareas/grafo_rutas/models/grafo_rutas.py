@@ -219,7 +219,7 @@ class GrafoRutas:
         return camino
 
     def obtener_estado(self):
-        """Retorna el estado completo del modelo para la vista - CORREGIDO"""
+        """Retorna el estado completo del modelo para la vista """
         # ✅ CORRECCIÓN: Convertir tuplas a formatos serializables para JSON
         conexiones_formateadas = []
         pesos_formateados = {}

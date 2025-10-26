@@ -135,8 +135,7 @@ body {
 .circulo-ciudad {
     fill: #4745b1ff;
     stroke: #260829;
-    stroke-width: 3;
-    r: 12;                     /* ✅ MÁS GRANDE (era 12) */
+    stroke-width: 3;    
 }
 
 

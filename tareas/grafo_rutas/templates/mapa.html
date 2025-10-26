@@ -49,6 +49,8 @@
                     <div class="botones-ruta">
                         <button onclick="calcularRuta()">Calcular Ruta</button>
                         <button onclick="limpiarRuta()">Limpiar</button>
+                        <button onclick="exportarMapa()">📸 Exportar SVG</button>
+                        <button onclick="cerrarAplicacion()">❌ Cerrar</button>
                     </div>
                 </div>
 
@@ -70,6 +72,8 @@
             <!-- MAPA SVG (CENTRO) -->
             <div class="mapa-container">
                 <svg id="mapa" width="1200" height="1000" viewBox="0 0 1200 1000">
+                        <!-- ✅ AGREGAR FONDO PERMANENTE -->
+                    <rect x="0" y="0" width="1200" height="1000" fill="#bad6db" rx="8"/>
                     <g id="rutas"></g>
                     <g id="ciudades"></g>
                     <g id="ruta-calculada"></g>

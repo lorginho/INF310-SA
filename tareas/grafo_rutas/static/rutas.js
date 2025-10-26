@@ -25,6 +25,8 @@ Controlar animaciones y estados de la aplicación para una experiencia de usuari
 // Configuración global, "apariencia" de los nodos
 
 
+
+
 class SistemaRutas {
     constructor() {
         this.ciudades = {};
@@ -169,6 +171,9 @@ class SistemaRutas {
         this.actualizarEstado("Mapa listo");
     }
 
+/*
+
+
     dibujarCiudades() {
         const ciudadesGroup = document.getElementById('ciudades');
         ciudadesGroup.innerHTML = '';
@@ -199,6 +204,46 @@ class SistemaRutas {
             ciudadesGroup.appendChild(grupo);
         });
     }
+
+*/
+
+dibujarCiudades() {
+    const ciudadesGroup = document.getElementById('ciudades');
+    ciudadesGroup.innerHTML = '';
+
+    Object.entries(this.ciudades).forEach(([nombre, [x, y]]) => {
+        const grupo = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        grupo.setAttribute('class', 'ciudad');
+        grupo.setAttribute('id', `ciudad-${nombre}`);
+
+        // Círculo de la ciudad - ATRIBUTOS EXPLÍCITOS
+        const circulo = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circulo.setAttribute('cx', x);
+        circulo.setAttribute('cy', y);
+        circulo.setAttribute('r', '16');  // ✅ String
+        circulo.setAttribute('class', 'circulo-ciudad');
+        circulo.setAttribute('id', `circulo-${nombre}`);
+        circulo.setAttribute('fill', '#4745b1');        // ✅ Color explícito
+        circulo.setAttribute('stroke', '#260829');      // ✅ Borde explícito  
+        circulo.setAttribute('stroke-width', '3');      // ✅ Grosor explícito
+
+        // Nombre de la ciudad
+        const texto = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        texto.setAttribute('x', x);
+        texto.setAttribute('y', y - 25);
+        texto.setAttribute('class', 'nombre-ciudad');
+        texto.setAttribute('text-anchor', 'middle');
+        texto.setAttribute('fill', '#0c330e');          // ✅ Color texto explícito
+        texto.textContent = nombre;
+
+        grupo.appendChild(circulo);
+        grupo.appendChild(texto);
+        ciudadesGroup.appendChild(grupo);
+    });
+}
+
+
+/*
 
 
     dibujarRutas() {
@@ -258,6 +303,76 @@ class SistemaRutas {
             rutasGroup.appendChild(linea);
         });
     }
+
+
+*/
+
+
+    dibujarRutas() {
+        const rutasGroup = document.getElementById('rutas');
+        rutasGroup.innerHTML = '';
+
+        this.conexiones.forEach(([ciudad1, ciudad2]) => {
+            const coord1 = this.ciudades[ciudad1];
+            const coord2 = this.ciudades[ciudad2];
+            
+            if (!coord1 || !coord2) return;
+            
+            // Buscar el peso
+            let peso = null;
+            const posiblesClaves = [
+                `${ciudad1}-${ciudad2}`,
+                `${ciudad2}-${ciudad1}`
+            ];
+            
+            for (const clave of posiblesClaves) {
+                if (this.pesos[clave] !== undefined) {
+                    peso = this.pesos[clave];
+                    break;
+                }
+            }
+            
+            if (peso === null) {
+                peso = "?";
+            }
+
+            // ✅ PRIMERO DIBUJAR LA LÍNEA (ABAJO)
+            const linea = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            linea.setAttribute('x1', coord1[0]);
+            linea.setAttribute('y1', coord1[1]);
+            linea.setAttribute('x2', coord2[0]);
+            linea.setAttribute('y2', coord2[1]);
+            linea.setAttribute('class', 'ruta');
+            linea.setAttribute('id', `ruta-${ciudad1}-${ciudad2}`);
+            
+            rutasGroup.appendChild(linea); // ✅ LÍNEA PRIMERO
+
+            // ✅ LUEGO DIBUJAR EL TEXTO (ENCIMA)
+            if (peso !== "?") {
+                const texto = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                const midX = (coord1[0] + coord2[0]) / 2;
+                const midY = (coord1[1] + coord2[1]) / 2;
+                
+                texto.setAttribute('x', midX);
+                texto.setAttribute('y', midY - 12);
+                texto.setAttribute('class', 'peso-ruta');
+                texto.setAttribute('text-anchor', 'middle');
+                texto.setAttribute('fill', '#531e1e'); // Color explícito
+                texto.textContent = peso;
+
+                rutasGroup.appendChild(texto); // ✅ TEXTO DESPUÉS
+            }
+        });
+    }
+
+
+
+
+
+
+
+
+
 
     async calcularRuta() {
         const origen = document.getElementById('origen').value;
@@ -624,6 +739,94 @@ class SistemaRutas {
         }
     }
 
+
+
+    
+    async exportarMapa() {
+        const svg = document.getElementById('mapa');
+        const clone = svg.cloneNode(true);
+        
+        // ✅ AGREGAR FONDO COMO ELEMENTO SVG
+        const fondo = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        fondo.setAttribute('x', '0');
+        fondo.setAttribute('y', '0');
+        fondo.setAttribute('width', '1200');
+        fondo.setAttribute('height', '1000');
+        fondo.setAttribute('fill', '#bad6db'); // Color del fondo
+        fondo.setAttribute('rx', '8'); // Bordes redondeados
+        clone.insertBefore(fondo, clone.firstChild); // Insertar al inicio
+
+        // ✅ ASEGURAR ATRIBUTOS EXPLÍCITOS PARA EXPORTACIÓN
+        const elementos = clone.querySelectorAll('*');
+        elementos.forEach(elemento => {
+            // Forzar visibilidad
+            elemento.style.display = 'block';
+            elemento.style.visibility = 'visible';
+            elemento.style.opacity = '1';
+        });
+
+        // ✅ ASEGURAR COLORES EN CÍRCULOS
+        const circulos = clone.querySelectorAll('.circulo-ciudad');
+        circulos.forEach(circulo => {
+            if (!circulo.getAttribute('fill') || circulo.getAttribute('fill').includes('rgb')) {
+                circulo.setAttribute('fill', '#4745b1');
+            }
+            if (!circulo.getAttribute('stroke') || circulo.getAttribute('stroke').includes('rgb')) {
+                circulo.setAttribute('stroke', '#260829');
+            }
+            circulo.setAttribute('stroke-width', '3');
+        });
+
+        // ✅ ASEGURAR COLORES EN TEXTO
+        const textos = clone.querySelectorAll('.nombre-ciudad, .peso-ruta');
+        textos.forEach(texto => {
+            if (!texto.getAttribute('fill') || texto.getAttribute('fill').includes('rgb')) {
+                if (texto.classList.contains('nombre-ciudad')) {
+                    texto.setAttribute('fill', '#0c330e');
+                } else if (texto.classList.contains('peso-ruta')) {
+                    texto.setAttribute('fill', '#531e1e');
+                }
+            }
+        });
+
+        // ✅ ASEGURAR COLORES EN RUTAS
+        const rutas = clone.querySelectorAll('.ruta');
+        rutas.forEach(ruta => {
+            if (!ruta.getAttribute('stroke')) {
+                ruta.setAttribute('stroke', '#6cb3af');
+            }
+            ruta.setAttribute('stroke-width', '3');
+            ruta.setAttribute('opacity', '0.8');
+        });
+
+        // ✅ ASEGURAR COLORES EN RUTAS ÓPTIMAS
+        const rutasOptimas = clone.querySelectorAll('.ruta-optima');
+        rutasOptimas.forEach(ruta => {
+            if (!ruta.getAttribute('stroke')) {
+                ruta.setAttribute('stroke', '#e70f0f');
+            }
+            ruta.setAttribute('stroke-width', '5');
+            ruta.setAttribute('opacity', '0.9');
+        });
+
+        // Serializar y descargar
+        const svgData = new XMLSerializer().serializeToString(clone);
+        const blob = new Blob([svgData], {type: 'image/svg+xml'});
+        const url = URL.createObjectURL(blob);
+        
+        const downloadLink = document.createElement('a');
+        downloadLink.href = url;
+        downloadLink.download = `mapa_bolivia_${new Date().toISOString().split('T')[0]}.svg`;
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+        URL.revokeObjectURL(url);
+        
+        this.actualizarEstado("Mapa exportado como SVG");
+    }
+
+  
+
     
 }
 
@@ -640,3 +843,15 @@ function calcularRuta() {
 function limpiarRuta() {
     window.sistemaRutas.limpiarRuta();
 }
+
+function exportarMapa() {
+    window.sistemaRutas.exportarMapa();
+}
+
+
+function cerrarAplicacion() {
+    if (confirm('¿Estás seguro de que quieres cerrar la aplicación?')) {
+        window.close(); // Cierra la ventana del navegador
+    }
+}
+
