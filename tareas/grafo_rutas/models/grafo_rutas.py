@@ -1,10 +1,11 @@
 """
-models/grafo_rutas.py
-Autor: Lorgio Añez J.
-Fecha: 2025-10-23
-Descripción: Clase que representa un Grafo de Rutas para conectar ciudades
-de Bolivia, creando ciudades y rutas entre ellas, calculando distancias y
-rutas optimas, etc
+ARCHIVO: models/grafo_rutas.py
+AUTOR: Lorgio Añez J.
+FECHA: 2025-10-23
+DESCRIPCIÓN: Implementación del grafo de rutas y algoritmo Dijkstra.
+             Representa ciudades, conexiones y calcula caminos óptimos.
+DEPENDENCIAS: heapq, Módulo de Python que implementa colas de prioridad 
+              usando min-heap para eficiencia.
 """
 
 
@@ -158,7 +159,62 @@ class GrafoRutas:
         return self.conexiones.copy()
 
     def dijkstra(self, origen, destino):
-        """Algoritmo Dijkstra para encontrar ruta óptima"""
+        """
+            ALGORITMO: Dijkstra para camino de costo mínimo
+            PROPÓSITO: Encontrar la ruta más corta (menor distancia) entre dos ciudades  
+
+            CARACTERÍSTICAS: 
+            - Óptimo para pesos no negativos
+            - Usa cola de prioridad (heap) para eficiencia
+
+            PARÁMETROS:
+            origen (str): Ciudad de partida
+            destino (str): Ciudad de llegada
+
+            RETORNA:        
+            dict: {
+                'camino': lista de ciudades,    # Ruta óptima encontrada
+                'distancia': int,               # Distancia total en km  
+                'pasos': lista                  # Registro para animación
+            }
+
+            FUNCIONAMIENTO:
+            1. INICIALIZACIÓN: 
+                - Establecer todas las distancias en infinito, excepto origen en 0
+                - Crear Cola de prioridad con (0, origen)
+                - Inicialiar Diccionario para reconstruir caminos y registrar pasos
+
+            2. PROCESAMIENTO:
+                - Mientras haya nodos en la cola:
+                a. Extraer nodo con menor distancia (heapq.heappop)
+                b. Si es el destino → terminar
+                c. Si la distancia actual es mayor a la almacenada → ignorar
+                d. Explorar todos los vecinos del nodo actual
+                e. Para cada vecino, calcular nueva distancia
+                f. Si mejora la distancia → actualizar y agregar a cola
+
+            3. RECONSTRUCCIÓN: (Proceso de armado del camino final al encontrar la distancia mínima.)
+                - Seguir nodos anteriores desde destino hasta origen
+                - Retorna el camino, distancia total y pasos para animación
+
+            EJEMPLO:
+            dijkstra('La Paz', 'Santa Cruz') → 
+                {'camino': ['La Paz', 'Cochabamba', 'Santa Cruz'], 
+                'distancia': 855,      
+
+                'pasos': [  
+                    ('visitando', 'La Paz', 0),
+                    ('actualizando', 'Cochabamba', 375),
+                    ('visitando', 'Cochabamba', 375),
+                    ('actualizando', 'Santa Cruz', 855),
+                    ('visitando', 'Santa Cruz', 855)
+                ]
+
+                camino,     Uso: Mostrar al usuario la ruta a seguir
+                distancia,  Uso: Informar la longitud total del recorrido
+                pasos,      Uso: Animación en frontend del proceso de Dijkstra
+        """
+
         if origen not in self.ciudades or destino not in self.ciudades:
             raise ValueError("Origen o destino no existen")
 

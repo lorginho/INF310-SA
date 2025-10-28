@@ -121,24 +121,20 @@ class SistemaRutas {
         const ciudad1Ruta = document.getElementById('ciudad1-ruta');
         const ciudad2Ruta = document.getElementById('ciudad2-ruta');
         
-        // Limpiar todos los selects
-        const selects = [origen, destino, ciudad1Ruta, ciudad2Ruta];
-        selects.forEach(select => {
-            if (select) {
-                select.innerHTML = '<option value="">Seleccionar ciudad</option>';
-            }
-        });
+        // ✅ LIMPIAR CON TEXTO ESPECÍFICO PARA CADA SELECT
+        if (origen) origen.innerHTML = '<option value="">Origen</option>';
+        if (destino) destino.innerHTML = '<option value="">Destino</option>';
+        if (ciudad1Ruta) ciudad1Ruta.innerHTML = '<option value="">Origen</option>';
+        if (ciudad2Ruta) ciudad2Ruta.innerHTML = '<option value="">Destino</option>';
 
         // Llenar con ciudades
         Object.keys(this.ciudades).forEach(ciudad => {
-            selects.forEach(select => {
-                if (select) {
-                    select.innerHTML += `<option value="${ciudad}">${ciudad}</option>`;
-                }
-            });
+            if (origen) origen.innerHTML += `<option value="${ciudad}">${ciudad}</option>`;
+            if (destino) destino.innerHTML += `<option value="${ciudad}">${ciudad}</option>`;
+            if (ciudad1Ruta) ciudad1Ruta.innerHTML += `<option value="${ciudad}">${ciudad}</option>`;
+            if (ciudad2Ruta) ciudad2Ruta.innerHTML += `<option value="${ciudad}">${ciudad}</option>`;
         });
     }
-
 
     mostrarListaCiudades() {
         const lista = document.getElementById('lista-ciudades');
@@ -171,9 +167,6 @@ class SistemaRutas {
         this.actualizarEstado("Mapa listo");
     }
 
-/*
-
-
     dibujarCiudades() {
         const ciudadesGroup = document.getElementById('ciudades');
         ciudadesGroup.innerHTML = '';
@@ -183,20 +176,24 @@ class SistemaRutas {
             grupo.setAttribute('class', 'ciudad');
             grupo.setAttribute('id', `ciudad-${nombre}`);
 
-            // Círculo de la ciudad
+            // Círculo de la ciudad - ATRIBUTOS EXPLÍCITOS
             const circulo = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
             circulo.setAttribute('cx', x);
             circulo.setAttribute('cy', y);
-            circulo.setAttribute('r', 16);  // ✅ RADIO MÁS GRANDE
+            circulo.setAttribute('r', '16');  // ✅ String
             circulo.setAttribute('class', 'circulo-ciudad');
             circulo.setAttribute('id', `circulo-${nombre}`);
+            circulo.setAttribute('fill', '#4745b1');        // ✅ Color explícito
+            circulo.setAttribute('stroke', '#260829');      // ✅ Borde explícito  
+            circulo.setAttribute('stroke-width', '3');      // ✅ Grosor explícito
 
-            // Nombre de la ciudad - MÁS SEPARADO
+            // Nombre de la ciudad
             const texto = document.createElementNS('http://www.w3.org/2000/svg', 'text');
             texto.setAttribute('x', x);
-            texto.setAttribute('y', y - 25);  // ✅ MÁS SEPARACIÓN (era 18)
+            texto.setAttribute('y', y - 25);
             texto.setAttribute('class', 'nombre-ciudad');
             texto.setAttribute('text-anchor', 'middle');
+            texto.setAttribute('fill', '#0c330e');          // ✅ Color texto explícito
             texto.textContent = nombre;
 
             grupo.appendChild(circulo);
@@ -204,108 +201,6 @@ class SistemaRutas {
             ciudadesGroup.appendChild(grupo);
         });
     }
-
-*/
-
-dibujarCiudades() {
-    const ciudadesGroup = document.getElementById('ciudades');
-    ciudadesGroup.innerHTML = '';
-
-    Object.entries(this.ciudades).forEach(([nombre, [x, y]]) => {
-        const grupo = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-        grupo.setAttribute('class', 'ciudad');
-        grupo.setAttribute('id', `ciudad-${nombre}`);
-
-        // Círculo de la ciudad - ATRIBUTOS EXPLÍCITOS
-        const circulo = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        circulo.setAttribute('cx', x);
-        circulo.setAttribute('cy', y);
-        circulo.setAttribute('r', '16');  // ✅ String
-        circulo.setAttribute('class', 'circulo-ciudad');
-        circulo.setAttribute('id', `circulo-${nombre}`);
-        circulo.setAttribute('fill', '#4745b1');        // ✅ Color explícito
-        circulo.setAttribute('stroke', '#260829');      // ✅ Borde explícito  
-        circulo.setAttribute('stroke-width', '3');      // ✅ Grosor explícito
-
-        // Nombre de la ciudad
-        const texto = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        texto.setAttribute('x', x);
-        texto.setAttribute('y', y - 25);
-        texto.setAttribute('class', 'nombre-ciudad');
-        texto.setAttribute('text-anchor', 'middle');
-        texto.setAttribute('fill', '#0c330e');          // ✅ Color texto explícito
-        texto.textContent = nombre;
-
-        grupo.appendChild(circulo);
-        grupo.appendChild(texto);
-        ciudadesGroup.appendChild(grupo);
-    });
-}
-
-
-/*
-
-
-    dibujarRutas() {
-        const rutasGroup = document.getElementById('rutas');
-        rutasGroup.innerHTML = '';
-
-        this.conexiones.forEach(([ciudad1, ciudad2]) => {
-            const coord1 = this.ciudades[ciudad1];
-            const coord2 = this.ciudades[ciudad2];
-            
-            if (!coord1 || !coord2) {
-                return;
-            }
-            
-            // Buscar el peso
-            let peso = null;
-            const posiblesClaves = [
-                `${ciudad1}-${ciudad2}`,
-                `${ciudad2}-${ciudad1}`
-            ];
-            
-            for (const clave of posiblesClaves) {
-                if (this.pesos[clave] !== undefined) {
-                    peso = this.pesos[clave];
-                    break;
-                }
-            }
-            
-            if (peso === null) {
-                peso = "?";
-            }
-
-            // Línea de la ruta
-            const linea = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            linea.setAttribute('x1', coord1[0]);
-            linea.setAttribute('y1', coord1[1]);
-            linea.setAttribute('x2', coord2[0]);
-            linea.setAttribute('y2', coord2[1]);
-            linea.setAttribute('class', 'ruta');
-            linea.setAttribute('id', `ruta-${ciudad1}-${ciudad2}`);
-
-            // Texto del peso
-            if (peso !== "?") {
-                const texto = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                const midX = (coord1[0] + coord2[0]) / 2;
-                const midY = (coord1[1] + coord2[1]) / 2;
-                
-                texto.setAttribute('x', midX);
-                texto.setAttribute('y', midY - 12);
-                texto.setAttribute('class', 'peso-ruta');
-                texto.setAttribute('text-anchor', 'middle');
-                texto.textContent = peso;
-
-                rutasGroup.appendChild(texto);
-            }
-            
-            rutasGroup.appendChild(linea);
-        });
-    }
-
-
-*/
 
 
     dibujarRutas() {
@@ -364,14 +259,6 @@ dibujarCiudades() {
             }
         });
     }
-
-
-
-
-
-
-
-
 
 
     async calcularRuta() {
@@ -449,7 +336,6 @@ dibujarCiudades() {
         
         // Restaurar colores después de la animación
         setTimeout(() => {
-            /*this.limpiarAnimaciones();*/
             this.limpiarAnimaciones();
         }, 10);
     }
@@ -612,9 +498,6 @@ dibujarCiudades() {
     }
 
 
-    // En la clase SistemaRutas, agregar estos métodos:
-
-
     mostrarListaRutas() {
         const lista = document.getElementById('lista-rutas');
         lista.innerHTML = '';
@@ -644,11 +527,6 @@ dibujarCiudades() {
             lista.appendChild(div);
         });
     }
-
-
-
-
-
 
 
     async eliminarRuta(ciudad1, ciudad2) {
@@ -738,9 +616,6 @@ dibujarCiudades() {
             this.actualizarEstado("Error de conexión");
         }
     }
-
-
-
     
     async exportarMapa() {
         const svg = document.getElementById('mapa');
@@ -789,6 +664,7 @@ dibujarCiudades() {
             }
         });
 
+
         // ✅ ASEGURAR COLORES EN RUTAS
         const rutas = clone.querySelectorAll('.ruta');
         rutas.forEach(ruta => {
@@ -824,10 +700,7 @@ dibujarCiudades() {
         
         this.actualizarEstado("Mapa exportado como SVG");
     }
-
-  
-
-    
+   
 }
 
 // Inicializar cuando cargue la página

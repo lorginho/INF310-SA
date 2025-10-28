@@ -12,7 +12,7 @@
             <!-- SIDEBAR IZQUIERDO - CONTROLES -->
             <div class="sidebar left-sidebar">
                 <!-- FORMULARIO AGREGAR CIUDAD -->
-                <div class="form-section">
+                <div class="form-agregar-ciudad">
                     <h3>➕ Agregar Ciudad</h3>
                     <form id="form-ciudad">
                         <input type="text" id="nombre-ciudad" placeholder="Nombre de ciudad" required>
@@ -23,7 +23,7 @@
                 </div>
 
                 <!-- FORMULARIO AGREGAR RUTA -->
-                <div class="form-section">
+                <div class="form-agregar-ciudad">
                     <h3>🛣️ Agregar Ruta</h3>
                     <form id="form-ruta">
                         <select id="ciudad1-ruta" required>
@@ -48,9 +48,7 @@
                     </select>
                     <div class="botones-ruta">
                         <button onclick="calcularRuta()">Calcular Ruta</button>
-                        <button onclick="limpiarRuta()">Limpiar</button>
-                        <button onclick="exportarMapa()">📸 Exportar SVG</button>
-                        <button onclick="cerrarAplicacion()">❌ Cerrar</button>
+                        <button onclick="limpiarRuta()">Limpiar</button>                        
                     </div>
                 </div>
 
@@ -100,6 +98,14 @@
                 <div class="rutas-lista">
                     <h3>🛣️ Rutas</h3>
                     <div id="lista-rutas"></div>
+                </div>
+
+                <!-- CONTROLES SVG - Cerrar -->
+                <div class="controles">                    
+                    <div class="botones-ruta">                        
+                        <button onclick="exportarMapa()">📸 Exportar SVG</button>
+                        <button onclick="cerrarAplicacion()">❌ Salir </button>
+                    </div>
                 </div>
             </div>
         </div>

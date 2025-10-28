@@ -1,23 +1,20 @@
 """
-archivo: app.py
-Punto de entrada principal del proyecto Flask
-Autor: Lorgio Añez J.
-Fecha: 2025-10-23
+ARCHIVO: app.py
+AUTOR: Lorgio Añez J.
+FECHA: 2025-10-23
+DESCRIPCIÓN: Punto de entrada principal de la aplicación Flask.
 
-Descripción: app.py arranca la aplicación web, conecta los controladores
-y sirve la interfaz de usuario, permitiendo que el proyecto funcione 
-como una aplicación web interactiva.
+CONCEPTOS CLAVE:
+- Blueprint: Componente modular de rutas (api_bp desde routes/api.py)
+- Endpoints REST: URLs que responden a métodos HTTP (GET, POST, DELETE)
+- Los endpoints REST API son URLs específicas que aceptan 
+  operaciones HTTP (GET, POST, DELETE) para realizar acciones en el sistema, 
+  como obtener datos o modificar el grafo.
+- url_prefix='/api': Todas las rutas del blueprint empiezan con /api
 
-
-Resumen breve del funcionamiento de app.py:
-
-Crea la aplicación Flask: app = Flask(name).
-Instancia el controlador: controlador = MapaController(). 
-app.py delega la lógica al controlador (patrón MVC).
-Define la ruta raíz / que muestra la página principal (mapa.html).
-Iniciar el servidor web cuando se ejecuta el archivo directamente.
-
+DEPENDENCIAS: Flask, routes.api
 """
+
 
 from flask import Flask, render_template
 from routes.api import api_bp

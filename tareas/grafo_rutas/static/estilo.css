@@ -87,6 +87,13 @@ body {
 }
 
 
+/* SEPARACIÓN PARA CONTROLES INFERIORES DERECHA */
+.right-sidebar .controles:last-child {
+    margin-top: 20px;
+}
+
+
+
 /* BORDE PARA EL MAPA - TAMAÑO MEJORADO */
 .mapa-container {
     flex: 1;
@@ -140,7 +147,7 @@ body {
 
 
 /* FORMULARIO */
-.form-section {
+.form-agregar-ciudad {
     margin-bottom: 20px;
     padding: 15px;
     background: rgb(160, 184, 214);
@@ -148,21 +155,33 @@ body {
     border: 1px solid #ced4da;
 }
 
-.form-section h3 {
+.form-agregar-ciudad h3 {
     margin: 0 0 15px 0;
     color: #495057;
 }
 
-.form-section input {
+.form-agregar-ciudad input {
     width: 100%;
-    padding: 8px;
+    padding: 15px;
     margin: 5px 0;
     border: 1px solid #96a7b9;
     border-radius: 4px;
     box-sizing: border-box;
 }
 
-.form-section button {
+
+.form-agregar-ciudad  select {
+    width: 100%;
+    padding: 8px;
+    margin: 5px 0;
+    border: 1px solid #7798b9;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+
+
+.form-agregar-ciudad button {
     width: 100%;
     padding: 10px;
     background: #28a745;
@@ -173,7 +192,7 @@ body {
     margin-top: 10px;
 }
 
-.form-section button:hover {
+.form-agregar-ciudad button:hover {
     background: #218838;
 }
 

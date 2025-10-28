@@ -1,11 +1,12 @@
 """
-archivo: controllers/mapa_controller.py
-Controlador para operaciones del árbol binario (MVC)
-Autor: Lorgio Añez J.
-Fecha: 2025-10-23
-Descripción: Controlador que gestiona las operaciones 
-entre la vista ( Template ) y el modelo del grafo_rutas
+ARCHIVO: controllers/mapa_controller.py
+AUTOR: Lorgio Añez J.
+FECHA: 2025-10-23
+DESCRIPCIÓN: Controlador principal que coordina operaciones entre modelo y vista.
+             Gestiona ciudades, rutas y cálculo de caminos mínimos.
+DEPENDENCIAS: models.grafo_rutas, views.mapa_view
 """
+
 
 from models.grafo_rutas import GrafoRutas
 from views.mapa_view import MapaView

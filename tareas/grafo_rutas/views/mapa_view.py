@@ -1,3 +1,13 @@
+"""
+ARCHIVO: views/mapa_view.py
+AUTOR: Lorgio Añez J.
+FECHA: 2025-10-23
+DESCRIPCIÓN: Formatea datos para frontend y valida entradas.
+             Serializa respuestas JSON y maneja validaciones.
+DEPENDENCIAS: Ninguna
+"""
+
+
 class MapaView:
     @staticmethod
     def formatear_datos_mapa(datos_modelo):

@@ -1,3 +1,26 @@
+"""
+ARCHIVO: routes/api.py
+AUTOR: Lorgio Añez J.
+FECHA: 2025-10-23
+DESCRIPCIÓN: Define endpoints REST API para comunicación frontend-backend.
+             Maneja requests de mapa, rutas y ciudades.
+CONCEPTO CLAVE: 
+Blueprint de Flask
+- Los Blueprints son como "módulos" o "componentes" de rutas en Flask
+- Permiten organizar la aplicación en partes reutilizables
+- En este proyecto: api_bp agrupa todas las rutas /api/*
+- Se registra en app.py con: app.register_blueprint(api_bp, url_prefix='/api')             
+Endpoints REST API: URLs que aceptan operaciones HTTP específicas:
+  * GET /api/mapa → Obtener datos del mapa
+  * POST /api/ruta → Calcular ruta óptima  
+  * POST /api/ciudad → Agregar nueva ciudad
+  * DELETE /api/ciudad → Eliminar ciudad
+- REST: Arquitectura que usa HTTP para comunicación cliente-servidor
+
+DEPENDENCIAS: Flask, controllers.mapa_controller
+"""
+
+
 from flask import Blueprint, jsonify, request
 from controllers.mapa_controller import MapaController
 
