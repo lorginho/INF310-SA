@@ -268,3 +268,44 @@ Proceso de generar la visualización a partir de los datos.
 3. Backend procesa algoritmo → JSON response
 4. Frontend actualiza SVG → CSS animaciones
 5. Usuario ve resultado final
+
+# 📚 Glosario de Términos - Sistema de Rutas
+
+## 🎯 Cola de Prioridad
+
+**Definición:** Estructura de datos que siempre devuelve el elemento de mayor prioridad (en Dijkstra: menor distancia).
+**En el proyecto:** Implementada con `heapq` en Python para el algoritmo Dijkstra.
+**Funcionamiento:**
+
+- Los elementos se insertan como tuplas `(distancia, ciudad)`
+- `heapq.heappop()` siempre extrae el de menor distancia
+- Mantiene el orden automáticamente para eficiencia O(log n)
+  **Ejemplo:** Cola = `[(0, 'La Paz'), (375, 'Cochabamba'), (240, 'Oruro')]` → Extrae primero `(0, 'La Paz')`
+
+## 🧠 Dijkstra (Algoritmo)
+
+**Definición:** Algoritmo para encontrar el camino de costo mínimo en grafos con pesos no negativos.
+**En el proyecto:** Implementado en `GrafoRutas.dijkstra()` para calcular rutas óptimas entre ciudades bolivianas.
+**Características:** Usa cola de prioridad (heap), retorna camino, distancia y pasos para animación.
+**Ejemplo:** La Paz → Santa Cruz = ['La Paz', 'Cochabamba', 'Santa Cruz'], 855 km
+
+## 📤 Serializar a String XML
+
+**Definición:** Convertir estructura SVG en memoria a texto XML para guardar como archivo.
+**En el proyecto:** Usado en `SistemaRutas.exportarMapa()` para exportar el mapa interactivo como archivo .svg descargable.
+**Implementación:** `XMLSerializer().serializeToString(clone)` genera texto con etiquetas `<svg><circle>...</svg>`
+
+## 🔄 Reconstrucción (Dijkstra)
+
+**Definición:** Proceso de armado del camino final usando el diccionario de nodos anteriores.
+**En el proyecto:** `GrafoRutas._reconstruir_camino()` sigue la cadena desde destino hasta origen y invierte el orden.
+**Ejemplo:** `previos = {'Santa Cruz': 'Cochabamba', 'Cochabamba': 'La Paz'}` → Camino: `['La Paz', 'Cochabamba', 'Santa Cruz']`
+
+## 📊 Estructura de Retorno Dijkstra
+
+**Definición:** Diccionario con tres componentes del resultado del algoritmo.
+**Componentes:**
+
+- `camino`: Lista ordenada de ciudades (origen → destino)
+- `distancia`: Suma total de kilómetros del recorrido óptimo
+- `pasos`: Registro detallado para animación en frontend
