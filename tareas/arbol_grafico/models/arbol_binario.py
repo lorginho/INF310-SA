@@ -372,3 +372,97 @@ class ArbolBinario:
             return 0
 
         return self._contar_nodos(nodo)  # Reutilizamos el método existente
+
+    def es_simetrico(self):
+        """
+        Verifica si el árbol es simétrico (espejo) en estructura.
+
+        Returns:
+            True si el árbol es simétrico, False en caso contrario.
+        """
+        if self.raiz is None:
+            return True
+        return self._es_espejo(self.raiz.get_izquierdo(), self.raiz.get_derecho())
+
+    def _es_espejo(self, nodo1, nodo2):
+        """
+        Método auxiliar recursivo para verificar simetría.
+
+        Args:
+            nodo1: Nodo del subárbol izquierdo
+            nodo2: Nodo del subárbol derecho
+
+        Returns:
+            True si los subárboles son espejo, False en caso contrario.
+        """
+        # Ambos nodos son None - simétricos
+        if nodo1 is None and nodo2 is None:
+            return True
+
+        # Solo uno es None - no simétricos
+        if nodo1 is None or nodo2 is None:
+            return False
+
+        # Verificar recursivamente:
+        # - Izquierdo de nodo1 vs Derecho de nodo2
+        # - Derecho de nodo1 vs Izquierdo de nodo2
+        return (self._es_espejo(nodo1.get_izquierdo(), nodo2.get_derecho()) and
+                self._es_espejo(nodo1.get_derecho(), nodo2.get_izquierdo()))
+
+    def obtener_niveles_simetria(self):
+        """
+        Analiza la simetría de cada nivel del árbol.
+
+        Returns:
+            Lista de diccionarios con información de cada nivel
+            Ejemplo: [{'nivel': 0, 'simetrico': True, 'nodos': [5]}, ...]
+        """
+        if self.raiz is None:
+            return []
+
+        niveles = []
+        cola = [self.raiz]
+        nivel_actual = 0
+
+        while cola:
+            # Obtener nodos del nivel actual
+            nodos_nivel = []
+            siguiente_cola = []
+
+            for nodo in cola:
+                if nodo is None:
+                    nodos_nivel.append(None)
+                    siguiente_cola.extend([None, None])
+                else:
+                    nodos_nivel.append(nodo.get_dato())
+                    siguiente_cola.append(nodo.get_izquierdo())
+                    siguiente_cola.append(nodo.get_derecho())
+
+            # Verificar simetría del nivel
+            es_simetrico = self._nivel_es_simetrico(nodos_nivel)
+            niveles.append({
+                'nivel': nivel_actual,
+                'simetrico': es_simetrico,
+                'nodos': nodos_nivel
+            })
+
+            # Si todos son None, terminamos
+            if all(nodo is None for nodo in siguiente_cola):
+                break
+
+            cola = siguiente_cola
+            nivel_actual += 1
+
+        return niveles
+
+    def _nivel_es_simetrico(self, nodos_nivel):
+        """
+        Verifica si un nivel es simétrico comparando posiciones espejo.
+        """
+        n = len(nodos_nivel)
+        for i in range(n // 2):
+            # Comparar posición i con posición n-1-i
+            # Ambos deben ser None o ambos no-None
+            if (nodos_nivel[i] is None) != (nodos_nivel[n-1-i] is None):
+                return False
+        return True

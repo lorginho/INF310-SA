@@ -1,39 +1,12 @@
 """
 controllers/arbol_controller.py
-Controlador para operaciones del árbol binario (MVC)
-Autor: Lorgio Añez J.
-Fecha: 2025-09-23
-Descripción: Controlador que gestiona las operaciones 
-entre la vista ( Template ) y el modelo del árbol binario
-
-A Detalle: 
-
-El archivo arbol_controller.py funciona como controlador en una arquitectura
-MVC (Modelo-Vista-Controlador) para el proyecto de árbol binario usando Flask.
-
-Sus funciones principales son:
-
-Recibir y procesar solicitudes HTTP relacionadas con operaciones sobre el 
-árbol binario (insertar, eliminar, buscar, limpiar, obtener recorridos, estadísticas, 
-estructura y manipulación de ramas).
-Conectar la vista (frontend o cliente) con el modelo (ArbolBinario), gestionando
-la lógica de negocio y devolviendo respuestas en formato JSON.
-Exponer endpoints REST para que otras partes del sistema 
-como ser la interfaz web pueda interactuar con el árbol binario de manera sencilla.
-
-En resumen:
-arbol_controller.py es el intermediario que recibe peticiones del usuario,
-ejecuta operaciones sobre el árbol binario y responde con los resultados, 
-facilitando la comunicación entre la interfaz de usuario y la lógica del árbol.
-
+Controlador para operaciones del árbol binario
 """
 
 from flask import Blueprint, request, jsonify
 from models.arbol_binario import ArbolBinario
 
-# Crear instancia global del árbol (para simplicidad)
 arbol = ArbolBinario()
-
 arbol_bp = Blueprint('arbol', __name__)
 
 
@@ -59,11 +32,7 @@ def insertar():
                 'mensaje': 'Valor no válido'
             })
 
-    # Temporalmente no devolver estadísticas
-    return jsonify({
-        'resultados': resultados
-        # 'estadisticas': obtener_estadisticas()
-    })
+    return jsonify({'resultados': resultados})
 
 
 @arbol_bp.route('/eliminar', methods=['POST'])
@@ -140,6 +109,88 @@ def estadisticas():
     return jsonify(obtener_estadisticas())
 
 
+@arbol_bp.route('/estructura', methods=['GET'])
+def obtener_estructura():
+    def serializar_nodo(nodo):
+        if nodo is None:
+            return None
+        return {
+            'dato': nodo.get_dato(),
+            'izquierdo': serializar_nodo(nodo.get_izquierdo()),
+            'derecho': serializar_nodo(nodo.get_derecho())
+        }
+
+    estructura = serializar_nodo(arbol.raiz)
+    return jsonify({'raiz': estructura})
+
+
+@arbol_bp.route('/eliminar-rama', methods=['POST'])
+def eliminar_rama():
+    data = request.get_json()
+    valor = data.get('valor')
+
+    try:
+        valor_int = int(valor)
+        nodo_existe = arbol.buscar_x(valor_int) is not None
+
+        if not nodo_existe:
+            return jsonify({
+                'exito': False,
+                'mensaje': f'Nodo {valor_int} no encontrado'
+            })
+
+        rama_info = arbol.obtener_rama(valor_int)
+        cantidad_nodos = arbol.contar_nodos_rama(valor_int)
+        exito = arbol.eliminar_rama(valor_int)
+
+        return jsonify({
+            'exito': exito,
+            'mensaje': f'Rama eliminada: {cantidad_nodos} nodos removidos' if exito else 'No se pudo eliminar la rama',
+            'rama_eliminada': rama_info if exito else [],
+            'cantidad_nodos': cantidad_nodos if exito else 0,
+            'estadisticas': obtener_estadisticas()
+        })
+
+    except ValueError:
+        return jsonify({
+            'exito': False,
+            'mensaje': 'Valor no válido'
+        })
+    except Exception as e:
+        return jsonify({
+            'exito': False,
+            'mensaje': f'Error interno: {str(e)}'
+        })
+
+
+@arbol_bp.route('/simetrico', methods=['GET'])
+def verificar_simetria():
+    try:
+        es_simetrico = arbol.es_simetrico()
+        return jsonify({
+            'es_simetrico': es_simetrico,
+            'mensaje': 'El árbol es simétrico' if es_simetrico else 'El árbol no es simétrico'
+        })
+    except Exception as e:
+        return jsonify({
+            'error': f'Error al verificar simetría: {str(e)}'
+        }), 500
+
+
+@arbol_bp.route('/simetria-niveles', methods=['GET'])
+def obtener_simetria_niveles():
+    try:
+        niveles_simetria = arbol.obtener_niveles_simetria()
+        return jsonify({
+            'niveles_simetria': niveles_simetria,
+            'total_niveles': len(niveles_simetria)
+        })
+    except Exception as e:
+        return jsonify({
+            'error': f'Error al analizar simetría por niveles: {str(e)}'
+        }), 500
+
+
 def obtener_estadisticas():
     return {
         'altura': arbol.altura(),
@@ -165,130 +216,3 @@ def recorrido_postorden(nodo):
     if nodo is None:
         return []
     return recorrido_postorden(nodo.get_izquierdo()) + recorrido_postorden(nodo.get_derecho()) + [nodo.get_dato()]
-
-
-@arbol_bp.route('/estructura', methods=['GET'])
-def obtener_estructura():
-    """
-    Devuelve la estructura completa del árbol para visualización.
-    """
-    def serializar_nodo(nodo):
-        if nodo is None:
-            return None
-        return {
-            'dato': nodo.get_dato(),
-            'izquierdo': serializar_nodo(nodo.get_izquierdo()),
-            'derecho': serializar_nodo(nodo.get_derecho())
-        }
-
-    estructura = serializar_nodo(arbol.raiz)
-    return jsonify({'raiz': estructura})
-
-
-@arbol_bp.route('/eliminar-rama', methods=['POST'])
-def eliminar_rama():
-    """Elimina una rama completa del árbol."""
-    data = request.get_json()
-    valor = data.get('valor')
-
-    try:
-        valor_int = int(valor)
-
-        print(f"🔍 Intentando eliminar rama del nodo: {valor_int}")
-
-        # Verificar si el nodo existe
-        nodo_existe = arbol.buscar_x(valor_int) is not None
-        print(f"🔍 Nodo existe: {nodo_existe}")
-
-        if not nodo_existe:
-            return jsonify({
-                'exito': False,
-                'mensaje': f'Nodo {valor_int} no encontrado'
-            })
-
-        # Primero obtenemos información de la rama antes de eliminarla
-        rama_info = arbol.obtener_rama(valor_int)
-        cantidad_nodos = arbol.contar_nodos_rama(valor_int)
-
-        print(f"🔍 Rama a eliminar: {rama_info}")
-        print(f"🔍 Cantidad de nodos en la rama: {cantidad_nodos}")
-
-        # Eliminar la rama
-        exito = arbol.eliminar_rama(valor_int)
-
-        print(f"🔍 Eliminación exitosa: {exito}")
-
-        # Verificar si el nodo aún existe después de la eliminación
-        nodo_despues = arbol.buscar_x(valor_int) is not None
-        print(f"🔍 Nodo existe después de eliminar: {nodo_despues}")
-
-        return jsonify({
-            'exito': exito,
-            'mensaje': f'Rama eliminada: {cantidad_nodos} nodos removidos' if exito else 'No se pudo eliminar la rama',
-            'rama_eliminada': rama_info if exito else [],
-            'cantidad_nodos': cantidad_nodos if exito else 0,
-            'estadisticas': obtener_estadisticas()
-        })
-
-    except ValueError:
-        return jsonify({
-            'exito': False,
-            'mensaje': 'Valor no válido'
-        })
-    except Exception as e:
-        print(f"❌ Error al eliminar rama: {e}")
-        return jsonify({
-            'exito': False,
-            'mensaje': f'Error interno: {str(e)}'
-        })
-
-
-@arbol_bp.route('/info-rama/<int:valor>', methods=['GET'])
-def info_rama(valor):
-    """
-    Obtiene información sobre una rama específica del árbol.
-    Documentacion Extendida
-
-    Parámetros
-    ----------
-    valor : int (en la URL)
-        Valor del nodo raíz de la rama que se desea consultar.
-
-    Respuestas
-    ----------
-    200 OK
-        Devuelve un JSON con la información de la rama, con el formato:
-        {
-            "valor_raiz": <int>,      # El valor del nodo solicitado
-            "rama": <list>,           # Lista de nodos que conforman la rama
-            "cantidad_nodos": <int>,  # Número de nodos en la rama
-            "altura_rama": <int>      # Altura de la rama calculada
-        }
-
-    404 Not Found
-        Si no existe un nodo con el valor solicitado, devuelve:
-        {
-            "error": "Nodo no encontrado"
-        }
-
-    500 Internal Server Error
-        Si ocurre un error inesperado en la ejecución, devuelve:
-        {
-            "error": "<detalle del error>"
-        }
-    """
-
-    try:
-        rama = arbol.obtener_rama(valor)
-        if rama is None:
-            return jsonify({'error': 'Nodo no encontrado'}), 404
-
-        return jsonify({
-            'valor_raiz': valor,
-            'rama': rama,
-            'cantidad_nodos': len(rama),
-            # Reutilizamos método interno
-            'altura_rama': arbol._altura(arbol.buscar_x(valor))
-        })
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500

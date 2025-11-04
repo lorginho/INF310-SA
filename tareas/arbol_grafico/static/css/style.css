@@ -95,7 +95,7 @@ button {
 }
 
 button:hover {
-    background-color: hsl(2, 64%, 44%);
+    background-color: #c0392b;
 }
 
 #arbol-container {
@@ -118,8 +118,8 @@ button:hover {
     padding: 10px;
     background-color: hsl(152, 44%, 83%);
     border-radius: 4px;
-    min-height: 100px;
-    max-height: 200px;
+    min-height: 200px;
+    max-height: 500px;
     overflow-y: auto;
 }
 
@@ -129,29 +129,13 @@ button:hover {
 
 /* Estilos para los nodos del árbol en SVG */
 .nodo {
-    fill: #351d7e;
-    stroke: #050941;
+    fill: #667eea;
+    stroke: #5a6fd8;
     stroke-width: 2;
     cursor: pointer;
 }
 
-.nodo-texto {
-    fill: rgb(203, 230, 52);
-    font-family: Arial, sans-serif;
-    font-size: 12px;
-    text-anchor: middle;
-    pointer-events: none;
-}
-
 .linea {
-    stroke: #7f8c8d;
+    stroke: #666;
     stroke-width: 2;
-}
-
-.nodo-seleccionado {
-    fill: #e74c3c;
-}
-
-.nodo-encontrado {
-    fill: #2ecc71;
 }
