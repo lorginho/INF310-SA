@@ -1,46 +1,29 @@
 /*
 static/js/script.js
-
-Autor: Lorgio Añez J.
-Fecha: 2025-09-23
-
-Descripción: 
-
-El archivo script.js es el principal, tambien unico :(, archivo JavaScript del frontend del proyecto.
-Conecta la interfaz gráfica con el backend, permitiendo que el usuario interactúe
-visualmente y en tiempo real con el árbol binario.
-
-Sus funciones principales son:
-
-Gestionar la interacción del usuario con la interfaz web (formularios, botones, eventos de teclado).
-Comunicar la interfaz con el backend Flask mediante peticiones AJAX (fetch) 
-a los endpoints definidos en el controlador.
-Actualizar dinámicamente la visualización del árbol binario en SVG, dibujando nodos y ramas 
-según los datos recibidos del backend.
-Mostrar mensajes, estadísticas y resultados de las operaciones realizadas sobre el árbol.
-Controlar animaciones y estados de la aplicación para una experiencia de usuario fluida.
+Controlador frontend para visualización de árbol binario
 */
 
-
-// Configuración global, "apariencia" de los nodos
+// Configuración global
 const CONFIG = {
     nodeRadius: 25,
     horizontalSpacing: 75,
-    verticalSpacing: 75,
-    animationDuration: 500
+    verticalSpacing: 75
 };
 
 // Estado de la aplicación
 let estado = {
     arbolData: null,
-    nodosSeleccionados: new Set(),
     animacionActiva: false
 };
+
+// Estado para controlar modo de coloreado
+let modoSimetria = false;
+let infoNiveles = [];
 
 // Inicialización
 document.addEventListener('DOMContentLoaded', function() {
     cargarEstadisticas();
-    setInterval(cargarEstadisticas, 3000); // Actualizar estadísticas cada 3 segundos
+    setInterval(cargarEstadisticas, 3000);
 });
 
 // Funciones de utilidad
@@ -48,14 +31,6 @@ function mostrarMensaje(mensaje, tipo = 'info') {
     const mensajesDiv = document.getElementById('mensajes');
     mensajesDiv.innerHTML = `<div class="mensaje ${tipo}">${mensaje}</div>`;
     
-    if (tipo === 'error') {
-        console.error(mensaje);
-    } else {
-        console.log(mensaje);
-    }
-}
-
-function limpiarMensajes() {
     setTimeout(() => {
         document.getElementById('mensajes').innerHTML = '';
     }, 3000);
@@ -90,13 +65,8 @@ async function insertarIndividual() {
     const input = document.getElementById('nodoIndividual');
     const valor = input.value.trim();
     
-    if (!valor) {
-        mostrarMensaje('Ingrese un valor numérico', 'error');
-        return;
-    }
-    
-    if (!/^-?\d+$/.test(valor)) {
-        mostrarMensaje('Solo se permiten números enteros', 'error');
+    if (!valor || !/^-?\d+$/.test(valor)) {
+        mostrarMensaje('Ingrese un valor numérico válido', 'error');
         return;
     }
     
@@ -119,7 +89,6 @@ async function insertarIndividual() {
         mostrarMensaje('Error al insertar nodo', 'error');
     } finally {
         estado.animacionActiva = false;
-        limpiarMensajes();
     }
 }
 
@@ -130,7 +99,7 @@ async function insertarSerie() {
     const serie = input.value.trim();
     
     if (!serie) {
-        mostrarMensaje('Ingrese una serie de números separados por espacios', 'error');
+        mostrarMensaje('Ingrese una serie de números', 'error');
         return;
     }
     
@@ -156,7 +125,6 @@ async function insertarSerie() {
         
         input.value = '';
         
-        // Mostrar resumen de inserciones
         const exitosas = data.resultados.filter(r => r.exito).length;
         const duplicados = data.resultados.filter(r => !r.exito).length;
         
@@ -172,7 +140,6 @@ async function insertarSerie() {
         mostrarMensaje('Error al insertar serie', 'error');
     } finally {
         estado.animacionActiva = false;
-        limpiarMensajes();
     }
 }
 
@@ -182,13 +149,8 @@ async function eliminarNodo() {
     const input = document.getElementById('eliminarNodo');
     const valor = input.value.trim();
     
-    if (!valor) {
-        mostrarMensaje('Ingrese un valor a eliminar', 'error');
-        return;
-    }
-    
-    if (!/^-?\d+$/.test(valor)) {
-        mostrarMensaje('Solo se permiten números enteros', 'error');
+    if (!valor || !/^-?\d+$/.test(valor)) {
+        mostrarMensaje('Ingrese un valor numérico válido', 'error');
         return;
     }
     
@@ -211,7 +173,6 @@ async function eliminarNodo() {
         mostrarMensaje('Error al eliminar nodo', 'error');
     } finally {
         estado.animacionActiva = false;
-        limpiarMensajes();
     }
 }
 
@@ -219,13 +180,8 @@ async function buscarNodo() {
     const input = document.getElementById('buscarNodo');
     const valor = input.value.trim();
     
-    if (!valor) {
-        mostrarMensaje('Ingrese un valor a buscar', 'error');
-        return;
-    }
-    
-    if (!/^-?\d+$/.test(valor)) {
-        mostrarMensaje('Solo se permiten números enteros', 'error');
+    if (!valor || !/^-?\d+$/.test(valor)) {
+        mostrarMensaje('Ingrese un valor numérico válido', 'error');
         return;
     }
     
@@ -244,8 +200,6 @@ async function buscarNodo() {
         
     } catch (error) {
         mostrarMensaje('Error al buscar nodo', 'error');
-    } finally {
-        limpiarMensajes();
     }
 }
 
@@ -260,15 +214,13 @@ async function realizarRecorrido(tipo) {
 }
 
 async function limpiarArbol() {
-
-    /*
-    if (!confirm('¿Está seguro de que desea limpiar el árbol completo?')) {
-        return;
-    }
-    */
     try {
         const data = await fetchAPI('/limpiar', { method: 'POST' });
         mostrarMensaje(data.mensaje, 'success');
+        
+        modoSimetria = false;
+        infoNiveles = [];
+        
         await actualizarVisualizacion();
         await cargarEstadisticas();
     } catch (error) {
@@ -277,8 +229,7 @@ async function limpiarArbol() {
 }
 
 async function generarAleatorio() {
-    // Generar N números aleatorios entre 1 y 100
-    N = 6
+    const N = 6;
     const valores = Array.from({ length: N }, () => 
         Math.floor(Math.random() * 200) + 1
     );
@@ -287,28 +238,80 @@ async function generarAleatorio() {
     await insertarSerie();
 }
 
-
-async function actualizarVisualizacion() {
+// Funciones de simetría
+async function verSimetriaNiveles() {
     try {
-        console.log("🔄 Actualizando visualización...");
-        const data = await fetchAPI('/estructura');
-        console.log("📊 Datos recibidos:", data);
-        estado.arbolData = data;
-        dibujarArbol(data.raiz);
+        const data = await fetchAPI('/simetria-niveles');
+        infoNiveles = data.niveles_simetria;
+        modoSimetria = true;
+        
+        await actualizarVisualizacion();
+        mostrarResumenSimetriaNiveles(infoNiveles);
+        mostrarMensaje('Análisis de simetría por niveles completado', 'success');
+        
     } catch (error) {
-        console.error('❌ Error al actualizar visualización:', error);
+        mostrarMensaje('Error al analizar simetría por niveles: ' + error.message, 'error');
     }
 }
 
+async function verificarSimetria() {
+    try {
+        const data = await fetchAPI('/simetrico');
+        
+        const resultadosDiv = document.getElementById('resultados');
+        if (data.es_simetrico) {
+            resultadosDiv.innerHTML = `
+                <strong>✅ Árbol Simétrico</strong><br>
+                <p>El árbol es estructuralmente simétrico (espejo).</p>
+            `;
+            mostrarMensaje('✅ ' + data.mensaje, 'success');
+        } else {
+            resultadosDiv.innerHTML = `
+                <strong>❌ Árbol No Simétrico</strong><br>
+                <p>El árbol NO es estructuralmente simétrico.</p>
+            `;
+            mostrarMensaje('❌ ' + data.mensaje, 'error');
+        }
+    } catch (error) {
+        mostrarMensaje('Error al verificar simetría: ' + error.message, 'error');
+    }
+}
+
+function mostrarResumenSimetriaNiveles(niveles) {
+    const resultadosDiv = document.getElementById('resultados');
+    let html = '<strong>📊 Análisis de Simetría por Niveles</strong><br>';
+    
+    niveles.forEach(nivel => {
+        const color = nivel.simetrico ? '🟢' : '🔴';
+        const estado = nivel.simetrico ? 'SIMÉTRICO' : 'ASIMÉTRICO';
+        const nodosStr = nivel.nodos.map(n => n !== null ? `●${n}` : '∅').join(' ');
+        
+        html += `<div style="margin: 5px 0; color: ${nivel.simetrico ? 'green' : 'red'}">
+            <strong>Nivel ${nivel.nivel}:</strong> ${nodosStr} ${color} ${estado}
+        </div>`;
+    });
+    
+    resultadosDiv.innerHTML = html;
+}
+
+// Funciones de visualización
+async function actualizarVisualizacion() {
+    try {
+        const data = await fetchAPI('/estructura');
+        estado.arbolData = data;
+        dibujarArbol(data.raiz);
+    } catch (error) {
+        console.error('Error al actualizar visualización:', error);
+        modoSimetria = false;
+        infoNiveles = [];
+    }
+}
 
 function dibujarArbol(raiz) {
-    console.log("🎨 Iniciando dibujo del árbol");
     const svg = document.getElementById('arbol-svg');
     svg.innerHTML = '';
     
     if (!raiz) {
-        console.log("ℹ️ El árbol está vacío");
-        // Dibujar mensaje en el centro del SVG
         const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         text.setAttribute('x', '50%');
         text.setAttribute('y', '50%');
@@ -320,30 +323,18 @@ function dibujarArbol(raiz) {
         return;
     }
     
-    // Calcular dimensiones del SVG
     const svgRect = svg.getBoundingClientRect();
     const svgWidth = svgRect.width || 800;
-    const svgHeight = svgRect.height || 600;
     
-    console.log(`📐 Dimensiones SVG: ${svgWidth}x${svgHeight}`);
-    
-    // Calcular posiciones
     const posiciones = {};
     calcularPosicionesSimple(raiz, posiciones, 0, svgWidth / 2, svgWidth / 4);
     
-    console.log("📍 Posiciones calculadas:", posiciones);
-    
-    // Dibujar líneas primero
     dibujarLineas(svg, raiz, posiciones);
     
-    // Dibujar nodos
     Object.keys(posiciones).forEach(valor => {
         const { x, y } = posiciones[valor];
-        console.log(`🔘 Dibujando nodo ${valor} en (${x}, ${y})`);
         dibujarNodo(svg, valor, x, y);
     });
-
-    
 }
 
 function calcularPosicionesSimple(nodo, posiciones, nivel, x, offset) {
@@ -358,7 +349,6 @@ function calcularPosicionesSimple(nodo, posiciones, nivel, x, offset) {
         calcularPosicionesSimple(nodo.derecho, posiciones, nivel + 1, x + offset, offset / 2);
     }
 }
-
 
 function dibujarLineas(svg, nodo, posiciones) {
     if (!nodo) return;
@@ -392,18 +382,28 @@ function dibujarLinea(svg, x1, y1, x2, y2) {
 function dibujarNodo(svg, valor, x, y) {
     const grupo = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     
-    // Círculo del nodo
+    let colorNodo = '#667eea';
+    
+    if (modoSimetria && infoNiveles.length > 0) {
+        for (const nivelInfo of infoNiveles) {
+            const valorNumerico = parseInt(valor);
+            if (nivelInfo.nodos.includes(valorNumerico)) {
+                colorNodo = nivelInfo.simetrico ? '#4CAF50' : '#F44336';
+                break;
+            }
+        }
+    }
+    
     const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     circle.setAttribute('cx', x);
     circle.setAttribute('cy', y);
     circle.setAttribute('r', CONFIG.nodeRadius);
-    circle.setAttribute('fill', '#667eea');
+    circle.setAttribute('fill', colorNodo);
     circle.setAttribute('stroke', '#5a6fd8');
     circle.setAttribute('stroke-width', '2');
     circle.setAttribute('class', 'nodo');
     circle.setAttribute('data-valor', valor);
     
-    // Texto del valor
     const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
     text.setAttribute('x', x);
     text.setAttribute('y', y + 5);
@@ -418,36 +418,72 @@ function dibujarNodo(svg, valor, x, y) {
     svg.appendChild(grupo);
 }
 
-
 function resaltarNodo(valor) {
-    console.log("Buscando nodo con valor:", valor);
-    
-    // Buscar todos los elementos con data-valor
     const nodos = document.querySelectorAll('[data-valor]');
-    console.log("Nodos encontrados en el SVG:", nodos.length);
     
     let encontrado = false;
     nodos.forEach(nodo => {
         const valorNodo = nodo.getAttribute('data-valor');
-        console.log("Nodo valor:", valorNodo, "Buscando:", valor);
         
         if (parseInt(valorNodo) === parseInt(valor)) {
-            console.log("¡Nodo encontrado! Resaltando...");
             nodo.style.fill = '#4CAF50';
             encontrado = true;
             
-            // Quitar el resaltado después de 2 segundos
             setTimeout(() => {
                 nodo.style.fill = '#667eea';
             }, 2000);
         }
     });
-    
-    if (!encontrado) {
-        console.log("Nodo no encontrado en la visualización");
-    }
 }
 
+async function eliminarRama() {
+    const input = document.getElementById('eliminarRama');
+    const valor = input.value.trim();
+    
+    if (!valor || !/^-?\d+$/.test(valor)) {
+        mostrarMensaje('Ingrese un valor numérico válido', 'error');
+        return;
+    }
+    
+    const valorInt = parseInt(valor);
+    
+    try {
+        const dataBusqueda = await fetchAPI('/buscar', {
+            method: 'POST',
+            body: JSON.stringify({ valor: valorInt })
+        });
+        
+        if (!dataBusqueda.encontrado) {
+            mostrarMensaje(`El nodo ${valor} no existe en el árbol`, 'error');
+            return;
+        }
+        
+        const data = await fetchAPI('/eliminar-rama', {
+            method: 'POST',
+            body: JSON.stringify({ valor: valorInt })
+        });
+        
+        input.value = '';
+        
+        if (data.exito) {
+            mostrarMensaje(data.mensaje, 'success');
+            document.getElementById('resultados').innerHTML = 
+                `<strong>✅ Rama eliminada exitosamente</strong><br>
+                 <strong>Nodos eliminados:</strong> ${data.rama_eliminada.join(' → ')}<br>
+                 <strong>Total de nodos eliminados:</strong> ${data.cantidad_nodos}`;
+            
+            await actualizarVisualizacion();
+            await cargarEstadisticas();
+        } else {
+            mostrarMensaje(data.mensaje, 'error');
+            document.getElementById('resultados').innerHTML = 
+                `<strong>❌ Error al eliminar rama</strong><br>${data.mensaje}`;
+        }
+        
+    } catch (error) {
+        mostrarMensaje('Error al eliminar rama: ' + error.message, 'error');
+    }
+}
 
 async function cargarEstadisticas() {
     try {
@@ -464,12 +500,14 @@ async function cargarEstadisticas() {
                 <p><strong>Nodos internos:</strong> ${data.total_nodos - data.nodos_hoja}</p>
             `;
         }
-    } catch (error) {        
-        // En caso de error, mostramos un mensaje pero no fallamos
-        console.error('Error al cargar estadísticas:', error);
+    } catch (error) {
         const statsDiv = document.getElementById('estadisticas');
         statsDiv.innerHTML = '<p>Estadísticas no disponibles temporalmente</p>';
     }
+}
+
+function salir() {
+    window.close();
 }
 
 // Event listeners para teclado
@@ -487,139 +525,3 @@ document.addEventListener('keypress', function(e) {
         }
     }
 });
-
-async function eliminarRama() {
-    const input = document.getElementById('eliminarRama');
-    const valor = input.value.trim();
-    
-    if (!valor) {
-        mostrarMensaje('Ingrese un valor para eliminar la rama', 'error');
-        return;
-    }
-    
-    if (!/^-?\d+$/.test(valor)) {
-        mostrarMensaje('Solo se permiten números enteros', 'error');
-        return;
-    }
-    
-    const valorInt = parseInt(valor);
-    
-    // Primero verificamos si el nodo existe
-    try {
-        const dataBusqueda = await fetchAPI('/buscar', {
-            method: 'POST',
-            body: JSON.stringify({ valor: valorInt })
-        });
-        
-        if (!dataBusqueda.encontrado) {
-            mostrarMensaje(`El nodo ${valor} no existe en el árbol`, 'error');
-            return;
-        }
-        
-        /*
-        if (!confirm(`
-            ¿Está seguro de que desea eliminar toda la rama que comienza
-             en el nodo ${valor}? Esta acción eliminará el nodo ${valor} y 
-            todos sus descendientes. Esta acción no se puede deshacer.`)) {
-            return;
-        }
-        
-        */
-        const data = await fetchAPI('/eliminar-rama', {
-            method: 'POST',
-            body: JSON.stringify({ valor: valorInt })
-        });
-        
-        input.value = '';
-        
-        if (data.exito) {
-            mostrarMensaje(data.mensaje, 'success');
-            // Mostrar información detallada de la rama eliminada
-            document.getElementById('resultados').innerHTML = 
-                `<strong>✅ Rama eliminada exitosamente</strong><br>
-                 <strong>Nodos eliminados:</strong> ${data.rama_eliminada.join(' → ')}<br>
-                 <strong>Total de nodos eliminados:</strong> ${data.cantidad_nodos}`;
-            
-            await actualizarVisualizacion();
-            await cargarEstadisticas();
-        } else {
-            mostrarMensaje(data.mensaje, 'error');
-            document.getElementById('resultados').innerHTML = 
-                `<strong>❌ Error al eliminar rama</strong><br>
-                 ${data.mensaje}`;
-        }
-        
-    } catch (error) {
-        mostrarMensaje('Error al eliminar rama: ' + error.message, 'error');
-    }
-}
-
-
-
-
-
-async function mostrarInfoRama() {
-    const valor = prompt('Ingrese el valor del nodo para ver información de su rama:');
-    
-    if (!valor || !/^-?\d+$/.test(valor)) {
-        mostrarMensaje('Valor no válido', 'error');
-        return;
-    }
-    
-    try {
-        // Usaremos el endpoint de búsqueda y luego calcularemos la rama
-        const dataBusqueda = await fetchAPI('/buscar', {
-            method: 'POST',
-            body: JSON.stringify({ valor: parseInt(valor) })
-        });
-        
-        if (!dataBusqueda.encontrado) {
-            mostrarMensaje('Nodo no encontrado', 'error');
-            return;
-        }
-        
-        // Para obtener la rama, necesitamos un endpoint específico
-        // Por ahora, mostramos un mensaje informativo
-        mostrarMensaje(`Nodo ${valor} encontrado. Use "Eliminar Rama" para ver información detallada.`, 'info');
-        
-    } catch (error) {
-        mostrarMensaje('Error al obtener información de la rama', 'error');
-    }
-}
-
-
-
-async function verificarRama() {
-    const valor = prompt('Ingrese el valor del nodo para ver información de su rama:');
-    
-    if (!valor || !/^-?\d+$/.test(valor)) {
-        mostrarMensaje('Valor no válido', 'error');
-        return;
-    }
-    
-    try {
-        const dataBusqueda = await fetchAPI('/buscar', {
-            method: 'POST',
-            body: JSON.stringify({ valor: parseInt(valor) })
-        });
-        
-        if (!dataBusqueda.encontrado) {
-            mostrarMensaje(`El nodo ${valor} no existe en el árbol`, 'error');
-            return;
-        }
-        
-        // Para obtener información detallada de la rama, necesitamos un endpoint
-        // Por ahora, usamos uno temporal o mostramos información básica
-        mostrarMensaje(`El nodo ${valor} existe. Puede eliminar toda su rama usando el botón "Eliminar Rama".`, 'info');
-        
-    } catch (error) {
-        mostrarMensaje('Error al verificar la rama', 'error');
-    }
-}
-
-function salir() {
-
-    // Sale de la Aplicacion al cerrar la Ventana del Navegador
-    window.close();
-
-}

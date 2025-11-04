@@ -17,15 +17,16 @@ para operar sobre el árbol binario.
 Definir la ruta raíz / que muestra la página principal (index.html).
 Iniciar el servidor web cuando se ejecuta el archivo directamente.
 
+app.py
+Punto de entrada principal del proyecto Flask
 """
 
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template
 from controllers.arbol_controller import arbol_bp
 
 app = Flask(__name__)
 app.secret_key = 'arbol_binario_secret_key'
 
-# Registrar blueprint
 app.register_blueprint(arbol_bp)
 
 
