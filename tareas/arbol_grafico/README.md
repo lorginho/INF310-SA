@@ -6,6 +6,12 @@ README.md
 - Descripción: `Aplicacion que representa un árbol binario` con métodos para insertar, buscar, eliminar, recorrer nodos, etc. La representacion del Arbol se realiza graficamente en una aplicacion WEB, con arquitectura MVC.
 - Materia: Estructura de Datos II, INF310
 
+# Para probar la aplicacion
+
+[Visitar el sitio web de Lorgio](https://lorginho.pythonanywhere.com/)
+
+https://lorginho.pythonanywhere.com/
+
 ![alt text](arbol_no_simetrico.png)
 ![alt text](image.png)
 
