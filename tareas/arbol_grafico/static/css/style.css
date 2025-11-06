@@ -101,16 +101,14 @@ button {
     transition: background-color 0.3s;
     font-size:medium;
     width: 100%;
-    align-self: center;
-    
-    
+    align-self: center;        
 }
 
 button:hover {
     background-color: #c0392b;
 }
 
-button2 {
+.btn-special {
     padding: 8px 12px;
     background-color: #4a3d97;
     color: rgb(218, 193, 193);
@@ -123,10 +121,14 @@ button2 {
     align-self: center;
 }
 
-button2:hover {
+.btn-special:hover {
     background-color: #2b5a22;
 }
 
+.btn-salir {
+    background-color: rgb(92, 52, 75); 
+    width: 75%; 
+}
 
 
 #arbol-container {
