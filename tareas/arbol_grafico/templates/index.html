@@ -13,7 +13,6 @@
         </header>
 
         <div class="main-content">
-            <!-- Panel Izquierdo - Controles -->
             <div class="panel left-panel">
                 <div class="section">
                     <h3>Ingreso de Nodos</h3>
@@ -52,16 +51,26 @@
                 </div>
 
                 <div class="section">
-                    <h3>Utilidades</h3>
+                    <h3>Utilidades Generales</h3>
                     <button onclick="limpiarArbol()">Limpiar Árbol</button>
-                    <button onclick="generarAleatorio()">Árbol Aleatorio</button>
+                    <button onclick="generarAleatorio()">Árbol Aleatorio</button>                    
+                </div>
+                
+                <div class="section">
+                    <h3>Balanceo (AVL)</h3>
+                    <button onclick="verificarBalanceo()">Verificar Balanceo</button>
+                    <button onclick="balancearArbol()">Balancear Árbol</button>
+                </div>
+                
+                <div class="section">
+                    <h3>Simetría</h3>
                     <button onclick="verificarSimetria()">Verificar Simetría</button>
                     <button onclick="verSimetriaNiveles()">Ver Simetría por Niveles</button>
                     <button style="background-color: rgb(131, 93, 93);" onclick="salir()">Salir</button> 
                 </div>
+                
             </div>
 
-            <!-- Panel Central - Visualización -->
             <div class="panel center-panel">
                 <div id="arbol-container">
                     <svg id="arbol-svg" width="100%" height="100%"></svg>
@@ -69,7 +78,6 @@
                 <div id="mensajes"></div>
             </div>
 
-            <!-- Panel Derecho - Información -->
             <div class="panel right-panel">
                 <div class="section">
                     <h3>Resultados</h3>

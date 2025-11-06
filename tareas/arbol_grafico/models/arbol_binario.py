@@ -83,6 +83,14 @@ class ArbolBinario:
         """
         return self.raiz is None
 
+    # <-- FUNCIÓN AÑADIDA: LIMPIAR ARBOL
+    def limpiar_arbol(self):
+        """
+        Establece la raíz a None, eliminando todo el árbol.
+        """
+        self.raiz = None
+    # FUNCIÓN AÑADIDA: LIMPIAR ARBOL -->
+
     def es_hoja(self, nodo):
         """
         Verifica si un nodo es una hoja.
@@ -140,6 +148,21 @@ class ArbolBinario:
             self.in_orden(nodo.get_izquierdo())
             print(nodo.get_dato(), end=" ")
             self.in_orden(nodo.get_derecho())
+
+    # <-- FUNCIÓN AÑADIDA: IN_ORDEN QUE DEVUELVE LISTA (para balanceo)
+    def _in_orden_list(self, nodo):
+        """
+        Método auxiliar para recorrido in-orden que devuelve una lista de valores.
+        """
+        if nodo is None:
+            return []
+
+        # Inorden: Izquierda -> Raíz -> Derecha
+        return (self._in_orden_list(nodo.get_izquierdo()) +
+                [nodo.get_dato()] +
+                self._in_orden_list(nodo.get_derecho()))
+
+    # FUNCIÓN AÑADIDA: IN_ORDEN QUE DEVUELVE LISTA (para balanceo) -->
 
     def post_orden(self, nodo):
         """
@@ -372,6 +395,76 @@ class ArbolBinario:
             return 0
 
         return self._contar_nodos(nodo)  # Reutilizamos el método existente
+
+    # <-- FUNCIÓN AÑADIDA: VERIFICAR BALANCEO
+    def esta_balanceado(self):
+        """
+        Verifica si el árbol completo es balanceado (propiedad AVL: factor de equilibrio <= 1 en todos los nodos).
+        """
+
+        # Función recursiva auxiliar anidada: retorna (es_balanceado, altura_del_subarbol)
+        def verificar(nodo):
+            if nodo is None:
+                return True, 0
+
+            # Verificar y obtener altura de los hijos
+            izq_balanceado, h_izq = verificar(nodo.get_izquierdo())
+            der_balanceado, h_der = verificar(nodo.get_derecho())
+
+            # Calcular el Factor de Equilibrio (FE)
+            fe = h_izq - h_der
+
+            # Un nodo está balanceado si:
+            # 1. Sus hijos están balanceados.
+            # 2. Su propio FE está entre -1 y 1.
+            nodo_balanceado = izq_balanceado and der_balanceado and abs(
+                fe) <= 1
+
+            # Retornar estado y altura del subárbol actual
+            return nodo_balanceado, 1 + max(h_izq, h_der)
+
+        balanceado, _ = verificar(self.raiz)
+        return balanceado
+    # FUNCIÓN AÑADIDA: VERIFICAR BALANCEO -->
+
+    # <-- FUNCIÓN AÑADIDA: FORZAR BALANCEO
+    def forzar_balanceo(self):
+        """
+        Reconstruye el árbol a partir del recorrido inorden para crear un ABB perfectamente balanceado 
+        (altura mínima).
+        """
+        if self.raiz is None:
+            return True
+
+        # 1. Obtener los elementos ordenados (recorrido inorden)
+        # Importar la función del controlador para obtener los valores
+        from controllers.arbol_controller import recorrido_inorden
+        elementos = recorrido_inorden(self.raiz)
+
+        # 2. Función auxiliar para construir el ABB balanceado
+        def construir_balanceado(lista):
+            if not lista:
+                return None
+
+            medio = len(lista) // 2
+
+            # El elemento central será la raíz del sub-árbol
+            nueva_raiz = Nodo(lista[medio])
+
+            # Construir sub-árboles recursivamente
+            nueva_raiz.set_izquierdo(construir_balanceado(lista[:medio]))
+            nueva_raiz.set_derecho(construir_balanceado(lista[medio+1:]))
+
+            return nueva_raiz
+
+        # Limpiar el árbol antes de reconstruir
+        self.limpiar_arbol()
+
+        # Asignar la nueva raíz balanceada
+        self.raiz = construir_balanceado(elementos)
+
+        return True
+    # FUNCIÓN AÑADIDA: FORZAR BALANCEO -->
 
     def es_simetrico(self):
         """

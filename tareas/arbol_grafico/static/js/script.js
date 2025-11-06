@@ -13,7 +13,8 @@ const CONFIG = {
 // Estado de la aplicación
 let estado = {
     arbolData: null,
-    animacionActiva: false
+    animacionActiva: false,
+    mapaNodosNivel: new Map() // <-- CAMBIO 1: Nuevo mapa para búsqueda O(1)
 };
 
 // Estado para controlar modo de coloreado
@@ -295,30 +296,21 @@ function mostrarResumenSimetriaNiveles(niveles) {
 }
 
 // Funciones de visualización
-/*
-async function actualizarVisualizacion() {
-    try {
-        const data = await fetchAPI('/estructura');
-        estado.arbolData = data;
-        dibujarArbol(data.raiz);
-    } catch (error) {
-        console.error('Error al actualizar visualización:', error);
-        modoSimetria = false;
-        infoNiveles = [];
-    }
-}*/
-
 
 async function actualizarVisualizacion() {
     try {
         // 1. VERIFICAR SI EL MODO SIMETRÍA ESTÁ ACTIVO
         if (modoSimetria) {
-            // Si lo está, refrescamos los datos de niveles
             const dataSimetria = await fetchAPI('/simetria-niveles');
             infoNiveles = dataSimetria.niveles_simetria;
             
-            // (Opcional pero recomendado) Actualizar también el panel de resultados
+            // 🚨 OPTIMIZACIÓN CLAVE: Crear el mapa de búsqueda
+            estado.mapaNodosNivel = crearMapaNodosNivel(infoNiveles);
+            
             mostrarResumenSimetriaNiveles(infoNiveles);
+        } else {
+            // Si el modo simetría se desactiva, limpiamos el mapa
+            estado.mapaNodosNivel.clear(); 
         }
 
         // 2. OBTENER Y DIBUJAR LA ESTRUCTURA (como antes)
@@ -328,13 +320,12 @@ async function actualizarVisualizacion() {
         
     } catch (error) {
         console.error('Error al actualizar visualización:', error);
-        // Si algo falla, reseteamos el modo
+        // Si algo falla, reseteamos el modo y el mapa
         modoSimetria = false;
         infoNiveles = [];
+        estado.mapaNodosNivel.clear();
     }
 }
-
-
 
 
 
@@ -412,51 +403,37 @@ function dibujarLinea(svg, x1, y1, x2, y2) {
 }
 
 
+
 function dibujarNodo(svg, valor, x, y) {
     const grupo = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     
-    let colorNodo = '#667eea'; // Color por defecto (Azul/Lila)
-    const valorNumerico = parseInt(valor); // El valor del nodo a buscar (como número)
+    let colorNodo = '#667eea'; 
+    const valorNumerico = parseInt(valor); // Valor del nodo como número
 
-    // 1. Lógica de Simetría (solo si el modo está activo)
-    if (modoSimetria && infoNiveles.length > 0) {
+    // 🚨 BÚSQUEDA O(1): Usamos el mapa para encontrar la información de nivel al instante.
+    if (modoSimetria && estado.mapaNodosNivel.size > 0) {
         
-        let nivelInfoCoincidente = null;
+        // Busca el objeto nivelInfo directamente usando el valor del nodo como clave
+        const nivelInfoCoincidente = estado.mapaNodosNivel.get(valorNumerico); 
 
-        // Recorrer la información de niveles para encontrar el nodo
-        for (const nivelInfo of infoNiveles) {
-            
-            // 2. Búsqueda Segura: Iterar sobre el array de nodos del nivel
-            for (const nodoNivel of nivelInfo.nodos) {
-                
-                // Comparamos el nodo del nivel con el valor del nodo a dibujar.
-                // Usamos la comparación no estricta (==) para que un Number (50) coincida
-                // con el Number o String que viene del JSON, ignorando el valor 'null'.
-                if (nodoNivel == valorNumerico) { 
-                    nivelInfoCoincidente = nivelInfo;
-                    break; 
-                }
-            }
-            if (nivelInfoCoincidente) {
-                break; // Nivel encontrado, salimos del bucle de niveles
-            }
-        }
-        
-        // 3. Aplicar el color de Simetría
+        // Aplicar el color de Simetría si se encontró el nodo en el mapa
         if (nivelInfoCoincidente) {
             colorNodo = nivelInfoCoincidente.simetrico ? '#4CAF50' : '#F44336'; // Verde o Rojo
         }
     }
     
-    // 4. Aplicación de Estilos con Alta Prioridad
+    // -------------------------------------------------------------
+    // Resto del código de dibujo (Asegura la prioridad de estilo)
+    // -------------------------------------------------------------
+    
     const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     circle.setAttribute('cx', x);
     circle.setAttribute('cy', y);
     circle.setAttribute('r', CONFIG.nodeRadius);
     
-    // Aplica el color como atributo y como estilo (la clave para evitar sobrescrituras)
+    // Aplicación de color con alta prioridad (solución final al fallo de color)
     circle.setAttribute('fill', colorNodo); 
-    circle.style.fill = colorNodo; // <--- Soluciona el problema de sobrescritura
+    circle.style.fill = colorNodo; 
     
     circle.setAttribute('stroke', '#5a6fd8');
     circle.setAttribute('stroke-width', '2');
@@ -476,9 +453,6 @@ function dibujarNodo(svg, valor, x, y) {
     grupo.appendChild(text);
     svg.appendChild(grupo);
 }
-
-
-
 
 
 
@@ -570,6 +544,81 @@ async function cargarEstadisticas() {
         statsDiv.innerHTML = '<p>Estadísticas no disponibles temporalmente</p>';
     }
 }
+
+
+
+async function verificarBalanceo() {
+    try {
+        const data = await fetchAPI('/verificar-balanceo');
+        
+        const resultadosDiv = document.getElementById('resultados');
+        if (data.balanceado) {
+            resultadosDiv.innerHTML = `
+                <strong>✅ Árbol Balanceado</strong><br>
+                <p>${data.mensaje}</p>
+            `;
+            mostrarMensaje('✅ ' + data.mensaje, 'success');
+        } else {
+            resultadosDiv.innerHTML = `
+                <strong>⚠️ Árbol Desbalanceado</strong><br>
+                <p>${data.mensaje}. Usa el botón "Balancear Árbol" para corregir.</p>
+            `;
+            mostrarMensaje('⚠️ ' + data.mensaje, 'warning');
+        }
+    } catch (error) {
+        mostrarMensaje('Error al verificar balanceo: ' + error.message, 'error');
+    }
+}
+
+async function balancearArbol() {
+    if (estado.animacionActiva) return;
+    
+    try {
+        estado.animacionActiva = true;
+        
+        // Ejecutamos la llamada POST para forzar el balanceo
+        const data = await fetchAPI('/balancear', { method: 'POST' });
+        
+        mostrarMensaje(data.mensaje, data.exito ? 'success' : 'error');
+        
+        if (data.exito) {
+            // Actualizar la visualización y estadísticas para mostrar el nuevo árbol
+            await actualizarVisualizacion();
+            await cargarEstadisticas();
+            document.getElementById('resultados').innerHTML = `
+                <strong>🌳 Balanceo Completo</strong><br>
+                <p>El árbol ha sido reconstruido a su versión de altura mínima.</p>
+            `;
+        }
+    } catch (error) {
+        mostrarMensaje('Error al balancear árbol: ' + error.message, 'error');
+    } finally {
+        estado.animacionActiva = false;
+    }
+}
+
+
+
+// --- NUEVA FUNCIÓN DE UTILIDAD: Crea un mapa de búsqueda O(1) ---
+function crearMapaNodosNivel(infoNiveles) {
+    const mapa = new Map();
+    if (!infoNiveles) return mapa;
+
+    for (const nivelInfo of infoNiveles) {
+        for (const nodoValor of nivelInfo.nodos) {
+            // Solo almacenamos nodos que existen (no 'null')
+            if (nodoValor !== null) {
+                // Clave: El valor del nodo (Number); Valor: El objeto nivelInfo
+                mapa.set(Number(nodoValor), nivelInfo); 
+            }
+        }
+    }
+    return mapa;
+}
+// -----------------------------------------------------------------
+
+
+
 
 function salir() {
     window.close();

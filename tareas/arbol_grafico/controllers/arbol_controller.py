@@ -163,6 +163,32 @@ def eliminar_rama():
         })
 
 
+@arbol_bp.route('/verificar-balanceo', methods=['GET'])
+def verificar_balanceo_ruta():
+    """Endpoint para verificar si el árbol está balanceado."""
+    try:
+        balanceado = arbol.esta_balanceado()
+        return jsonify({
+            'balanceado': balanceado,
+            'mensaje': 'El árbol está balanceado (ABB de altura mínima).' if balanceado else 'El árbol está desbalanceado.'
+        })
+    except Exception as e:
+        return jsonify({'error': f'Error al verificar balanceo: {str(e)}'}), 500
+
+
+@arbol_bp.route('/balancear', methods=['POST'])
+def balancear_arbol_ruta():
+    """Endpoint para forzar el balanceo del árbol."""
+    try:
+        arbol.forzar_balanceo()
+        return jsonify({
+            'exito': True,
+            'mensaje': 'Árbol balanceado exitosamente (reconstruido a altura mínima).'
+        })
+    except Exception as e:
+        return jsonify({'error': f'Error al balancear el árbol: {str(e)}'}), 500
+
+
 @arbol_bp.route('/simetrico', methods=['GET'])
 def verificar_simetria():
     try:
