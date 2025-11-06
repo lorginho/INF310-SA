@@ -295,6 +295,7 @@ function mostrarResumenSimetriaNiveles(niveles) {
 }
 
 // Funciones de visualización
+/*
 async function actualizarVisualizacion() {
     try {
         const data = await fetchAPI('/estructura');
@@ -305,7 +306,38 @@ async function actualizarVisualizacion() {
         modoSimetria = false;
         infoNiveles = [];
     }
+}*/
+
+
+async function actualizarVisualizacion() {
+    try {
+        // 1. VERIFICAR SI EL MODO SIMETRÍA ESTÁ ACTIVO
+        if (modoSimetria) {
+            // Si lo está, refrescamos los datos de niveles
+            const dataSimetria = await fetchAPI('/simetria-niveles');
+            infoNiveles = dataSimetria.niveles_simetria;
+            
+            // (Opcional pero recomendado) Actualizar también el panel de resultados
+            mostrarResumenSimetriaNiveles(infoNiveles);
+        }
+
+        // 2. OBTENER Y DIBUJAR LA ESTRUCTURA (como antes)
+        const data = await fetchAPI('/estructura');
+        estado.arbolData = data;
+        dibujarArbol(data.raiz);
+        
+    } catch (error) {
+        console.error('Error al actualizar visualización:', error);
+        // Si algo falla, reseteamos el modo
+        modoSimetria = false;
+        infoNiveles = [];
+    }
 }
+
+
+
+
+
 
 function dibujarArbol(raiz) {
     const svg = document.getElementById('arbol-svg');
@@ -379,26 +411,53 @@ function dibujarLinea(svg, x1, y1, x2, y2) {
     svg.appendChild(line);
 }
 
+
 function dibujarNodo(svg, valor, x, y) {
     const grupo = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     
-    let colorNodo = '#667eea';
-    
+    let colorNodo = '#667eea'; // Color por defecto (Azul/Lila)
+    const valorNumerico = parseInt(valor); // El valor del nodo a buscar (como número)
+
+    // 1. Lógica de Simetría (solo si el modo está activo)
     if (modoSimetria && infoNiveles.length > 0) {
+        
+        let nivelInfoCoincidente = null;
+
+        // Recorrer la información de niveles para encontrar el nodo
         for (const nivelInfo of infoNiveles) {
-            const valorNumerico = parseInt(valor);
-            if (nivelInfo.nodos.includes(valorNumerico)) {
-                colorNodo = nivelInfo.simetrico ? '#4CAF50' : '#F44336';
-                break;
+            
+            // 2. Búsqueda Segura: Iterar sobre el array de nodos del nivel
+            for (const nodoNivel of nivelInfo.nodos) {
+                
+                // Comparamos el nodo del nivel con el valor del nodo a dibujar.
+                // Usamos la comparación no estricta (==) para que un Number (50) coincida
+                // con el Number o String que viene del JSON, ignorando el valor 'null'.
+                if (nodoNivel == valorNumerico) { 
+                    nivelInfoCoincidente = nivelInfo;
+                    break; 
+                }
             }
+            if (nivelInfoCoincidente) {
+                break; // Nivel encontrado, salimos del bucle de niveles
+            }
+        }
+        
+        // 3. Aplicar el color de Simetría
+        if (nivelInfoCoincidente) {
+            colorNodo = nivelInfoCoincidente.simetrico ? '#4CAF50' : '#F44336'; // Verde o Rojo
         }
     }
     
+    // 4. Aplicación de Estilos con Alta Prioridad
     const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     circle.setAttribute('cx', x);
     circle.setAttribute('cy', y);
     circle.setAttribute('r', CONFIG.nodeRadius);
-    circle.setAttribute('fill', colorNodo);
+    
+    // Aplica el color como atributo y como estilo (la clave para evitar sobrescrituras)
+    circle.setAttribute('fill', colorNodo); 
+    circle.style.fill = colorNodo; // <--- Soluciona el problema de sobrescritura
+    
     circle.setAttribute('stroke', '#5a6fd8');
     circle.setAttribute('stroke-width', '2');
     circle.setAttribute('class', 'nodo');
@@ -417,6 +476,12 @@ function dibujarNodo(svg, valor, x, y) {
     grupo.appendChild(text);
     svg.appendChild(grupo);
 }
+
+
+
+
+
+
 
 function resaltarNodo(valor) {
     const nodos = document.querySelectorAll('[data-valor]');
