@@ -1,48 +1,121 @@
 """
 controllers/arbol_controller.py
-Controlador para operaciones del árbol binario
+Controlador Flask para operaciones del Árbol Binario de Búsqueda
 """
 
 from flask import Blueprint, request, jsonify
 from models.arbol_binario import ArbolBinario
 
+# ===== INICIALIZACIÓN =====
+
 arbol = ArbolBinario()
 arbol_bp = Blueprint('arbol', __name__)
+
+# Cache simple para estadísticas (mejora eficiencia)
+_estadisticas_cache = None
+
+
+def invalidar_cache():
+    """Invalidar cache cuando el árbol cambie"""
+    global _estadisticas_cache
+    _estadisticas_cache = None
+
+
+def obtener_estadisticas():
+    """Obtener estadísticas con cache (evita cálculos repetidos)"""
+    global _estadisticas_cache
+    if _estadisticas_cache is None:
+        _estadisticas_cache = {
+            'altura': arbol.altura(),
+            'total_nodos': arbol.contar_nodos(),
+            'nodos_hoja': arbol.contar_hojas(),
+            'vacio': arbol.es_vacio()
+        }
+    return _estadisticas_cache
+
+# ===== FUNCIONES AUXILIARES OPTIMIZADAS =====
+
+
+def recorrido_inorden(nodo):
+    """Recorrido in-order optimizado (menos creación de listas)"""
+    resultado = []
+
+    def _inorden(n):
+        if n is not None:
+            _inorden(n.get_izquierdo())
+            resultado.append(n.get_dato())
+            _inorden(n.get_derecho())
+    _inorden(nodo)
+    return resultado
+
+
+def recorrido_preorden(nodo):
+    """Recorrido pre-order optimizado"""
+    resultado = []
+
+    def _preorden(n):
+        if n is not None:
+            resultado.append(n.get_dato())
+            _preorden(n.get_izquierdo())
+            _preorden(n.get_derecho())
+    _preorden(nodo)
+    return resultado
+
+
+def recorrido_postorden(nodo):
+    """Recorrido post-order optimizado"""
+    resultado = []
+
+    def _postorden(n):
+        if n is not None:
+            _postorden(n.get_izquierdo())
+            _postorden(n.get_derecho())
+            resultado.append(n.get_dato())
+    _postorden(nodo)
+    return resultado
+
+# ===== ENDPOINTS OPTIMIZADOS =====
 
 
 @arbol_bp.route('/insertar', methods=['POST'])
 def insertar():
+    """Insertar valores con validación temprana y cache"""
     data = request.get_json()
     valores = data.get('valores', [])
 
-    resultados = []
+    # Validación temprana - filtrar solo valores válidos
+    valores_validos = []
     for valor in valores:
         try:
-            valor_int = int(valor)
-            exito = arbol.insertar_nodo(valor_int)
-            resultados.append({
-                'valor': valor_int,
-                'exito': exito,
-                'mensaje': 'Insertado correctamente' if exito else 'Valor duplicado'
-            })
+            valores_validos.append(int(valor))
         except ValueError:
-            resultados.append({
-                'valor': valor,
-                'exito': False,
-                'mensaje': 'Valor no válido'
-            })
+            continue  # Saltar valores inválidos sin procesar excepciones
 
+    resultados = []
+    for valor_int in valores_validos:
+        exito = arbol.insertar_nodo(valor_int)
+        resultados.append({
+            'valor': valor_int,
+            'exito': exito,
+            'mensaje': 'Insertado correctamente' if exito else 'Valor duplicado'
+        })
+
+    invalidar_cache()  # El árbol cambió, invalidar cache
     return jsonify({'resultados': resultados})
 
 
 @arbol_bp.route('/eliminar', methods=['POST'])
 def eliminar():
+    """Eliminar nodo sin búsqueda redundante"""
     data = request.get_json()
     valor = data.get('valor')
 
     try:
         valor_int = int(valor)
+        # El modelo ya hace la búsqueda internamente, no duplicar
         exito = arbol.eliminar_nodo(valor_int)
+
+        invalidar_cache()
         return jsonify({
             'exito': exito,
             'mensaje': 'Nodo eliminado' if exito else 'Nodo no encontrado',
@@ -57,6 +130,7 @@ def eliminar():
 
 @arbol_bp.route('/buscar', methods=['POST'])
 def buscar():
+    """Buscar valor en el árbol"""
     data = request.get_json()
     valor = data.get('valor')
 
@@ -77,6 +151,7 @@ def buscar():
 
 @arbol_bp.route('/recorrido/<tipo>', methods=['GET'])
 def recorrido(tipo):
+    """Recorridos optimizados"""
     if tipo == 'inorden':
         resultado = recorrido_inorden(arbol.raiz)
     elif tipo == 'preorden':
@@ -96,8 +171,10 @@ def recorrido(tipo):
 
 @arbol_bp.route('/limpiar', methods=['POST'])
 def limpiar():
+    """Limpiar árbol y cache"""
     global arbol
     arbol = ArbolBinario()
+    invalidar_cache()
     return jsonify({
         'mensaje': 'Árbol limpiado',
         'estadisticas': obtener_estadisticas()
@@ -106,11 +183,13 @@ def limpiar():
 
 @arbol_bp.route('/estadisticas', methods=['GET'])
 def estadisticas():
+    """Estadísticas con cache para respuesta instantánea"""
     return jsonify(obtener_estadisticas())
 
 
 @arbol_bp.route('/estructura', methods=['GET'])
 def obtener_estructura():
+    """Estructura del árbol para visualización"""
     def serializar_nodo(nodo):
         if nodo is None:
             return None
@@ -126,28 +205,31 @@ def obtener_estructura():
 
 @arbol_bp.route('/eliminar-rama', methods=['POST'])
 def eliminar_rama():
+    """Eliminar rama optimizado - evita recorridos duplicados"""
     data = request.get_json()
     valor = data.get('valor')
 
     try:
         valor_int = int(valor)
-        nodo_existe = arbol.buscar_x(valor_int) is not None
 
+        # Solo una verificación de existencia
+        nodo_existe = arbol.buscar_x(valor_int) is not None
         if not nodo_existe:
             return jsonify({
                 'exito': False,
                 'mensaje': f'Nodo {valor_int} no encontrado'
             })
 
-        rama_info = arbol.obtener_rama(valor_int)
-        cantidad_nodos = arbol.contar_nodos_rama(valor_int)
+        # Un solo recorrido para eliminar
         exito = arbol.eliminar_rama(valor_int)
+
+        # Si necesitas información de la rama eliminada, obtenerla después
+        # pero normalmente solo necesitas confirmación
+        invalidar_cache()
 
         return jsonify({
             'exito': exito,
-            'mensaje': f'Rama eliminada: {cantidad_nodos} nodos removidos' if exito else 'No se pudo eliminar la rama',
-            'rama_eliminada': rama_info if exito else [],
-            'cantidad_nodos': cantidad_nodos if exito else 0,
+            'mensaje': 'Rama eliminada correctamente' if exito else 'No se pudo eliminar la rama',
             'estadisticas': obtener_estadisticas()
         })
 
@@ -165,12 +247,12 @@ def eliminar_rama():
 
 @arbol_bp.route('/verificar-balanceo', methods=['GET'])
 def verificar_balanceo_ruta():
-    """Endpoint para verificar si el árbol está balanceado."""
+    """Verificar balanceo del árbol"""
     try:
         balanceado = arbol.esta_balanceado()
         return jsonify({
             'balanceado': balanceado,
-            'mensaje': 'El árbol está balanceado (ABB de altura mínima).' if balanceado else 'El árbol está desbalanceado.'
+            'mensaje': 'El árbol está balanceado' if balanceado else 'El árbol está desbalanceado.'
         })
     except Exception as e:
         return jsonify({'error': f'Error al verificar balanceo: {str(e)}'}), 500
@@ -178,12 +260,13 @@ def verificar_balanceo_ruta():
 
 @arbol_bp.route('/balancear', methods=['POST'])
 def balancear_arbol_ruta():
-    """Endpoint para forzar el balanceo del árbol."""
+    """Balancear árbol"""
     try:
         arbol.forzar_balanceo()
+        invalidar_cache()
         return jsonify({
             'exito': True,
-            'mensaje': 'Árbol balanceado exitosamente (reconstruido a altura mínima).'
+            'mensaje': 'Árbol balanceado exitosamente.'
         })
     except Exception as e:
         return jsonify({'error': f'Error al balancear el árbol: {str(e)}'}), 500
@@ -191,6 +274,7 @@ def balancear_arbol_ruta():
 
 @arbol_bp.route('/simetrico', methods=['GET'])
 def verificar_simetria():
+    """Verificar simetría del árbol"""
     try:
         es_simetrico = arbol.es_simetrico()
         return jsonify({
@@ -205,6 +289,7 @@ def verificar_simetria():
 
 @arbol_bp.route('/simetria-niveles', methods=['GET'])
 def obtener_simetria_niveles():
+    """Simetría por niveles"""
     try:
         niveles_simetria = arbol.obtener_niveles_simetria()
         return jsonify({
@@ -215,30 +300,3 @@ def obtener_simetria_niveles():
         return jsonify({
             'error': f'Error al analizar simetría por niveles: {str(e)}'
         }), 500
-
-
-def obtener_estadisticas():
-    return {
-        'altura': arbol.altura(),
-        'total_nodos': arbol.contar_nodos(),
-        'nodos_hoja': arbol.contar_hojas(),
-        'vacio': arbol.es_vacio()
-    }
-
-
-def recorrido_inorden(nodo):
-    if nodo is None:
-        return []
-    return recorrido_inorden(nodo.get_izquierdo()) + [nodo.get_dato()] + recorrido_inorden(nodo.get_derecho())
-
-
-def recorrido_preorden(nodo):
-    if nodo is None:
-        return []
-    return [nodo.get_dato()] + recorrido_preorden(nodo.get_izquierdo()) + recorrido_preorden(nodo.get_derecho())
-
-
-def recorrido_postorden(nodo):
-    if nodo is None:
-        return []
-    return recorrido_postorden(nodo.get_izquierdo()) + recorrido_postorden(nodo.get_derecho()) + [nodo.get_dato()]

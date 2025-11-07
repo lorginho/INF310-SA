@@ -6,332 +6,274 @@ Fecha: 2025-08-28
 Descripción: Clase que representa un árbol binario con métodos para insertar, buscar y recorrer nodos
 """
 
-
+from collections import deque  # Para colas eficientes en recorrido por amplitud
 from models.nodo import Nodo
 
 
 class ArbolBinario:
-    """Clase que representa un árbol binario de búsqueda."""
+    """Representa un árbol binario de búsqueda."""
 
     def __init__(self):
-        """Inicializa un árbol binario vacío."""
+        # Inicializa un árbol vacío (raíz = None)
         self.raiz = None
 
-    def get_raiz(self):
-        """
-        Obtiene la raíz del árbol.
+    # ===== OPERACIONES BÁSICAS DEL ÁRBOL =====
 
-        Returns:
-            Nodo raíz del árbol o None si está vacío.
-        """
+    def get_raiz(self):
         return self.raiz
 
     def set_raiz(self, raiz):
-        """
-        Establece la raíz del árbol.
-
-        Args:
-            raiz: Nuevo nodo raíz.
-        """
         self.raiz = raiz
+
+    def es_vacio(self):
+        """Verifica si el árbol no tiene nodos."""
+        return self.raiz is None
+
+    def limpiar_arbol(self):
+        """Elimina todos los nodos del árbol."""
+        self.raiz = None
+
+    # ===== INSERCIÓN DE NODOS =====
 
     def insertar_nodo(self, x):
         """
-        Inserta un nuevo nodo con el valor x en el árbol si no existe.
-
-        Args:
-            x: Valor a insertar en el árbol.
-
-        Returns:
-            True si se insertó, False si ya existía.
+        Inserta un nuevo valor en el árbol manteniendo la propiedad de ABB.
+        No permite valores duplicados.
         """
+        # Verificar si el valor ya existe (no se permiten duplicados)
         if self.buscar_x(x) is not None:
-            return False  # El valor ya existe, no se inserta
+            return False
 
+        # Caso especial: árbol vacío
         if self.raiz is None:
             self.raiz = Nodo(x)
             return True
-        else:
-            self._insertar(self.raiz, x)
-            return True
+
+        # Insertar recursivamente en la posición correcta
+        self._insertar(self.raiz, x)
+        return True
 
     def _insertar(self, nodo, x):
         """
-        Método auxiliar recursivo para insertar un nodo.
-
-        Args:
-            nodo: Nodo actual en la recursión.
-            x: Valor a insertar.
+        Método auxiliar recursivo para insertar.
+        Busca la posición correcta comparando con el nodo actual.
         """
         if x < nodo.get_dato():
+            # Insertar en subárbol izquierdo
             if nodo.get_izquierdo() is None:
                 nodo.set_izquierdo(Nodo(x))
             else:
                 self._insertar(nodo.get_izquierdo(), x)
         else:
+            # Insertar en subárbol derecho
             if nodo.get_derecho() is None:
                 nodo.set_derecho(Nodo(x))
             else:
                 self._insertar(nodo.get_derecho(), x)
 
-    def es_vacio(self):
-        """
-        Verifica si el árbol está vacío.
-
-        Returns:
-            True si el árbol está vacío, False en caso contrario.
-        """
-        return self.raiz is None
-
-    # <-- FUNCIÓN AÑADIDA: LIMPIAR ARBOL
-    def limpiar_arbol(self):
-        """
-        Establece la raíz a None, eliminando todo el árbol.
-        """
-        self.raiz = None
-    # FUNCIÓN AÑADIDA: LIMPIAR ARBOL -->
-
-    def es_hoja(self, nodo):
-        """
-        Verifica si un nodo es una hoja.
-
-        Args:
-            nodo: Nodo a verificar.
-
-        Returns:
-            True si el nodo es una hoja, False en caso contrario.
-        """
-        if nodo is None:
-            return False
-        return nodo.get_izquierdo() is None and nodo.get_derecho() is None
+    # ===== BÚSQUEDA DE NODOS =====
 
     def buscar_x(self, x):
-        """
-        Busca un valor en el árbol.
-
-        Args:
-            x: Valor a buscar.
-
-        Returns:
-            Nodo que contiene el valor o None si no se encuentra.
-        """
+        """Busca un valor en el árbol y retorna el nodo que lo contiene."""
         return self._buscar(self.raiz, x)
 
     def _buscar(self, nodo, x):
         """
-        Método auxiliar recursivo para buscar un valor.
-
-        Args:
-            nodo: Nodo actual en la recursión.
-            x: Valor a buscar.
-
-        Returns:
-            Nodo que contiene el valor o None si no se encuentra.
+        Búsqueda recursiva en el árbol.
+        Aprovecha la propiedad de ABB para hacer búsqueda eficiente.
         """
         if nodo is None:
-            return None
+            return None  # No encontrado
         if x == nodo.get_dato():
-            return nodo
+            return nodo  # Encontrado
         if x < nodo.get_dato():
+            # Buscar en subárbol izquierdo
             return self._buscar(nodo.get_izquierdo(), x)
+        # Buscar en subárbol derecho
         return self._buscar(nodo.get_derecho(), x)
+
+    # ===== RECORRIDOS DEL ÁRBOL =====
 
     def in_orden(self, nodo):
         """
-        Recorrido in-order del árbol (izquierdo, raíz, derecho).
-        Produce una lista ordenada de los nodos.
-
-        Args:
-            nodo: Nodo actual en la recursión.
+        Recorrido in-orden: izquierdo -> raíz -> derecho.
+        Produce los valores ordenados de menor a mayor.
         """
         if nodo is not None:
             self.in_orden(nodo.get_izquierdo())
             print(nodo.get_dato(), end=" ")
             self.in_orden(nodo.get_derecho())
 
-    # <-- FUNCIÓN AÑADIDA: IN_ORDEN QUE DEVUELVE LISTA (para balanceo)
     def _in_orden_list(self, nodo):
         """
-        Método auxiliar para recorrido in-orden que devuelve una lista de valores.
+        Versión del in-orden que retorna una lista ordenada.
+        Útil para operaciones como el balanceo del árbol.
         """
         if nodo is None:
             return []
-
-        # Inorden: Izquierda -> Raíz -> Derecha
         return (self._in_orden_list(nodo.get_izquierdo()) +
                 [nodo.get_dato()] +
                 self._in_orden_list(nodo.get_derecho()))
 
-    # FUNCIÓN AÑADIDA: IN_ORDEN QUE DEVUELVE LISTA (para balanceo) -->
-
-    def post_orden(self, nodo):
-        """
-        Recorrido post-order del árbol (izquierdo, derecho, raíz).
-
-        Args:
-            nodo: Nodo actual en la recursión.
-        """
-        if nodo is not None:
-            self.post_orden(nodo.get_izquierdo())
-            self.post_orden(nodo.get_derecho())
-            print(nodo.get_dato(), end=" ")
-
     def pre_orden(self, nodo):
         """
-        Recorrido pre-order del árbol (raíz, izquierdo, derecho).
-
-        Args:
-            nodo: Nodo actual en la recursión.
+        Recorrido pre-orden: raíz -> izquierdo -> derecho.
+        Útil para copiar la estructura del árbol.
         """
         if nodo is not None:
             print(nodo.get_dato(), end=" ")
             self.pre_orden(nodo.get_izquierdo())
             self.pre_orden(nodo.get_derecho())
 
+    def post_orden(self, nodo):
+        """
+        Recorrido post-orden: izquierdo -> derecho -> raíz.
+        Útil para eliminar árboles.
+        """
+        if nodo is not None:
+            self.post_orden(nodo.get_izquierdo())
+            self.post_orden(nodo.get_derecho())
+            print(nodo.get_dato(), end=" ")
+
     def amplitud(self):
         """
-        Recorrido por amplitud (nivel por nivel) del árbol.
-
-        Returns:
-            Lista con los valores del árbol en orden por niveles.
+        Recorrido por niveles (amplitud).
+        Usa una cola para procesar nodos nivel por nivel.
         """
         if self.raiz is None:
             return []
 
         resultado = []
-        # Usamos una cola (simulada con lista) para el recorrido
-        cola = [self.raiz]
+        cola = deque([self.raiz])  # Cola eficiente para BFS
 
         while cola:
-            # Extraemos el primer elemento de la cola
-            nodo_actual = cola.pop(0)
+            nodo_actual = cola.popleft()  # Obtener el primer nodo de la cola
             resultado.append(nodo_actual.get_dato())
 
-            # Agregamos los hijos a la cola si existen
-            if nodo_actual.get_izquierdo() is not None:
+            # Agregar hijos a la cola para procesar después
+            if nodo_actual.get_izquierdo():
                 cola.append(nodo_actual.get_izquierdo())
-            if nodo_actual.get_derecho() is not None:
+            if nodo_actual.get_derecho():
                 cola.append(nodo_actual.get_derecho())
 
         return resultado
 
+    # ===== ELIMINACIÓN DE NODOS =====
+
     def eliminar_nodo(self, x):
-        """
-        Elimina un nodo con el valor x del árbol.
-
-        Args:
-            x: Valor a eliminar
-
-        Returns:
-            True si se eliminó, False si no se encontró
-        """
+        """Elimina un nodo con el valor x manteniendo la propiedad de ABB."""
         if self.buscar_x(x) is None:
-            return False
+            return False  # El valor no existe
 
         self.raiz = self._eliminar(self.raiz, x)
         return True
 
     def _eliminar(self, nodo, x):
         """
-        Método auxiliar recursivo para eliminar un nodo.
+        Eliminación recursiva con tres casos:
+        1. Nodo hoja: simplemente se elimina
+        2. Nodo con un hijo: el hijo reemplaza al nodo
+        3. Nodo con dos hijos: se busca el sucesor inorden
         """
         if nodo is None:
             return nodo
 
+        # Buscar el nodo a eliminar
         if x < nodo.get_dato():
             nodo.set_izquierdo(self._eliminar(nodo.get_izquierdo(), x))
         elif x > nodo.get_dato():
             nodo.set_derecho(self._eliminar(nodo.get_derecho(), x))
         else:
-            # Nodo con un solo hijo o sin hijos
-            if nodo.get_izquierdo() is None:
-                return nodo.get_derecho()
-            elif nodo.get_derecho() is None:
-                return nodo.get_izquierdo()
+            # Nodo encontrado - aplicar estrategia según cantidad de hijos
 
-            # Nodo con dos hijos: obtener el sucesor inorden (mínimo en subárbol derecho)
+            # Caso 1: Nodo con un hijo o sin hijos
+            if nodo.get_izquierdo() is None:
+                return nodo.get_derecho()  # El derecho reemplaza al nodo
+            elif nodo.get_derecho() is None:
+                return nodo.get_izquierdo()  # El izquierdo reemplaza al nodo
+
+            # Caso 2: Nodo con dos hijos
+            # Buscar el sucesor inorden (mínimo del subárbol derecho)
             temp = self._min_valor_nodo(nodo.get_derecho())
+            # Copiar el valor del sucesor
             nodo.set_dato(temp.get_dato())
+            # Eliminar el sucesor original
             nodo.set_derecho(self._eliminar(
                 nodo.get_derecho(), temp.get_dato()))
 
         return nodo
 
     def _min_valor_nodo(self, nodo):
-        """
-        Encuentra el nodo con el valor mínimo en un subárbol.
-        """
+        """Encuentra el nodo con el valor mínimo en un subárbol."""
         actual = nodo
         while actual.get_izquierdo() is not None:
             actual = actual.get_izquierdo()
         return actual
 
-    def altura(self):
-        """
-        Calcula la altura del árbol.
+    # ===== INFORMACIÓN DEL ÁRBOL =====
 
-        Returns:
-            Altura del árbol (0 si está vacío)
-        """
+    def altura(self):
+        """Calcula la altura máxima del árbol."""
         return self._altura(self.raiz)
 
     def _altura(self, nodo):
+        """Calcula recursivamente la altura de un subárbol."""
         if nodo is None:
             return 0
-        return 1 + max(self._altura(nodo.get_izquierdo()), self._altura(nodo.get_derecho()))
+        return 1 + max(self._altura(nodo.get_izquierdo()),
+                       self._altura(nodo.get_derecho()))
 
     def contar_nodos(self):
-        """
-        Cuenta el total de nodos en el árbol.
-        """
+        """Cuenta el total de nodos en el árbol."""
         return self._contar_nodos(self.raiz)
 
     def _contar_nodos(self, nodo):
+        """Cuenta recursivamente los nodos en un subárbol."""
         if nodo is None:
             return 0
-        return 1 + self._contar_nodos(nodo.get_izquierdo()) + self._contar_nodos(nodo.get_derecho())
+        return (1 + self._contar_nodos(nodo.get_izquierdo()) +
+                self._contar_nodos(nodo.get_derecho()))
 
     def contar_hojas(self):
-        """
-        Cuenta los nodos hoja en el árbol.
-        """
+        """Cuenta los nodos hoja (sin hijos) en el árbol."""
         return self._contar_hojas(self.raiz)
 
     def _contar_hojas(self, nodo):
+        """Cuenta recursivamente las hojas en un subárbol."""
         if nodo is None:
             return 0
-        if self.es_hoja(nodo):
+        if nodo.es_hoja():  # Usa el método del nodo para verificar si es hoja
             return 1
-        return self._contar_hojas(nodo.get_izquierdo()) + self._contar_hojas(nodo.get_derecho())
+        return (self._contar_hojas(nodo.get_izquierdo()) +
+                self._contar_hojas(nodo.get_derecho()))
+
+    # ===== OPERACIONES CON RAMAS =====
 
     def eliminar_rama(self, x):
         """
-        Elimina toda la rama que comienza en el nodo con valor x.
-
-        Args:
-            x: Valor del nodo raíz de la rama a eliminar
-
-        Returns:
-            True si se encontró y eliminó la rama, False si no se encontró el nodo
+        Elimina toda una rama del árbol a partir del nodo con valor x.
+        Útil para podar subárboles completos.
         """
         if self.raiz is None:
             return False
 
-        # Caso especial: si la raíz es el nodo a eliminar
+        # Caso especial: eliminar toda el árbol
         if self.raiz.get_dato() == x:
             self.raiz = None
             return True
 
-        # Buscar el nodo padre que contiene al nodo que será eliminado
+        # Buscar el padre del nodo a eliminar
         padre = self._buscar_padre(self.raiz, x)
         if padre is None:
-            return False
+            return False  # Nodo no encontrado
 
-        # Eliminar la referencia al nodo desde su padre
-        if padre.get_izquierdo() and padre.get_izquierdo().get_dato() == x:
+        # Eliminar la referencia del padre al nodo
+        if (padre.get_izquierdo() and
+                padre.get_izquierdo().get_dato() == x):
             padre.set_izquierdo(None)
             return True
-        elif padre.get_derecho() and padre.get_derecho().get_dato() == x:
+        elif (padre.get_derecho() and
+              padre.get_derecho().get_dato() == x):
             padre.set_derecho(None)
             return True
 
@@ -339,199 +281,157 @@ class ArbolBinario:
 
     def _buscar_padre(self, nodo, x):
         """
-        Busca el padre del nodo con valor x.
-
-        Returns:
-            El nodo padre que contiene al nodo con valor x, o None si no se encuentra.
+        Busca el nodo padre del nodo que contiene el valor x.
+        Retorna None si no encuentra el nodo o si es la raíz.
         """
         if nodo is None:
             return None
 
-        # Verificar si el nodo actual es el padre del nodo buscado
-        if (nodo.get_izquierdo() and nodo.get_izquierdo().get_dato() == x) or \
-                (nodo.get_derecho() and nodo.get_derecho().get_dato() == x):
-            return nodo
+        # Verificar si alguno de los hijos tiene el valor buscado
+        if ((nodo.get_izquierdo() and nodo.get_izquierdo().get_dato() == x) or
+                (nodo.get_derecho() and nodo.get_derecho().get_dato() == x)):
+            return nodo  # Este es el padre
 
         # Buscar recursivamente en los subárboles
         if x < nodo.get_dato():
             return self._buscar_padre(nodo.get_izquierdo(), x)
-        else:
-            return self._buscar_padre(nodo.get_derecho(), x)
+        return self._buscar_padre(nodo.get_derecho(), x)
 
     def obtener_rama(self, x):
-        """
-        Obtiene todos los valores de la rama que comienza en el nodo con valor x.
-
-        Returns:
-            Lista con los valores de la rama en recorrido preorden, o None si no se encuentra
-        """
+        """Obtiene todos los valores de la rama que comienza en x (pre-orden)."""
         nodo = self.buscar_x(x)
-        if nodo is None:
-            return None
-
-        return self._obtener_rama_preorden(nodo)
+        return self._obtener_rama_preorden(nodo) if nodo else None
 
     def _obtener_rama_preorden(self, nodo):
-        """Obtiene los valores de una rama en recorrido preorden."""
+        """Recoge todos los valores de una rama en recorrido pre-orden."""
         if nodo is None:
             return []
 
         resultado = [nodo.get_dato()]
-        # Agregar subárbol izquierdo
         if nodo.get_izquierdo():
             resultado.extend(self._obtener_rama_preorden(nodo.get_izquierdo()))
-        # Agregar subárbol derecho
         if nodo.get_derecho():
             resultado.extend(self._obtener_rama_preorden(nodo.get_derecho()))
 
         return resultado
 
     def contar_nodos_rama(self, x):
-        """
-        Cuenta la cantidad de nodos en la rama que comienza en el nodo con valor x.
-        """
+        """Cuenta cuántos nodos hay en la rama que comienza en x."""
         nodo = self.buscar_x(x)
-        if nodo is None:
-            return 0
+        return self._contar_nodos(nodo) if nodo else 0
 
-        return self._contar_nodos(nodo)  # Reutilizamos el método existente
+    # ===== BALANCEO DEL ÁRBOL =====
 
-    # <-- FUNCIÓN AÑADIDA: VERIFICAR BALANCEO
     def esta_balanceado(self):
         """
-        Verifica si el árbol completo es balanceado (propiedad AVL: factor de equilibrio <= 1 en todos los nodos).
+        Verifica si el árbol está balanceado (propiedad AVL).
+        Un árbol está balanceado si para cada nodo, la diferencia de alturas
+        entre sus subárboles izquierdo y derecho es como máximo 1.
         """
-
-        # Función recursiva auxiliar anidada: retorna (es_balanceado, altura_del_subarbol)
         def verificar(nodo):
             if nodo is None:
-                return True, 0
+                return True, 0  # Árbol vacío está balanceado y altura 0
 
-            # Verificar y obtener altura de los hijos
+            # Verificar recursivamente los subárboles
             izq_balanceado, h_izq = verificar(nodo.get_izquierdo())
             der_balanceado, h_der = verificar(nodo.get_derecho())
 
-            # Calcular el Factor de Equilibrio (FE)
+            # Calcular factor de equilibrio
             fe = h_izq - h_der
+            # El nodo está balanceado si sus hijos lo están y |FE| <= 1
+            nodo_balanceado = (izq_balanceado and der_balanceado
+                               and abs(fe) <= 1)
 
-            # Un nodo está balanceado si:
-            # 1. Sus hijos están balanceados.
-            # 2. Su propio FE está entre -1 y 1.
-            nodo_balanceado = izq_balanceado and der_balanceado and abs(
-                fe) <= 1
-
-            # Retornar estado y altura del subárbol actual
             return nodo_balanceado, 1 + max(h_izq, h_der)
 
         balanceado, _ = verificar(self.raiz)
         return balanceado
-    # FUNCIÓN AÑADIDA: VERIFICAR BALANCEO -->
 
-    # <-- FUNCIÓN AÑADIDA: FORZAR BALANCEO
     def forzar_balanceo(self):
         """
-        Reconstruye el árbol a partir del recorrido inorden para crear un ABB perfectamente balanceado 
-        (altura mínima).
+        Reconstruye el árbol como un árbol perfectamente balanceado.
+        Convierte el árbol en un ABB balanceado de altura mínima.
         """
         if self.raiz is None:
             return True
 
-        # 1. Obtener los elementos ordenados (recorrido inorden)
-        # Importar la función del controlador para obtener los valores
-        from controllers.arbol_controller import recorrido_inorden
-        elementos = recorrido_inorden(self.raiz)
+        # 1. Obtener todos los valores ordenados
+        elementos = self._in_orden_list(self.raiz)
 
-        # 2. Función auxiliar para construir el ABB balanceado
+        # 2. Construir árbol balanceado recursivamente
         def construir_balanceado(lista):
             if not lista:
                 return None
 
+            # El elemento del medio será la raíz (estrategia divide y vencerás)
             medio = len(lista) // 2
-
-            # El elemento central será la raíz del sub-árbol
             nueva_raiz = Nodo(lista[medio])
-
-            # Construir sub-árboles recursivamente
+            # Construir subárbol izquierdo con la mitad izquierda
             nueva_raiz.set_izquierdo(construir_balanceado(lista[:medio]))
+            # Construir subárbol derecho con la mitad derecha
             nueva_raiz.set_derecho(construir_balanceado(lista[medio+1:]))
 
             return nueva_raiz
 
-        # Limpiar el árbol antes de reconstruir
-        self.limpiar_arbol()
-
-        # Asignar la nueva raíz balanceada
+        # 3. Reemplazar el árbol actual por el balanceado
         self.raiz = construir_balanceado(elementos)
-
         return True
-    # FUNCIÓN AÑADIDA: FORZAR BALANCEO -->
+
+    # ===== SIMETRÍA DEL ÁRBOL =====
 
     def es_simetrico(self):
         """
         Verifica si el árbol es simétrico (espejo) en estructura.
-
-        Returns:
-            True si el árbol es simétrico, False en caso contrario.
+        Un árbol es simétrico si el subárbol izquierdo es espejo del derecho.
         """
         if self.raiz is None:
             return True
-        return self._es_espejo(self.raiz.get_izquierdo(), self.raiz.get_derecho())
+        return self._es_espejo(self.raiz.get_izquierdo(),
+                               self.raiz.get_derecho())
 
     def _es_espejo(self, nodo1, nodo2):
         """
-        Método auxiliar recursivo para verificar simetría.
-
-        Args:
-            nodo1: Nodo del subárbol izquierdo
-            nodo2: Nodo del subárbol derecho
-
-        Returns:
-            True si los subárboles son espejo, False en caso contrario.
+        Verifica recursivamente si dos subárboles son espejo.
+        Compara: izquierdo de nodo1 con derecho de nodo2, y viceversa.
         """
-        # Ambos nodos son None - simétricos
         if nodo1 is None and nodo2 is None:
-            return True
-
-        # Solo uno es None - no simétricos
+            return True  # Ambos vacíos → simétricos
         if nodo1 is None or nodo2 is None:
-            return False
+            return False  # Solo uno vacío → no simétricos
 
-        # Verificar recursivamente:
-        # - Izquierdo de nodo1 vs Derecho de nodo2
-        # - Derecho de nodo1 vs Izquierdo de nodo2
+        # Verificar recursivamente la simetría espejo
         return (self._es_espejo(nodo1.get_izquierdo(), nodo2.get_derecho()) and
                 self._es_espejo(nodo1.get_derecho(), nodo2.get_izquierdo()))
 
     def obtener_niveles_simetria(self):
         """
-        Analiza la simetría de cada nivel del árbol.
-
-        Returns:
-            Lista de diccionarios con información de cada nivel
-            Ejemplo: [{'nivel': 0, 'simetrico': True, 'nodos': [5]}, ...]
+        Analiza la simetría nivel por nivel.
+        Útil para identificar en qué nivel específico falla la simetría.
         """
         if self.raiz is None:
             return []
 
         niveles = []
-        cola = [self.raiz]
+        cola = deque([self.raiz])
         nivel_actual = 0
 
         while cola:
-            # Obtener nodos del nivel actual
             nodos_nivel = []
-            siguiente_cola = []
+            siguiente_cola = deque()
 
+            # Procesar todos los nodos del nivel actual
             for nodo in cola:
                 if nodo is None:
                     nodos_nivel.append(None)
+                    # Para mantener la estructura, agregamos hijos None
                     siguiente_cola.extend([None, None])
                 else:
                     nodos_nivel.append(nodo.get_dato())
+                    # Agregar hijos al siguiente nivel (aunque sean None)
                     siguiente_cola.append(nodo.get_izquierdo())
                     siguiente_cola.append(nodo.get_derecho())
 
-            # Verificar simetría del nivel
+            # Verificar simetría del nivel actual
             es_simetrico = self._nivel_es_simetrico(nodos_nivel)
             niveles.append({
                 'nivel': nivel_actual,
@@ -539,7 +439,7 @@ class ArbolBinario:
                 'nodos': nodos_nivel
             })
 
-            # Si todos son None, terminamos
+            # Si todos los nodos del siguiente nivel son None, terminamos
             if all(nodo is None for nodo in siguiente_cola):
                 break
 
@@ -550,12 +450,12 @@ class ArbolBinario:
 
     def _nivel_es_simetrico(self, nodos_nivel):
         """
-        Verifica si un nivel es simétrico comparando posiciones espejo.
+        Verifica si un array de nodos es simétrico.
+        Compara posiciones espejo: primera con última, segunda con penúltima, etc.
         """
         n = len(nodos_nivel)
         for i in range(n // 2):
-            # Comparar posición i con posición n-1-i
-            # Ambos deben ser None o ambos no-None
+            # Dos posiciones son simétricas si ambas son None o ambas no-None
             if (nodos_nivel[i] is None) != (nodos_nivel[n-1-i] is None):
                 return False
         return True
