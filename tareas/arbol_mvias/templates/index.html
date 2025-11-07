@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualizador de Árbol M-Vías (Orden 4)</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🌳 Visualizador de Árbol M-Vías (Orden 4)</h1>
+            <p class="subtitle">Cada nodo puede tener hasta 3 valores y 4 hijos</p>
+        </header>
+
+        <div class="controls">
+            <div class="input-group">
+                <input type="number" id="valorInput" placeholder="Ingrese un número entero">
+                <button onclick="insertar()">Insertar</button>
+                <button onclick="buscar()">Buscar</button>
+            </div>
+            
+            <div class="actions">
+                <button onclick="limpiarArbol()">Limpiar Árbol</button>
+                <select id="recorridoSelect">
+                    <option value="inorden">Recorrido Inorden</option>
+                    <option value="preorden">Recorrido Preorden</option>
+                    <option value="niveles">Recorrido por Niveles</option>
+                </select>
+                <button onclick="realizarRecorrido()">Mostrar Recorrido</button>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <h3>Estadísticas</h3>
+                <div id="estadisticas">
+                    <p>Total de nodos: <span id="totalNodos">0</span></p>
+                    <p>Utilización promedio: <span id="utilizacionPromedio">0%</span></p>
+                    <p>Máximo por nodo: <span id="maxPorNodo">3 valores, 4 hijos</span></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="visualization">
+            <svg id="arbolSVG" width="100%" height="600"></svg>
+        </div>
+
+        <div class="results">
+            <h3>Resultados de Búsqueda/Recorridos</h3>
+            <div id="resultados"></div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
