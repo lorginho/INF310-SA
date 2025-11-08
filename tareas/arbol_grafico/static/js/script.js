@@ -204,15 +204,26 @@ async function buscarNodo() {
     }
 }
 
+
 async function realizarRecorrido(tipo) {
     try {
+        // 1. Obtener y mostrar lista en panel de resultados (como antes)
         const data = await fetchAPI(`/recorrido/${tipo}`);
         document.getElementById('resultados').innerHTML = 
             `<strong>Recorrido ${tipo}:</strong><br>${data.recorrido.join(' → ')}`;
+        
+        // 2. Ejecutar animación en paralelo
+        animarRecorrido(tipo);
+        
+        // 3. Mensaje combinado
+        mostrarMensaje(`📊 Mostrando y animando recorrido ${tipo}`, 'success');
+        
     } catch (error) {
         mostrarMensaje('Error al realizar recorrido', 'error');
     }
 }
+
+
 
 async function limpiarArbol() {
     try {
@@ -229,8 +240,53 @@ async function limpiarArbol() {
     }
 }
 
+async function mostrarArbol2() {
+    try {
+        // Reset visual completo
+        modoSimetria = false;
+        infoNiveles = [];
+        estado.mapaNodosNivel.clear();
+        
+        // Forzar actualización visual
+        await actualizarVisualizacion();
+        
+        // Mostrar confirmación
+        mostrarMensaje('✅ Vista del árbol restablecida a modo normal', 'success');
+        
+    } catch (error) {
+        mostrarMensaje('Error al mostrar árbol: ' + error.message, 'error');
+    }
+}
+
+
+async function mostrarArbol() {
+    try {
+        // Reset visual completo
+        modoSimetria = false;
+        infoNiveles = [];
+        estado.mapaNodosNivel.clear();
+        
+        // Forzar actualización visual
+        await actualizarVisualizacion();
+        
+        // 1. Mensaje en panel de Resultados (derecho)
+        document.getElementById('resultados').innerHTML = 
+            '<strong>🌳 Vista Normal Activada</strong><br>Árbol mostrado con colores estándar';
+        
+        // 2. Mensaje en panel de Mensajes (central)  
+        mostrarMensaje('✅ Vista del árbol restablecida a modo normal', 'success');
+        
+    } catch (error) {
+        mostrarMensaje('Error al mostrar árbol: ' + error.message, 'error');
+    }
+}
+
+
+
+
+
 async function generarAleatorio() {
-    const N = 6;
+    const N = 4;
     const valores = Array.from({ length: N }, () => 
         Math.floor(Math.random() * 200) + 1
     );
@@ -639,3 +695,120 @@ document.addEventListener('keypress', function(e) {
         }
     }
 });
+
+/*
+async function animarRecorrido(tipo) {
+    try {
+        const data = await fetchAPI(`/recorrido-animado/${tipo}`);
+        const nodos = data.recorrido;
+        
+        // Desactivar modo simetría durante animación
+        const simetriaAnterior = modoSimetria;
+        modoSimetria = false;
+        
+        mostrarMensaje(`🎬 Animando recorrido ${tipo}...`, 'info');
+        
+        // Animación secuencial
+        for (let i = 0; i < nodos.length; i++) {
+            await new Promise(resolve => setTimeout(resolve, 800)); // Delay
+            resaltarNodoAnimado(nodos[i], i + 1);
+        }
+        
+        // Restaurar modo simetría si estaba activo
+        modoSimetria = simetriaAnterior;
+        await actualizarVisualizacion();
+        
+    } catch (error) {
+        mostrarMensaje('Error en animación: ' + error.message, 'error');
+    }
+}
+
+*/
+async function animarRecorrido(tipo) {
+    try {
+        const data = await fetchAPI(`/recorrido-animado/${tipo}`);
+        const nodos = data.recorrido;
+        
+        // Resetear colores anteriores
+        resetearColoresAnimacion();
+        
+        mostrarMensaje(`🎬 Animando recorrido ${tipo}...`, 'info');
+        
+        // Array para trackear nodos visitados
+        const nodosVisitados = new Set();
+        
+        for (let i = 0; i < nodos.length; i++) {
+            await new Promise(resolve => setTimeout(resolve, 800));
+            
+            // Agregar nodo actual a visitados
+            nodosVisitados.add(nodos[i]);
+            
+            // Aplicar colores: visitados=verde, actual=naranja
+            aplicarColoresRecorrido(nodosVisitados, nodos[i]);
+        }
+        
+        mostrarMensaje(`✅ Recorrido ${tipo} completado. Nodos verdes = visitados`, 'success');
+        
+    } catch (error) {
+        mostrarMensaje('Error en animación: ' + error.message, 'error');
+    }
+}
+
+function aplicarColoresRecorrido(nodosVisitados, nodoActual) {
+    const elementos = document.querySelectorAll('[data-valor]');
+    
+    elementos.forEach(nodo => {
+        const valor = parseInt(nodo.getAttribute('data-valor'));
+        
+        if (valor === nodoActual) {
+            // Nodo actual - Naranja
+            nodo.style.fill = '#FFA500';
+            nodo.style.stroke = '#FF8C00';
+        } else if (nodosVisitados.has(valor)) {
+            // Nodo visitado - Verde
+            nodo.style.fill = '#4CAF50';
+            nodo.style.stroke = '#45a049';
+        }
+        // Los no visitados mantienen colores normales
+    });
+}
+
+function resetearColoresAnimacion() {
+    const elementos = document.querySelectorAll('[data-valor]');
+    elementos.forEach(nodo => {
+        nodo.style.fill = '';
+        nodo.style.stroke = '';
+    });
+}
+
+
+
+
+
+function resaltarNodoAnimado(valor, orden) {
+    const nodos = document.querySelectorAll('[data-valor]');
+    
+    nodos.forEach(nodo => {
+        const valorNodo = nodo.getAttribute('data-valor');
+        if (parseInt(valorNodo) === valor) {
+            // Resaltar temporalmente en color de animación
+            nodo.style.fill = '#FFA500'; // Naranja para animación
+            nodo.style.stroke = '#FF8C00';
+            
+            // Restaurar después de un tiempo
+            setTimeout(() => {
+                if (modoSimetria) {
+                    // Si hay simetría, mantener esos colores
+                    actualizarVisualizacion();
+                } else {
+                    // Volver al color normal
+                    nodo.style.fill = '#667eea';
+                    nodo.style.stroke = '#5a6fd8';
+                }
+            }, 600);
+        }
+    });
+}
+
+
+
