@@ -46,16 +46,11 @@
                     <h3>Utilidades Generales</h3>
                     <button class="btn-special" onclick="generarAleatorio()">Árbol Aleatorio</button>                    
                     <button class="btn-special" onclick="limpiarArbol()">Limpiar Árbol</button>
+                    <button class="btn-special" onclick="mostrarArbol()">Mostrar Normal</button> 
                     
                 </div>
 
-                <div class="section">
-                    <h3>Recorridos</h3>
-                    <button onclick="realizarRecorrido('inorden')">Inorden</button>
-                    <button onclick="realizarRecorrido('preorden')">Preorden</button>
-                    <button onclick="realizarRecorrido('postorden')">Postorden</button>
-                    <button onclick="realizarRecorrido('amplitud')">Por Niveles</button>
-                </div>
+                
                 
                 <div class="section">
                     <h3>Balanceo (AVL)</h3>
@@ -71,7 +66,7 @@
 
                 <div class="section">
                     <h3></h3>
-                    <button class="btn-salir" onclick="salir()">SALIR</button> 
+                    <button class="btn-salir" onclick="salir()">SALIR</button>                     
                 </div>                
 
             </div>
@@ -86,14 +81,25 @@
             <div class="panel right-panel">
 
                 <div class="section">
-                    <h3>Estadísticas</h3>
-                    <div id="estadisticas" class="estadisticas-area"> </div>
+                    <h3>Recorridos</h3>
+                    <button onclick="realizarRecorrido('inorden')">Inorden</button>
+                    <button onclick="realizarRecorrido('preorden')">Preorden</button>
+                    <button onclick="realizarRecorrido('postorden')">Postorden</button>
+                    <button onclick="realizarRecorrido('amplitud')">Por Niveles</button>
                 </div>
 
                 <div class="section">
                     <h3>Resultados</h3>
                     <div id="resultados" class="resultados-area"></div>
                 </div>
+
+
+                <div class="section">
+                    <h3>Estadísticas</h3>
+                    <div id="estadisticas" class="estadisticas-area"> </div>
+                </div>
+
+                
 
 
 

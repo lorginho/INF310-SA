@@ -300,3 +300,27 @@ def obtener_simetria_niveles():
         return jsonify({
             'error': f'Error al analizar simetría por niveles: {str(e)}'
         }), 500
+
+
+@arbol_bp.route('/recorrido-animado/<tipo>', methods=['GET'])
+def recorrido_animado(tipo):
+    """Devuelve lista de nodos en orden para animación"""
+    try:
+        if tipo == 'inorden':
+            resultado = recorrido_inorden(arbol.raiz)
+        elif tipo == 'preorden':
+            resultado = recorrido_preorden(arbol.raiz)
+        elif tipo == 'postorden':
+            resultado = recorrido_postorden(arbol.raiz)
+        elif tipo == 'amplitud':
+            resultado = arbol.amplitud()
+        else:
+            return jsonify({'error': 'Tipo de recorrido no válido'})
+
+        return jsonify({
+            'tipo': tipo,
+            'recorrido': resultado,
+            'mensaje': f'Recorrido {tipo} listo para animación'
+        })
+    except Exception as e:
+        return jsonify({'error': f'Error en recorrido animado: {str(e)}'})
