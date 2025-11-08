@@ -286,7 +286,7 @@ async function mostrarArbol() {
 
 
 async function generarAleatorio() {
-    const N = 8;
+    const N = 4;
     const valores = Array.from({ length: N }, () => 
         Math.floor(Math.random() * 200) + 1
     );
@@ -809,3 +809,6 @@ function resaltarNodoAnimado(valor, orden) {
         }
     });
 }
+
+
+

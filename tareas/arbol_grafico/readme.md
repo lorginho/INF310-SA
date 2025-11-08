@@ -24,7 +24,7 @@ Aplicación web interactiva que representa visualmente un **Árbol Binario de B�
 - **🌱 Inserción** individual y por series
 - **🗑️ Eliminación** de nodos y ramas completas
 - **🔍 Búsqueda** con resaltado visual
-- **🔄 Recorridos**: Inorden, Preorden, Postorden, Por Niveles
+- **🔄 Recorridos Animados**: Inorden, Preorden, Postorden, Por Niveles con visualización secuencial
 
 ### 📊 Análisis Avanzado
 
@@ -36,7 +36,7 @@ Aplicación web interactiva que representa visualmente un **Árbol Binario de B�
 
 - **🎨 SVG Dinámico** con colores por estado
 - **📱 Interfaz Responsiva** con tres paneles
-- **✨ Animaciones Suaves** para todas las operaciones
+- **✨ Recorridos Animados** - Nodos se iluminan en orden de visita
 - **🎯 Coloreado por niveles** para análisis de simetría
 
 ## 🛠️ Stack Tecnológico
@@ -60,27 +60,28 @@ Aplicación web interactiva que representa visualmente un **Árbol Binario de B�
 | `🗑️ ELIMINAR NODO`  | Elimina nodo específico             |
 | `🌿 ELIMINAR RAMA`  | Elimina nodo y toda su descendencia |
 | `🔍 BUSCAR NODO`    | Encuentra y resalta nodo            |
+| `🌳 MOSTRAR ÁRBOL`  | Restablece vista a colores normales |
 
-### 🔄 Recorridos Disponibles
+### 🔄 Recorridos Animados
 
-| Tipo           | Orden                                 |
-| -------------- | ------------------------------------- |
-| `🔄 INORDEN`   | Izquierdo - Raíz - Derecho (ordenado) |
-| `🔄 PREORDEN`  | Raíz - Izquierdo - Derecho            |
-| `🔄 POSTORDEN` | Izquierdo - Derecho - Raíz            |
-| `🔄 AMPLITUD`  | Por niveles (BFS)                     |
+| Tipo           | Comportamiento                                              |
+| -------------- | ----------------------------------------------------------- |
+| `🔄 INORDEN`   | Muestra lista + anima nodos en orden izquierdo-raíz-derecho |
+| `🔄 PREORDEN`  | Muestra lista + anima nodos en orden raíz-izquierdo-derecho |
+| `🔄 POSTORDEN` | Muestra lista + anima nodos en orden izquierdo-derecho-raíz |
+| `🔄 AMPLITUD`  | Muestra lista + anima nodos por niveles                     |
 
 ### ⚡ Utilidades Avanzadas
 
-| Función                   | Descripción                     |
-| ------------------------- | ------------------------------- |
-| `⚖️ VERIFICAR BALANCE`    | Chequea balance AVL             |
-| `⚖️ BALANCEAR ÁRBOL`      | Reconstruye a altura mínima     |
-| `🔄 VERIFICAR SIMETRÍA`   | Análisis estructural completo   |
-| `📊 SIMETRÍA POR NIVELES` | Análisis nivel por nivel        |
-| `🎲 ÁRBOL ALEATORIO`      | Genera árbol con valores random |
-| `🗑️ LIMPIAR ÁRBOL`        | Reinicia completamente          |
-| `🚪 SALIR`                | Cierra la aplicación            |
+| Función                   | Descripción                            |
+| ------------------------- | -------------------------------------- |
+| `⚖️ VERIFICAR BALANCE`    | Chequea balance AVL                    |
+| `⚖️ BALANCEAR ÁRBOL`      | Reconstruye a altura mínima            |
+| `🔄 VERIFICAR SIMETRÍA`   | Análisis estructural completo          |
+| `📊 SIMETRÍA POR NIVELES` | Análisis nivel por nivel con coloreado |
+| `🎲 ÁRBOL ALEATORIO`      | Genera árbol con valores random        |
+| `🗑️ LIMPIAR ÁRBOL`        | Reinicia completamente                 |
+| `🚪 SALIR`                | Cierra la aplicación                   |
 
 ## 🏗️ Arquitectura del Sistema
 
@@ -119,58 +120,32 @@ arbol_grafico/
 
 `esta_balanceado()` | `forzar_balanceo()` | `es_simetrico()` | `obtener_niveles_simetria()`
 
-## 🎯 Casos de Uso Detallados
+## 🎯 Casos de Uso Destacados
 
-### 📥 Proceso de Inserción
+### 🔄 Recorridos Animados
 
-1. **👤 Usuario** ingresa valor
-2. **🎮 Frontend** envía `POST /insertar`
-3. **🐍 Backend** valida e inserta
-4. **🧠 Modelo** coloca nodo BST
-5. **📡 Respuesta** confirma
-6. **🎨 SVG** redibuja
+- **Un solo click** muestra lista ordenada + animación visual
+- **Nodos visitados** se mantienen en verde permanente
+- **Nodo actual** se resalta en naranja durante cada paso
+- **Máximo valor educativo** para entender algoritmos
 
-### 🔍 Proceso de Búsqueda
+### 🎨 Análisis de Simetría
 
-1. **👤 Usuario** ingresa valor
-2. **🎮 Frontend** envía `POST /buscar`
-3. **🧠 Modelo** búsqueda recursiva
-4. **📡 Respuesta** resultado
-5. **🎨 SVG** resalta nodo
+- **Coloreado inteligente** por niveles (🟢 VERDE = simétrico, 🔴 ROJO = asimétrico)
+- **Reporte detallado** nivel por nivel en panel de resultados
+- **Visualización inmediata** de estructura del árbol
 
-### ⚖️ Proceso de Balanceo AVL
+### ⚡ Optimizaciones de Rendimiento
 
-1. **👤 Usuario** presiona "VERIFICAR BALANCE"
-2. **🐍 Backend** calcula factores equilibrio
-3. **📡 Respuesta** estado balance
-4. **👤 Usuario** opción "BALANCEAR"
-5. **🧠 Modelo** reconstruye árbol
+- **Algoritmo O(1)** para coloreado usando Map()
+- **Búsqueda eficiente** con mapa de niveles
+- **Manejo de estado** optimizado y centralizado
 
-### 🔄 Análisis de Simetría por Niveles
+## 🚀 Instalación y Desarrollo
 
-1. **👤 Usuario** presiona "VER SIMETRÍA POR NIVELES"
-2. **🧠 Modelo** analiza cada nivel
-3. **🎨 Frontend** colorea nodos: 🟢 **VERDE** (simétrico), 🔴 **ROJO** (asimétrico)
-4. **📊 Panel** reporte detallado
-
-## 🚀 Características Técnicas Destacadas
-
-### ⚡ Optimizaciones
-
-- **Algoritmo O(1)** para coloreado con `Map()`
-- **Búsqueda eficiente** con mapa niveles
-- **Manejo de estado** optimizado
-
-### 🎨 Visualización
-
-- **SVG Nativo** escalado vectorial
-- **Colores semánticos** por estado
-- **Responsive design** CSS Grid/Flexbox
-- **Transiciones suaves**
-
-### 🔧 Robustez
-
-- **Validación completa** inputs
-- **Manejo de errores** frontend/backend
-- **Prevención duplicados**
-- **API RESTful** estandarizada
+```bash
+git clone [url-repositorio]
+cd arbol_grafico
+python app.py
+# http://localhost:5000
+```
