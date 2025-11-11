@@ -8,7 +8,16 @@ const CONFIG = {
     nodeRadius: 25,
     horizontalSpacing: 75,
     verticalSpacing: 75
+    
 };
+
+// Variables de control global
+
+
+// Variable de control global
+let animacionEnCurso = false;
+
+const TIEMPO_MENSAJES = 6000; // 6 segundos
 
 // Estado de la aplicación
 let estado = {
@@ -27,15 +36,16 @@ document.addEventListener('DOMContentLoaded', function() {
     setInterval(cargarEstadisticas, 3000);
 });
 
-// Funciones de utilidad
 function mostrarMensaje(mensaje, tipo = 'info') {
     const mensajesDiv = document.getElementById('mensajes');
     mensajesDiv.innerHTML = `<div class="mensaje ${tipo}">${mensaje}</div>`;
     
     setTimeout(() => {
-        document.getElementById('mensajes').innerHTML = '';
-    }, 3000);
+        mensajesDiv.innerHTML = '';
+    }, TIEMPO_MENSAJES); // ✅ Usar variable global
 }
+
+
 
 // Funciones de comunicación con el backend
 async function fetchAPI(endpoint, options = {}) {
@@ -206,23 +216,33 @@ async function buscarNodo() {
 
 
 async function realizarRecorrido(tipo) {
+    // ✅ BLOQUEO: Verificar si ya hay animación en curso
+    if (animacionEnCurso) {
+        mostrarMensaje('⏳ Espere a que termine la animación actual', 'warning');
+        return;
+    }
+    
+    animacionEnCurso = true;
+    
     try {
-        // 1. Obtener y mostrar lista en panel de resultados (como antes)
+        // 1. Obtener y mostrar lista en panel de resultados
         const data = await fetchAPI(`/recorrido/${tipo}`);
         document.getElementById('resultados').innerHTML = 
             `<strong>Recorrido ${tipo}:</strong><br>${data.recorrido.join(' → ')}`;
         
         // 2. Ejecutar animación en paralelo
-        animarRecorrido(tipo);
+        await animarRecorrido(tipo);
         
         // 3. Mensaje combinado
-        mostrarMensaje(`📊 Mostrando y animando recorrido ${tipo}`, 'success');
+        mostrarMensaje(`📊 Recorrido ${tipo} completado`, 'success');
         
     } catch (error) {
         mostrarMensaje('Error al realizar recorrido', 'error');
+    } finally {
+        // ✅ DESBLOQUEO: Siempre liberar, incluso si hay error
+        animacionEnCurso = false;
     }
 }
-
 
 
 async function limpiarArbol() {
@@ -334,24 +354,36 @@ async function verificarSimetria() {
     }
 }
 
+
 function mostrarResumenSimetriaNiveles(niveles) {
     const resultadosDiv = document.getElementById('resultados');
-    let html = '<strong>📊 Análisis de Simetría por Niveles</strong><br>';
+    let html = '<strong>📊 Análisis de Simetría por Niveles</strong><br><br>';
     
     niveles.forEach(nivel => {
-        const color = nivel.simetrico ? '🟢' : '🔴';
+        const icono = nivel.simetrico ? '🟢' : '🔴';
         const estado = nivel.simetrico ? 'SIMÉTRICO' : 'ASIMÉTRICO';
         const nodosStr = nivel.nodos.map(n => n !== null ? `●${n}` : '∅').join(' ');
         
-        html += `<div style="margin: 5px 0; color: ${nivel.simetrico ? 'green' : 'red'}">
-            <strong>Nivel ${nivel.nivel}:</strong> ${nodosStr} ${color} ${estado}
-        </div>`;
+        html += `
+            <div style="margin: 12px 0;">
+                <div style="font-weight: bold; color: ${nivel.simetrico ? 'green' : 'red'}; font-size: 16px;">
+                    Nivel ${nivel.nivel}: ${icono} ${estado}
+                </div>
+                <div style="margin-top: 6px; font-size: 18px; font-weight: 500;">
+                    ${nodosStr}
+                </div>
+            </div>
+        `;
     });
     
     resultadosDiv.innerHTML = html;
 }
 
+
 // Funciones de visualización
+
+
+
 
 async function actualizarVisualizacion() {
     try {
@@ -696,8 +728,9 @@ document.addEventListener('keypress', function(e) {
     }
 });
 
-/*
+
 async function animarRecorrido(tipo) {
+    
     try {
         const data = await fetchAPI(`/recorrido-animado/${tipo}`);
         const nodos = data.recorrido;
@@ -705,29 +738,6 @@ async function animarRecorrido(tipo) {
         // Desactivar modo simetría durante animación
         const simetriaAnterior = modoSimetria;
         modoSimetria = false;
-        
-        mostrarMensaje(`🎬 Animando recorrido ${tipo}...`, 'info');
-        
-        // Animación secuencial
-        for (let i = 0; i < nodos.length; i++) {
-            await new Promise(resolve => setTimeout(resolve, 800)); // Delay
-            resaltarNodoAnimado(nodos[i], i + 1);
-        }
-        
-        // Restaurar modo simetría si estaba activo
-        modoSimetria = simetriaAnterior;
-        await actualizarVisualizacion();
-        
-    } catch (error) {
-        mostrarMensaje('Error en animación: ' + error.message, 'error');
-    }
-}
-
-*/
-async function animarRecorrido(tipo) {
-    try {
-        const data = await fetchAPI(`/recorrido-animado/${tipo}`);
-        const nodos = data.recorrido;
         
         // Resetear colores anteriores
         resetearColoresAnimacion();
@@ -738,6 +748,9 @@ async function animarRecorrido(tipo) {
         const nodosVisitados = new Set();
         
         for (let i = 0; i < nodos.length; i++) {
+            // ✅ Verificar periódicamente si debemos cancelar
+            if (!animacionEnCurso) break;
+            
             await new Promise(resolve => setTimeout(resolve, 800));
             
             // Agregar nodo actual a visitados
@@ -747,12 +760,56 @@ async function animarRecorrido(tipo) {
             aplicarColoresRecorrido(nodosVisitados, nodos[i]);
         }
         
-        mostrarMensaje(`✅ Recorrido ${tipo} completado. Nodos verdes = visitados`, 'success');
+        if (animacionEnCurso) {
+            mostrarMensaje(`✅ Recorrido ${tipo} completado. Nodos verdes = visitados`, 'success');
+        }
+        
+        // Restaurar modo simetría si estaba activo
+        modoSimetria = simetriaAnterior;
+        if (modoSimetria) {
+            await actualizarVisualizacion();
+        }
         
     } catch (error) {
-        mostrarMensaje('Error en animación: ' + error.message, 'error');
+        if (animacionEnCurso) {
+            mostrarMensaje('Error en animación: ' + error.message, 'error');
+        }
+    } finally {
+        // ✅ DESBLOQUEO: Siempre liberar
+        animacionEnCurso = false;
     }
 }
+
+function aplicarColoresRecorrido(nodosVisitados, nodoActual) {
+    const elementos = document.querySelectorAll('[data-valor]');
+    
+    elementos.forEach(nodo => {
+        const valor = parseInt(nodo.getAttribute('data-valor'));
+        
+        if (valor === nodoActual) {
+            // Nodo actual - Naranja
+            nodo.style.fill = '#FFA500';
+            nodo.style.stroke = '#FF8C00';
+        } else if (nodosVisitados.has(valor)) {
+            // Nodo visitado - Verde
+            nodo.style.fill = '#4CAF50';
+            nodo.style.stroke = '#45a049';
+        }
+        // Los no visitados mantienen colores normales
+    });
+}
+
+function resetearColoresAnimacion() {
+    const elementos = document.querySelectorAll('[data-valor]');
+    elementos.forEach(nodo => {
+        nodo.style.fill = '';
+        nodo.style.stroke = '';
+    });
+}
+
+
+
+
 
 function aplicarColoresRecorrido(nodosVisitados, nodoActual) {
     const elementos = document.querySelectorAll('[data-valor]');

@@ -139,13 +139,53 @@ button:hover {
     position: relative;
 }
 
+
+/* ESTILOS PARA MENSAJES - CORREGIDOS */
+
 #mensajes {
     margin-top: 10px;
     padding: 10px;
-    background-color: #f8f9fa;
+    background-color: #505c69;
     border-radius: 4px;
-    min-height: 50px;
+    height: 60px;           /* ← ALTURA FIJA */
+    display: flex;
+    align-items: center;    /* ← Centrado vertical */
+    justify-content: center; /* ← Centrado horizontal (opcional) */
 }
+
+.mensaje {
+    padding: 12px;
+    margin: 10px 0;
+    border-radius: 6px;
+    border-left: 5px solid;
+    font-weight: 500;
+}
+
+.mensaje.success {
+    background-color: #d4edda;
+    color: #155724;
+    border-left-color: #28a745;
+}
+
+.mensaje.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border-left-color: #dc3545;
+}
+
+.mensaje.warning {
+    background-color: #fff3cd;
+    color: #856404;
+    border-left-color: #ffc107;
+}
+
+.mensaje.info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border-left-color: #17a2b8;
+}
+
+
 
 .resultados-area, .estadisticas-area {
     padding: 10px;
