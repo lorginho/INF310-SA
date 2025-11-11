@@ -7,32 +7,32 @@ DESCRIPCIÓN: Controlador principal que coordina operaciones entre modelo y vist
 DEPENDENCIAS: models.grafo_rutas, views.mapa_view
 """
 
-
 from models.grafo_rutas import GrafoRutas
 from views.mapa_view import MapaView
 
 
 class MapaController:
     def __init__(self, modelo=None, vista=None):
-        # ✅ MVC CORRECTO: Controlador no sabe de datos específicos
-        self.modelo = modelo or GrafoRutas.crear_grafo_bolivia()  # Factory method
+        self.modelo = modelo or GrafoRutas.crear_grafo_bolivia()
         self.vista = vista or MapaView()
 
-        # DEBUG DETALLADO
         print(f"🔍 DEBUG - Ciudades en modelo: {len(self.modelo.ciudades)}")
         print(f"🔍 DEBUG - Conexiones en modelo: {len(self.modelo.conexiones)}")
         print(
             f"🔍 DEBUG - Ciudades específicas: {list(self.modelo.ciudades.keys())}")
-
         print("✅ Controlador MVC inicializado correctamente")
+
+    def obtener_grafo(self):
+        """✅ NUEVO MÉTODO: Retorna la instancia actual del grafo"""
+        return self.modelo
 
     def obtener_mapa(self):
         """Obtiene los datos del mapa formateados para la vista"""
         datos_modelo = self.modelo.obtener_estado()
         return self.vista.formatear_datos_mapa(datos_modelo)
 
-    def calcular_ruta(self, origen, destino):
-        """Calcula la ruta óptima entre dos ciudades"""
+    def calcular_ruta(self, origen, destino, criterio='distancia'):
+        """✅ ACTUALIZADO: Calcula la ruta óptima entre dos ciudades con criterio"""
         try:
             valido, error = self.vista.validar_datos_ruta_calculo({
                 'origen': origen,
@@ -42,7 +42,7 @@ class MapaController:
             if not valido:
                 return self.vista.formatear_error(error)
 
-            resultado = self.modelo.dijkstra(origen, destino)
+            resultado = self.modelo.dijkstra(origen, destino, criterio)
             return self.vista.formatear_respuesta_ruta(resultado)
 
         except Exception as e:
@@ -69,10 +69,16 @@ class MapaController:
             if not valido:
                 return self.vista.formatear_error(error)
 
+            # ✅ CREAR OBJETO CON DISTANCIA Y TIEMPO
+            pesos = {
+                'distancia': float(datos['distancia']),
+                'tiempo': float(datos['tiempo'])
+            }
+
             self.modelo.agregar_ruta(
                 datos['ciudad1'],
                 datos['ciudad2'],
-                float(datos['peso'])
+                pesos  # ← ENVIAR OBJETO COMPLETO
             )
             return self.vista.formatear_exito("Ruta agregada correctamente")
 

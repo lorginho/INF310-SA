@@ -2,20 +2,53 @@
 
 /* FONDO DE LA VENTANA PRINCIPAL */
 body {
-    background: #bcd8f3;       /* ✅ GRIS MUY CLARO */
+    background: #bcd8f3;
     margin: 0;
     padding: 20px;
     font-family: Arial, sans-serif;
 }
 
 .container {
-    background: rgb(167, 140, 140);         /* ✅ CONTENEDOR PRINCIPAL BLANCO */
+    background: rgb(167, 140, 140);
     border-radius: 12px;
     padding: 20px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
+/* ESTILOS PARA CRITERIOS */
+.criterios {
+    margin: 15px 0;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+}
 
+.botones-criterio {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.btn-criterio {
+    flex: 1;
+    background: #f0f0f0;
+    border: 2px solid #ddd;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.btn-criterio.active {
+    background: #007bff;
+    color: white;
+    border-color: #0056b3;
+}
+
+.btn-criterio:hover {
+    background: #e0e0e0;
+}
 
 .info-estado {
     margin: 15px 0;
@@ -36,7 +69,6 @@ body {
 }
 
 .ruta {
-    /*stroke: #365cc5;*/
     stroke: #6cb3af;
     stroke-width: 3;
     opacity: 0.8;
@@ -61,7 +93,6 @@ body {
     background-color: rgba(1, 20, 4, 0.8);
 }
 
-
 /* LAYOUT PRINCIPAL */
 .layout {
     display: flex;
@@ -78,21 +109,17 @@ body {
 }
 
 .left-sidebar {
-    width: 380px;              /* ✅ IZQUIERDO: 380px (era 280px) */
+    width: 380px;
 }
-
 
 .right-sidebar {
-    width: 500px;              /* ✅ DERECHO MÁS ANCHO: 400px */
+    width: 500px;
 }
-
 
 /* SEPARACIÓN PARA CONTROLES INFERIORES DERECHA */
 .right-sidebar .controles:last-child {
     margin-top: 20px;
 }
-
-
 
 /* BORDE PARA EL MAPA - TAMAÑO MEJORADO */
 .mapa-container {
@@ -105,46 +132,41 @@ body {
     background: #7b9ab9;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
     margin: 5px;
-    min-height: 100px;  /* ✅ ALTURA MÍNIMA PARA EL MAPA */
-    
-    width: 1620px;    /* ✅ ANCHO FIJO (1600 + padding) */
-    height: 1100px;   /* ✅ ALTO FIJO (1200 + padding) */
-    overflow: visible; /* ✅ PERMITIR QUE TODO SEA VISIBLE */
+    min-height: 100px;
+    width: 1620px;
+    height: 1100px;
+    overflow: visible;
 }
 
 /* SVG MÁS GRANDE */
 #mapa {
-    /* Color del Fondo del Mapa*/    
     background: rgb(186, 214, 219);
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    display: block;    /* ✅ EVITAR ESPACIOS EXTRA */
-    cursor: crosshair;  /* ✅ CURSOR ESPECIAL PARA AGREGAR CIUDADES */
+    display: block;
+    cursor: crosshair;
 }
 
 /* LETRAS MÁS GRANDES Y LEGIBLES */
 .nombre-ciudad {
     fill: #0c330e;
-    font-size: 22px;           /* ✅ MÁS GRANDE (era 12px) */
+    font-size: 22px;
     font-weight: bold;
-    text-shadow: 1px 2px 1px rgb(153, 149, 189);  /* ✅ SOMBRA MÁS FUERTE */
+    text-shadow: 1px 2px 1px rgb(153, 149, 189);
 }
 
 .peso-ruta {
     fill: #531e1e;
-    font-size: 18px;           /* ✅ MÁS GRANDE (era 10px) */
+    font-size: 18px;
     font-weight: bold;
-    /*background-color: rgba(255, 255, 255, 0.9);*/
-    /*text-shadow: 1px 1px 3px white;  /* ✅ SOMBRA PARA MEJOR LECTURA */
 }
 
 /* CIUDADES MÁS GRANDES */
 .circulo-ciudad {
     fill: #4745b1ff;
     stroke: #260829;
-    stroke-width: 3;    
+    stroke-width: 3;
 }
-
 
 /* FORMULARIO */
 .form-agregar-ciudad {
@@ -169,8 +191,7 @@ body {
     box-sizing: border-box;
 }
 
-
-.form-agregar-ciudad  select {
+.form-agregar-ciudad select {
     width: 100%;
     padding: 8px;
     margin: 5px 0;
@@ -178,8 +199,6 @@ body {
     border-radius: 4px;
     box-sizing: border-box;
 }
-
-
 
 .form-agregar-ciudad button {
     width: 100%;

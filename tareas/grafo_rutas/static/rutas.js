@@ -5,43 +5,51 @@ Autor: Lorgio Añez J.
 Fecha: 2025-10-23
 
 Descripción: 
-
-El archivo rutas.js es el principal, tambien unico :(, archivo JavaScript del frontend del proyecto.
+El archivo rutas.js es el principal archivo JavaScript del frontend del proyecto.
 Conecta la interfaz gráfica con el backend, permitiendo que el usuario interactúe
 visualmente y en tiempo real con la mapa de ciudades y sus rutas.
-
-Sus funciones principales son:
-
-Gestionar la interacción del usuario con la interfaz web (formularios, botones, eventos de teclado).
-Comunicar la interfaz con el backend Flask mediante peticiones AJAX (fetch) 
-a los endpoints definidos en el controlador.
-Actualizar dinámicamente la visualización del Mapa de Rutas en SVG, dibujando vertices y las aristas 
-según los datos recibidos del backend.
-Mostrar mensajes, estadísticas y resultados de las operaciones realizadas sobre el Mapa.
-Controlar animaciones y estados de la aplicación para una experiencia de usuario fluida.
 */
-
-
-// Configuración global, "apariencia" de los nodos
-
-
-
 
 class SistemaRutas {
     constructor() {
         this.ciudades = {};
         this.conexiones = [];
         this.pesos = {};
+        this.criterioActual = 'distancia';
         
         this.actualizarEstado("Inicializando...");
         this.configurarFormularios();
         this.configurarClicksMapa(); 
+        this.configurarCriterios();
         this.cargarMapa();
     }
 
+
+
+    configurarCriterios() {
+        document.querySelectorAll('.btn-criterio').forEach(btn => {
+            btn.addEventListener('click', (event) => {
+                document.querySelectorAll('.btn-criterio').forEach(b => b.classList.remove('active'));
+                event.target.classList.add('active');
+                this.criterioActual = event.target.dataset.criterio;
+                
+                // ✅ ACTUALIZAR EL MAPA INMEDIATAMENTE
+                this.actualizarEstado(`Mostrando ${this.criterioActual === 'distancia' ? 'distancias (km)' : 'tiempos (horas)'}`);
+                this.dibujarRutas(); // ← REDIBUJAR RUTAS CON NUEVO CRITERIO
+                
+                // ✅ ACTUALIZAR LISTA DE RUTAS TAMBIÉN
+                this.mostrarListaRutas();
+            });
+        });
+    }
+
+
+
+
+
     actualizarEstado(mensaje) {
         const estadoElement = document.getElementById('estado');
-        if (estadoElement) {  // ✅ CORREGIDO: "estadoElement"
+        if (estadoElement) {
             estadoElement.textContent = mensaje;
         }
     }
@@ -59,7 +67,6 @@ class SistemaRutas {
     }
 
     configurarFormularios() {
-        // Configurar formulario de ciudad
         const formCiudad = document.getElementById('form-ciudad');
         if (formCiudad) {
             formCiudad.addEventListener('submit', (event) => {
@@ -68,7 +75,6 @@ class SistemaRutas {
             });
         }
 
-        // Configurar formulario de ruta
         const formRuta = document.getElementById('form-ruta');
         if (formRuta) {
             formRuta.addEventListener('submit', (event) => {
@@ -97,7 +103,6 @@ class SistemaRutas {
             this.actualizarEstado("Datos cargados correctamente");
             this.actualizarContadores();
             
-            // Actualizar interfaz
             this.actualizarSelects();
             this.mostrarListaCiudades();
             this.mostrarListaRutas();
@@ -121,13 +126,11 @@ class SistemaRutas {
         const ciudad1Ruta = document.getElementById('ciudad1-ruta');
         const ciudad2Ruta = document.getElementById('ciudad2-ruta');
         
-        // ✅ LIMPIAR CON TEXTO ESPECÍFICO PARA CADA SELECT
         if (origen) origen.innerHTML = '<option value="">Origen</option>';
         if (destino) destino.innerHTML = '<option value="">Destino</option>';
         if (ciudad1Ruta) ciudad1Ruta.innerHTML = '<option value="">Origen</option>';
         if (ciudad2Ruta) ciudad2Ruta.innerHTML = '<option value="">Destino</option>';
 
-        // Llenar con ciudades
         Object.keys(this.ciudades).forEach(ciudad => {
             if (origen) origen.innerHTML += `<option value="${ciudad}">${ciudad}</option>`;
             if (destino) destino.innerHTML += `<option value="${ciudad}">${ciudad}</option>`;
@@ -140,7 +143,6 @@ class SistemaRutas {
         const lista = document.getElementById('lista-ciudades');
         lista.innerHTML = '';
         
-        // ✅ ORDENAR CIUDADES ALFABÉTICAMENTE
         const ciudadesOrdenadas = Object.keys(this.ciudades).sort();
         
         ciudadesOrdenadas.forEach(ciudad => {
@@ -157,8 +159,7 @@ class SistemaRutas {
             div.style.padding = '5px 0';
             lista.appendChild(div);
         });
-    }    
-
+    }
 
     dibujarMapa() {
         this.actualizarEstado("Dibujando mapa...");
@@ -176,24 +177,22 @@ class SistemaRutas {
             grupo.setAttribute('class', 'ciudad');
             grupo.setAttribute('id', `ciudad-${nombre}`);
 
-            // Círculo de la ciudad - ATRIBUTOS EXPLÍCITOS
             const circulo = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
             circulo.setAttribute('cx', x);
             circulo.setAttribute('cy', y);
-            circulo.setAttribute('r', '16');  // ✅ String
+            circulo.setAttribute('r', '16');
             circulo.setAttribute('class', 'circulo-ciudad');
             circulo.setAttribute('id', `circulo-${nombre}`);
-            circulo.setAttribute('fill', '#4745b1');        // ✅ Color explícito
-            circulo.setAttribute('stroke', '#260829');      // ✅ Borde explícito  
-            circulo.setAttribute('stroke-width', '3');      // ✅ Grosor explícito
+            circulo.setAttribute('fill', '#4745b1');
+            circulo.setAttribute('stroke', '#260829');
+            circulo.setAttribute('stroke-width', '3');
 
-            // Nombre de la ciudad
             const texto = document.createElementNS('http://www.w3.org/2000/svg', 'text');
             texto.setAttribute('x', x);
             texto.setAttribute('y', y - 25);
             texto.setAttribute('class', 'nombre-ciudad');
             texto.setAttribute('text-anchor', 'middle');
-            texto.setAttribute('fill', '#0c330e');          // ✅ Color texto explícito
+            texto.setAttribute('fill', '#0c330e');
             texto.textContent = nombre;
 
             grupo.appendChild(circulo);
@@ -201,7 +200,6 @@ class SistemaRutas {
             ciudadesGroup.appendChild(grupo);
         });
     }
-
 
     dibujarRutas() {
         const rutasGroup = document.getElementById('rutas');
@@ -213,7 +211,7 @@ class SistemaRutas {
             
             if (!coord1 || !coord2) return;
             
-            // Buscar el peso
+            // ✅ BUSCAR PESO SEGÚN CRITERIO ACTUAL
             let peso = null;
             const posiblesClaves = [
                 `${ciudad1}-${ciudad2}`,
@@ -222,7 +220,13 @@ class SistemaRutas {
             
             for (const clave of posiblesClaves) {
                 if (this.pesos[clave] !== undefined) {
-                    peso = this.pesos[clave];
+                    // ✅ SI ES DICCIONARIO (con distancia/tiempo), USAR CRITERIO ACTUAL
+                    if (typeof this.pesos[clave] === 'object') {
+                        peso = this.pesos[clave][this.criterioActual] || this.pesos[clave]['distancia'];
+                    } else {
+                        // ✅ SI ES NÚMERO (viejo formato), usar directamente
+                        peso = this.pesos[clave];
+                    }
                     break;
                 }
             }
@@ -231,7 +235,7 @@ class SistemaRutas {
                 peso = "?";
             }
 
-            // ✅ PRIMERO DIBUJAR LA LÍNEA (ABAJO)
+            // Dibujar línea
             const linea = document.createElementNS('http://www.w3.org/2000/svg', 'line');
             linea.setAttribute('x1', coord1[0]);
             linea.setAttribute('y1', coord1[1]);
@@ -240,9 +244,9 @@ class SistemaRutas {
             linea.setAttribute('class', 'ruta');
             linea.setAttribute('id', `ruta-${ciudad1}-${ciudad2}`);
             
-            rutasGroup.appendChild(linea); // ✅ LÍNEA PRIMERO
+            rutasGroup.appendChild(linea);
 
-            // ✅ LUEGO DIBUJAR EL TEXTO (ENCIMA)
+            // Dibujar texto con peso
             if (peso !== "?") {
                 const texto = document.createElementNS('http://www.w3.org/2000/svg', 'text');
                 const midX = (coord1[0] + coord2[0]) / 2;
@@ -252,13 +256,17 @@ class SistemaRutas {
                 texto.setAttribute('y', midY - 12);
                 texto.setAttribute('class', 'peso-ruta');
                 texto.setAttribute('text-anchor', 'middle');
-                texto.setAttribute('fill', '#531e1e'); // Color explícito
+                texto.setAttribute('fill', '#531e1e');
                 texto.textContent = peso;
 
-                rutasGroup.appendChild(texto); // ✅ TEXTO DESPUÉS
+                rutasGroup.appendChild(texto);
             }
         });
     }
+
+
+
+
 
 
     async calcularRuta() {
@@ -275,6 +283,9 @@ class SistemaRutas {
             return;
         }
 
+        // ✅ DEBUG: Verificar criterio
+        console.log("🔍 DEBUG - Criterio actual:", this.criterioActual);
+
         this.actualizarEstado("Calculando ruta óptima...");
         this.limpiarAnimaciones();
 
@@ -282,35 +293,53 @@ class SistemaRutas {
             const response = await fetch('/api/ruta', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ origen, destino })
+                body: JSON.stringify({ 
+                    origen, 
+                    destino, 
+                    criterio: this.criterioActual // ← AQUÍ ESTÁ EL PROBLEMA
+                })
             });
 
-            const resultado = await response.json();
-            
-            if (resultado.status === 'success') {
-                // Mostrar animación del algoritmo
-                await this.animarDijkstra(resultado.pasos);
-                
-                // Dibujar ruta óptima
-                this.dibujarRutaOptima(resultado.camino);
-                
-                document.getElementById('resultado').innerHTML = 
-                    `<strong>✅ Ruta Óptima Encontrada:</strong><br>
-                     <strong>📍 Recorrido:</strong> ${resultado.camino.join(' → ')}<br>
-                     <strong>📏 Distancia Total:</strong> ${resultado.distancia} km`;
-                
-                this.actualizarEstado("Ruta calculada correctamente");
-            } else {
-                document.getElementById('resultado').innerHTML = 
-                    `<strong>❌ Error:</strong> ${resultado.message}`;
-                this.actualizarEstado("Error en cálculo de ruta");
+            if (!response.ok) {
+                throw new Error(`Error del servidor: ${response.status}`);
             }
-                 
+
+            const data = await response.json();
+            
+            // ✅ DEBUG: Verificar respuesta
+            console.log("🔍 DEBUG - Respuesta del servidor:", data);
+            
+            if (data.error) {
+                document.getElementById('resultado').innerHTML = 
+                    `<strong>❌ Error:</strong> ${data.error}`;
+                this.actualizarEstado("Error en cálculo de ruta");
+            } else {
+                await this.animarDijkstra(data.pasos);
+                this.dibujarRutaOptima(data.camino);
+                this.mostrarResultado(data);
+                this.actualizarEstado("Ruta calculada correctamente");
+            }
+                
         } catch (error) {
             document.getElementById('resultado').innerHTML = 
-                '<strong>❌ Error:</strong> No se pudo conectar con el servidor';
+                `<strong>❌ Error:</strong> ${error.message}`;
             this.actualizarEstado("Error de conexión");
         }
+    }
+
+
+    mostrarResultado(data) {
+        console.log("Datos recibidos:", data);
+        const resultadoDiv = document.getElementById('resultado');
+        
+        const criterio = data.criterio === 'distancia' ? 'Distancia' : 'Tiempo';
+        const unidad = data.criterio === 'distancia' ? 'km' : 'horas';
+        
+        resultadoDiv.innerHTML = `
+            <h3>Ruta ${criterio.toLowerCase()} más corta</h3>
+            <p><strong>Ruta:</strong> ${data.camino.join(' → ')}</p>
+            <p><strong>${criterio} total:</strong> ${data.distancia} ${unidad}</p>
+        `;
     }
 
     async animarDijkstra(pasos) {
@@ -319,33 +348,29 @@ class SistemaRutas {
         for (let i = 0; i < pasos.length; i++) {
             const [accion, ciudad, valor] = pasos[i];
             
-            // Pausas de 300ms entre pasos para seguimiento visual, se cambio a 500
-            await new Promise(resolve => setTimeout(resolve, 300)); // Pausa de 300ms
+            await new Promise(resolve => setTimeout(resolve, 300));
             
             const circulo = document.getElementById(`circulo-${ciudad}`);
             if (circulo) {
                 if (accion === 'visitando') {
-                    circulo.style.fill = '#ffd700'; // Amarillo - visitando
+                    circulo.style.fill = '#ffd700';
                     circulo.style.stroke = '#ff6b00';
                 } else if (accion === 'actualizando') {
-                    circulo.style.fill = '#90ee90'; // Verde claro - actualizando
+                    circulo.style.fill = '#90ee90';
                     circulo.style.stroke = '#28a745';
                 }
             }
         }
         
-        // Restaurar colores después de la animación
         setTimeout(() => {
             this.limpiarAnimaciones();
         }, 10);
     }
 
     limpiarAnimaciones() {
-        // Restaurar colores originales de todas las ciudades
         Object.keys(this.ciudades).forEach(ciudad => {
             const circulo = document.getElementById(`circulo-${ciudad}`);
             if (circulo) {
-                //circulo.style.fill = '#d52b1e';
                 circulo.style.fill = '#4745b1ff';
                 circulo.style.stroke = '#f2f700';
             }
@@ -408,9 +433,7 @@ class SistemaRutas {
             const resultado = await response.json();
 
             if (resultado.status === 'ok') {
-                // Limpiar formulario
                 document.getElementById('form-ciudad').reset();
-                // Recargar mapa
                 await this.cargarMapa();
                 this.actualizarEstado("Ciudad agregada correctamente");
             } else {
@@ -454,13 +477,18 @@ class SistemaRutas {
         }
     }
 
+
+
     async agregarRuta() {
+        // ✅ OBTENER VALORES DEL FORMULARIO
         const ciudad1 = document.getElementById('ciudad1-ruta').value;
         const ciudad2 = document.getElementById('ciudad2-ruta').value;
-        const peso = document.getElementById('peso-ruta').value;
+        const distancia = document.getElementById('distancia-ruta').value;
+        const tiempo = document.getElementById('tiempo-ruta').value;
 
-        if (!ciudad1 || !ciudad2 || !peso) {
-            alert('Por favor completa todos los campos');
+        // ✅ VERIFICAR QUE TODOS LOS CAMPOS ESTÁN LLENOS
+        if (!ciudad1 || !ciudad2 || !distancia || !tiempo) {
+            alert('Por favor completa todos los campos: ciudad origen, ciudad destino, distancia y tiempo');
             return;
         }
 
@@ -472,18 +500,26 @@ class SistemaRutas {
         this.actualizarEstado("Agregando ruta...");
 
         try {
+            // ✅ PREPARAR DATOS PARA ENVIAR
+            const datos = {
+                ciudad1: ciudad1,
+                ciudad2: ciudad2,
+                distancia: parseFloat(distancia),
+                tiempo: parseFloat(tiempo)
+            };
+
+            // ✅ ENVIAR AL ENDPOINT CORRECTO
             const response = await fetch('/api/ruta/nueva', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ciudad1, ciudad2, peso })
+                body: JSON.stringify(datos)
             });
 
             const resultado = await response.json();
 
             if (resultado.status === 'ok') {
-                // Limpiar formulario
+                // ✅ LIMPIAR FORMULARIO Y ACTUALIZAR MAPA
                 document.getElementById('form-ruta').reset();
-                // Recargar mapa
                 await this.cargarMapa();
                 this.actualizarEstado("Ruta agregada correctamente");
             } else {
@@ -498,11 +534,11 @@ class SistemaRutas {
     }
 
 
+
     mostrarListaRutas() {
         const lista = document.getElementById('lista-rutas');
         lista.innerHTML = '';
         
-        // ✅ ORDENAR RUTAS ALFABÉTICAMENTE
         const rutasOrdenadas = [...this.conexiones].sort(([ciudad1A, ciudad2A], [ciudad1B, ciudad2B]) => {
             const rutaA = `${ciudad1A} ↔ ${ciudad2A}`;
             const rutaB = `${ciudad1B} ↔ ${ciudad2B}`;
@@ -510,12 +546,27 @@ class SistemaRutas {
         });
         
         rutasOrdenadas.forEach(([ciudad1, ciudad2]) => {
-            let peso = this.pesos[`${ciudad1}-${ciudad2}`] || this.pesos[`${ciudad2}-${ciudad1}`] || '?';
+            let peso = "?";
+            const clave = `${ciudad1}-${ciudad2}`;
+            const claveInversa = `${ciudad2}-${ciudad1}`;
+            
+            // ✅ USAR CRITERIO ACTUAL PARA MOSTRAR PESOS
+            if (this.pesos[clave] !== undefined || this.pesos[claveInversa] !== undefined) {
+                const datosPeso = this.pesos[clave] || this.pesos[claveInversa];
+                
+                if (typeof datosPeso === 'object') {
+                    peso = datosPeso[this.criterioActual] || datosPeso['distancia'];
+                } else {
+                    peso = datosPeso;
+                }
+            }
+            
+            const unidad = this.criterioActual === 'distancia' ? 'km' : 'horas';
             
             const div = document.createElement('div');
             div.className = 'ruta-item';
             div.innerHTML = `
-                <span>${ciudad1} ↔ ${ciudad2} (${peso} km)</span>
+                <span>${ciudad1} ↔ ${ciudad2} (${peso} ${unidad})</span>
                 <button onclick="window.sistemaRutas.eliminarRuta('${ciudad1}', '${ciudad2}')" 
                         class="btn-eliminar">🗑️</button>
             `;
@@ -527,6 +578,7 @@ class SistemaRutas {
             lista.appendChild(div);
         });
     }
+
 
 
     async eliminarRuta(ciudad1, ciudad2) {
@@ -559,14 +611,12 @@ class SistemaRutas {
         }
     }
 
-
     configurarClicksMapa() {
         const mapa = document.getElementById('mapa');
         if (mapa) {
             mapa.addEventListener('click', (event) => {
                 this.manejarClickMapa(event);
             });
-            // Cambiar cursor para indicar que es clickeable
             mapa.style.cursor = 'crosshair';
         }
     }
@@ -575,7 +625,6 @@ class SistemaRutas {
         const svg = document.getElementById('mapa');
         const point = svg.createSVGPoint();
         
-        // Obtener coordenadas relativas al SVG
         point.x = event.clientX;
         point.y = event.clientY;
         const svgPoint = point.matrixTransform(svg.getScreenCTM().inverse());
@@ -583,7 +632,6 @@ class SistemaRutas {
         const x = Math.round(svgPoint.x);
         const y = Math.round(svgPoint.y);
         
-        // Pedir nombre de la ciudad
         const nombre = prompt(`📍 Agregar nueva ciudad en coordenadas (${x}, ${y})\n\nIngresa el nombre de la ciudad:`);
         
         if (nombre && nombre.trim()) {
@@ -621,26 +669,22 @@ class SistemaRutas {
         const svg = document.getElementById('mapa');
         const clone = svg.cloneNode(true);
         
-        // ✅ AGREGAR FONDO COMO ELEMENTO SVG
         const fondo = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
         fondo.setAttribute('x', '0');
         fondo.setAttribute('y', '0');
         fondo.setAttribute('width', '1200');
         fondo.setAttribute('height', '1000');
-        fondo.setAttribute('fill', '#bad6db'); // Color del fondo
-        fondo.setAttribute('rx', '8'); // Bordes redondeados
-        clone.insertBefore(fondo, clone.firstChild); // Insertar al inicio
+        fondo.setAttribute('fill', '#bad6db');
+        fondo.setAttribute('rx', '8');
+        clone.insertBefore(fondo, clone.firstChild);
 
-        // ✅ ASEGURAR ATRIBUTOS EXPLÍCITOS PARA EXPORTACIÓN
         const elementos = clone.querySelectorAll('*');
         elementos.forEach(elemento => {
-            // Forzar visibilidad
             elemento.style.display = 'block';
             elemento.style.visibility = 'visible';
             elemento.style.opacity = '1';
         });
 
-        // ✅ ASEGURAR COLORES EN CÍRCULOS
         const circulos = clone.querySelectorAll('.circulo-ciudad');
         circulos.forEach(circulo => {
             if (!circulo.getAttribute('fill') || circulo.getAttribute('fill').includes('rgb')) {
@@ -652,7 +696,6 @@ class SistemaRutas {
             circulo.setAttribute('stroke-width', '3');
         });
 
-        // ✅ ASEGURAR COLORES EN TEXTO
         const textos = clone.querySelectorAll('.nombre-ciudad, .peso-ruta');
         textos.forEach(texto => {
             if (!texto.getAttribute('fill') || texto.getAttribute('fill').includes('rgb')) {
@@ -664,8 +707,6 @@ class SistemaRutas {
             }
         });
 
-
-        // ✅ ASEGURAR COLORES EN RUTAS
         const rutas = clone.querySelectorAll('.ruta');
         rutas.forEach(ruta => {
             if (!ruta.getAttribute('stroke')) {
@@ -675,7 +716,6 @@ class SistemaRutas {
             ruta.setAttribute('opacity', '0.8');
         });
 
-        // ✅ ASEGURAR COLORES EN RUTAS ÓPTIMAS
         const rutasOptimas = clone.querySelectorAll('.ruta-optima');
         rutasOptimas.forEach(ruta => {
             if (!ruta.getAttribute('stroke')) {
@@ -685,7 +725,6 @@ class SistemaRutas {
             ruta.setAttribute('opacity', '0.9');
         });
 
-        // Serializar y descargar
         const svgData = new XMLSerializer().serializeToString(clone);
         const blob = new Blob([svgData], {type: 'image/svg+xml'});
         const url = URL.createObjectURL(blob);
@@ -700,15 +739,12 @@ class SistemaRutas {
         
         this.actualizarEstado("Mapa exportado como SVG");
     }
-   
 }
 
-// Inicializar cuando cargue la página
 document.addEventListener('DOMContentLoaded', () => {
     window.sistemaRutas = new SistemaRutas();
 });
 
-// Funciones globales para los botones
 function calcularRuta() {
     window.sistemaRutas.calcularRuta();
 }
@@ -721,10 +757,8 @@ function exportarMapa() {
     window.sistemaRutas.exportarMapa();
 }
 
-
 function cerrarAplicacion() {
     if (confirm('¿Estás seguro de que quieres cerrar la aplicación?')) {
-        window.close(); // Cierra la ventana del navegador
+        window.close();
     }
 }
-

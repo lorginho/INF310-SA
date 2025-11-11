@@ -4,30 +4,16 @@ AUTOR: Lorgio Añez J.
 FECHA: 2025-10-23
 DESCRIPCIÓN: Define endpoints REST API para comunicación frontend-backend.
              Maneja requests de mapa, rutas y ciudades.
-CONCEPTO CLAVE: 
-Blueprint de Flask
-- Los Blueprints son como "módulos" o "componentes" de rutas en Flask
-- Permiten organizar la aplicación en partes reutilizables
-- En este proyecto: api_bp agrupa todas las rutas /api/*
-- Se registra en app.py con: app.register_blueprint(api_bp, url_prefix='/api')             
-Endpoints REST API: URLs que aceptan operaciones HTTP específicas:
-  * GET /api/mapa → Obtener datos del mapa
-  * POST /api/ruta → Calcular ruta óptima  
-  * POST /api/ciudad → Agregar nueva ciudad
-  * DELETE /api/ciudad → Eliminar ciudad
-- REST: Arquitectura que usa HTTP para comunicación cliente-servidor
-
-DEPENDENCIAS: Flask, controllers.mapa_controller
 """
-
 
 from flask import Blueprint, jsonify, request
 from controllers.mapa_controller import MapaController
+from models.grafo_rutas import GrafoRutas
 
 # Crear blueprint
 api_bp = Blueprint('api', __name__)
 
-# Inicializar controlador
+# Inicializar controlador (UNA SOLA INSTANCIA)
 controlador = MapaController()
 
 
@@ -46,19 +32,31 @@ def obtener_mapa():
 
 @api_bp.route('/ruta', methods=['POST'])
 def calcular_ruta():
-    """Calcula ruta a través del Controlador"""
-    data = request.json
-    origen = data.get('origen', '').strip()
-    destino = data.get('destino', '').strip()
-
-    if not origen or not destino:
-        return jsonify({'status': 'error', 'message': 'Origen y destino son requeridos'})
-
     try:
-        resultado = controlador.calcular_ruta(origen, destino)
-        return jsonify(resultado)
+        datos = request.get_json()
+        origen = datos.get('origen')
+        destino = datos.get('destino')
+        criterio = datos.get('criterio', 'distancia')
+
+        if not origen or not destino:
+            return jsonify({'error': 'Origen y destino requeridos'}), 400
+
+        # ✅ OPCIÓN 1: Usar obtener_grafo() (más directo)
+        grafo = controlador.obtener_grafo()
+        resultado = grafo.dijkstra(origen, destino, criterio)
+
+        return jsonify({
+            'camino': resultado['camino'],
+            'distancia': resultado['distancia'],
+            'pasos': resultado['pasos'],
+            'criterio': criterio
+        })
+
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
     except Exception as e:
-        return jsonify({'status': 'error', 'message': str(e)})
+        print(f"❌ Error en /api/ruta: {e}")
+        return jsonify({'error': 'Error interno del servidor'}), 500
 
 
 @api_bp.route('/ciudad', methods=['POST'])
@@ -100,24 +98,42 @@ def eliminar_ciudad():
 
 
 @api_bp.route('/ruta/nueva', methods=['POST'])
-def agregar_ruta():
+def agregar_ruta_nueva():
     """Agrega una nueva ruta entre ciudades existentes"""
-    data = request.json
-    ciudad1 = data.get('ciudad1', '').strip()
-    ciudad2 = data.get('ciudad2', '').strip()
-    peso = data.get('peso', '')
-
-    if not ciudad1 or not ciudad2 or not peso:
-        return jsonify({'status': 'error', 'message': 'ciudad1, ciudad2 y peso son requeridos'})
-
     try:
-        resultado = controlador.agregar_ruta({
-            'ciudad1': ciudad1,
-            'ciudad2': ciudad2,
-            'peso': peso
-        })
-        return jsonify(resultado)
+        data = request.get_json()
+        print(f"🔍 DEBUG - Tipo de datos recibidos: {type(data)}")
+        print(f"🔍 DEBUG - Datos crudos: {data}")
+
+        if not data:
+            return jsonify({'status': 'error', 'message': 'No se recibieron datos JSON'})
+
+        ciudad1 = data.get('ciudad1', '').strip()
+        ciudad2 = data.get('ciudad2', '').strip()
+        distancia = data.get('distancia')
+        tiempo = data.get('tiempo')
+
+        print(f"🔍 DEBUG - ciudad1: '{ciudad1}'")
+        print(f"🔍 DEBUG - ciudad2: '{ciudad2}'")
+        print(f"🔍 DEBUG - distancia: {distancia}")
+        print(f"🔍 DEBUG - tiempo: {tiempo}")
+
+        if not ciudad1 or not ciudad2 or distancia is None or tiempo is None:
+            return jsonify({'status': 'error', 'message': 'ciudad1, ciudad2, distancia y tiempo son requeridos'})
+
+        try:
+            resultado = controlador.agregar_ruta({
+                'ciudad1': ciudad1,
+                'ciudad2': ciudad2,
+                'distancia': distancia,
+                'tiempo': tiempo
+            })
+            return jsonify(resultado)
+        except Exception as e:
+            return jsonify({'status': 'error', 'message': str(e)})
+
     except Exception as e:
+        print(f"❌ Error en agregar_ruta_nueva: {e}")
         return jsonify({'status': 'error', 'message': str(e)})
 
 

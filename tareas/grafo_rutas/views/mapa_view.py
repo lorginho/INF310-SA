@@ -62,16 +62,20 @@ class MapaView:
 
     @staticmethod
     def validar_datos_ruta(datos):
-        """Valida los datos para agregar una ruta"""
-        if not datos.get('ciudad1') or not datos.get('ciudad2') or not datos.get('peso'):
-            return False, "Faltan datos: ciudad1, ciudad2, peso son requeridos"
+        """Valida datos para agregar ruta"""
+        if not datos.get('ciudad1') or not datos.get('ciudad2'):
+            return False, "Ambas ciudades son requeridas"
+
+        if not datos.get('distancia') or not datos.get('tiempo'):
+            return False, "Distancia y tiempo son requeridos"
 
         try:
-            peso = float(datos['peso'])
-            if peso <= 0:
-                return False, "El peso debe ser mayor a 0"
+            distancia = float(datos['distancia'])
+            tiempo = float(datos['tiempo'])
+            if distancia <= 0 or tiempo <= 0:
+                return False, "Distancia y tiempo deben ser mayores a 0"
         except ValueError:
-            return False, "El peso debe ser un número"
+            return False, "Distancia y tiempo deben ser números válidos"
 
         return True, None
 

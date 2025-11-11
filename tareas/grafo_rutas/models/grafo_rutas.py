@@ -8,7 +8,6 @@ DEPENDENCIAS: heapq, Módulo de Python que implementa colas de prioridad
               usando min-heap para eficiencia.
 """
 
-
 import heapq
 
 
@@ -33,18 +32,16 @@ class GrafoRutas:
         for conexion in datos.get('conexiones', []):
             ciudad1, ciudad2 = conexion
             clave = f"{ciudad1}-{ciudad2}"
-            peso = datos['pesos'].get(clave)
-            if peso:
-                self.agregar_ruta(ciudad1, ciudad2, peso)
+            pesos = datos['pesos'].get(clave)
+            if pesos:
+                self.agregar_ruta(ciudad1, ciudad2, pesos)
 
     @classmethod
     def crear_grafo_bolivia(cls):
         """Factory method para crear grafo con datos de Bolivia"""
-
         datos_bolivia = {
-
             'ciudades': {
-                'La Paz': [200, 360],        # ✅ COORDENADAS ESCALADAS
+                'La Paz': [200, 360],
                 'Cochabamba': [400, 500],
                 'Santa Cruz': [700, 600],
                 'Sucre': [500, 700],
@@ -54,9 +51,6 @@ class GrafoRutas:
                 'Trinidad': [600, 200],
                 'Cobija': [300, 100]
             },
-
-
-
             'conexiones': [
                 ['La Paz', 'Cochabamba'],
                 ['La Paz', 'Oruro'],
@@ -70,32 +64,31 @@ class GrafoRutas:
                 ['Oruro', 'Potosí'],
                 ['Cochabamba', 'Oruro']
             ],
-
             'pesos': {
-                'La Paz-Cochabamba': 375,
-                'Cochabamba-La Paz': 375,
-                'La Paz-Oruro': 240,
-                'Oruro-La Paz': 240,
-                'Cochabamba-Santa Cruz': 480,
-                'Santa Cruz-Cochabamba': 480,
-                'Cochabamba-Sucre': 340,
-                'Sucre-Cochabamba': 340,
-                'Santa Cruz-Trinidad': 420,
-                'Trinidad-Santa Cruz': 420,
-                'Sucre-Potosí': 150,
-                'Potosí-Sucre': 150,
-                'Sucre-Tarija': 320,
-                'Tarija-Sucre': 320,
-                'Oruro-Sucre': 350,
-                'Sucre-Oruro': 350,
-                'La Paz-Cobija': 650,
-                'Cobija-La Paz': 650,
-                'Santa Cruz-Sucre': 410,
-                'Sucre-Santa Cruz': 410,
-                'Oruro-Potosí': 220,
-                'Potosí-Oruro': 220,
-                'Cochabamba-Oruro': 180,
-                'Oruro-Cochabamba': 180
+                'La Paz-Cochabamba': {'distancia': 375, 'tiempo': 6.3},
+                'Cochabamba-La Paz': {'distancia': 375, 'tiempo': 6.3},
+                'La Paz-Oruro': {'distancia': 240, 'tiempo': 4.0},
+                'Oruro-La Paz': {'distancia': 240, 'tiempo': 4.0},
+                'Cochabamba-Santa Cruz': {'distancia': 480, 'tiempo': 8.0},
+                'Santa Cruz-Cochabamba': {'distancia': 480, 'tiempo': 8.0},
+                'Cochabamba-Sucre': {'distancia': 340, 'tiempo': 5.7},
+                'Sucre-Cochabamba': {'distancia': 340, 'tiempo': 5.7},
+                'Santa Cruz-Trinidad': {'distancia': 420, 'tiempo': 7.0},
+                'Trinidad-Santa Cruz': {'distancia': 420, 'tiempo': 7.0},
+                'Sucre-Potosí': {'distancia': 150, 'tiempo': 2.5},
+                'Potosí-Sucre': {'distancia': 150, 'tiempo': 2.5},
+                'Sucre-Tarija': {'distancia': 320, 'tiempo': 5.3},
+                'Tarija-Sucre': {'distancia': 320, 'tiempo': 5.3},
+                'Oruro-Sucre': {'distancia': 350, 'tiempo': 5.8},
+                'Sucre-Oruro': {'distancia': 350, 'tiempo': 5.8},
+                'La Paz-Cobija': {'distancia': 650, 'tiempo': 10.8},
+                'Cobija-La Paz': {'distancia': 650, 'tiempo': 10.8},
+                'Santa Cruz-Sucre': {'distancia': 410, 'tiempo': 6.8},
+                'Sucre-Santa Cruz': {'distancia': 410, 'tiempo': 6.8},
+                'Oruro-Potosí': {'distancia': 220, 'tiempo': 3.7},
+                'Potosí-Oruro': {'distancia': 220, 'tiempo': 3.7},
+                'Cochabamba-Oruro': {'distancia': 180, 'tiempo': 3.0},
+                'Oruro-Cochabamba': {'distancia': 180, 'tiempo': 3.0}
             }
         }
 
@@ -134,11 +127,19 @@ class GrafoRutas:
         if ciudad1 not in self.ciudades or ciudad2 not in self.ciudades:
             raise ValueError("Una o ambas ciudades no existen")
 
-        if peso <= 0:
-            raise ValueError("El peso debe ser mayor a 0")
+        # ✅ SI RECIBE UN NÚMERO, CALCULAR TIEMPO AUTOMÁTICAMENTE
+        if isinstance(peso, (int, float)):
+            # Calcular tiempo estimado basado en distancia (60 km/h promedio)
+            tiempo_estimado = round(peso / 60, 1)
+            pesos = {
+                'distancia': peso,
+                'tiempo': tiempo_estimado
+            }
+        else:
+            pesos = peso
 
-        self.conexiones[(ciudad1, ciudad2)] = peso
-        self.conexiones[(ciudad2, ciudad1)] = peso
+        self.conexiones[(ciudad1, ciudad2)] = pesos
+        self.conexiones[(ciudad2, ciudad1)] = pesos
         return True
 
     def eliminar_ruta(self, ciudad1, ciudad2):
@@ -158,63 +159,7 @@ class GrafoRutas:
         """Retorna todas las conexiones"""
         return self.conexiones.copy()
 
-    def dijkstra(self, origen, destino):
-        """
-            ALGORITMO: Dijkstra para camino de costo mínimo
-            PROPÓSITO: Encontrar la ruta más corta (menor distancia) entre dos ciudades  
-
-            CARACTERÍSTICAS: 
-            - Óptimo para pesos no negativos
-            - Usa cola de prioridad (heap) para eficiencia
-
-            PARÁMETROS:
-            origen (str): Ciudad de partida
-            destino (str): Ciudad de llegada
-
-            RETORNA:        
-            dict: {
-                'camino': lista de ciudades,    # Ruta óptima encontrada
-                'distancia': int,               # Distancia total en km  
-                'pasos': lista                  # Registro para animación
-            }
-
-            FUNCIONAMIENTO:
-            1. INICIALIZACIÓN: 
-                - Establecer todas las distancias en infinito, excepto origen en 0
-                - Crear Cola de prioridad con (0, origen)
-                - Inicialiar Diccionario para reconstruir caminos y registrar pasos
-
-            2. PROCESAMIENTO:
-                - Mientras haya nodos en la cola:
-                a. Extraer nodo con menor distancia (heapq.heappop)
-                b. Si es el destino → terminar
-                c. Si la distancia actual es mayor a la almacenada → ignorar
-                d. Explorar todos los vecinos del nodo actual
-                e. Para cada vecino, calcular nueva distancia
-                f. Si mejora la distancia → actualizar y agregar a cola
-
-            3. RECONSTRUCCIÓN: (Proceso de armado del camino final al encontrar la distancia mínima.)
-                - Seguir nodos anteriores desde destino hasta origen
-                - Retorna el camino, distancia total y pasos para animación
-
-            EJEMPLO:
-            dijkstra('La Paz', 'Santa Cruz') → 
-                {'camino': ['La Paz', 'Cochabamba', 'Santa Cruz'], 
-                'distancia': 855,      
-
-                'pasos': [  
-                    ('visitando', 'La Paz', 0),
-                    ('actualizando', 'Cochabamba', 375),
-                    ('visitando', 'Cochabamba', 375),
-                    ('actualizando', 'Santa Cruz', 855),
-                    ('visitando', 'Santa Cruz', 855)
-                ]
-
-                camino,     Uso: Mostrar al usuario la ruta a seguir
-                distancia,  Uso: Informar la longitud total del recorrido
-                pasos,      Uso: Animación en frontend del proceso de Dijkstra
-        """
-
+    def dijkstra(self, origen, destino, criterio='distancia'):
         if origen not in self.ciudades or destino not in self.ciudades:
             raise ValueError("Origen o destino no existen")
 
@@ -237,9 +182,10 @@ class GrafoRutas:
                 continue
 
             # Explorar vecinos
-            for (c1, c2), peso in self.conexiones.items():
+            for (c1, c2), pesos_ruta in self.conexiones.items():
                 if c1 == ciudad_actual:
                     vecino = c2
+                    peso = pesos_ruta.get(criterio, pesos_ruta['distancia'])
                     nueva_dist = dist_actual + peso
 
                     if nueva_dist < distancias[vecino]:
@@ -275,20 +221,18 @@ class GrafoRutas:
         return camino
 
     def obtener_estado(self):
-        """Retorna el estado completo del modelo para la vista """
-        # ✅ CORRECCIÓN: Convertir tuplas a formatos serializables para JSON
+        """Retorna el estado completo del modelo para la vista"""
         conexiones_formateadas = []
         pesos_formateados = {}
 
-        for (ciudad1, ciudad2), peso in self.conexiones.items():
-            # Formato para conexiones: lista de listas [["La Paz", "Cochabamba"], ...]
+        for (ciudad1, ciudad2), pesos in self.conexiones.items():
             conexiones_formateadas.append([ciudad1, ciudad2])
-            # Formato para pesos: diccionario con claves string {"La Paz-Cochabamba": 380, ...}
             clave = f"{ciudad1}-{ciudad2}"
-            pesos_formateados[clave] = peso
+            # ✅ MANTENER OBJETO COMPLETO CON DISTANCIA Y TIEMPO
+            pesos_formateados[clave] = pesos
 
         return {
             'ciudades': self.ciudades.copy(),
-            'conexiones': conexiones_formateadas,  # ✅ Lista de listas
-            'pesos': pesos_formateados             # ✅ Diccionario con claves string
+            'conexiones': conexiones_formateadas,
+            'pesos': pesos_formateados  # ← AHORA ENVÍA OBJETOS COMPLETOS
         }
