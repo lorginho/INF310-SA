@@ -8,9 +8,15 @@ README.md
 
 # 🗺️ Sistema de Rutas de Bolivia - Grafos
 
-## En Tiempo
+## Ruta multiple : Ciudad Origen, Intermedia y Destino Final
+
+Probar en : https://lorginho.pythonanywhere.com/
 
 ![Interfaz del Sistema de Rutas de Bolivia](sistema_rutas.png)
+
+## En Tiempo
+
+![Interfaz del Sistema de Rutas de Bolivia](sistema_rutas3.png)
 
 ## En Distancia
 

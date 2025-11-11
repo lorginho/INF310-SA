@@ -120,24 +120,33 @@ class SistemaRutas {
         }
     }
 
+
     actualizarSelects() {
         const origen = document.getElementById('origen');
+        const intermedio = document.getElementById('intermedio');
         const destino = document.getElementById('destino');
         const ciudad1Ruta = document.getElementById('ciudad1-ruta');
         const ciudad2Ruta = document.getElementById('ciudad2-ruta');
         
-        if (origen) origen.innerHTML = '<option value="">Origen</option>';
-        if (destino) destino.innerHTML = '<option value="">Destino</option>';
+        // ✅ LIMPIAR TODOS LOS SELECTORES
+        if (origen) origen.innerHTML = '<option value="">Ciudad Origen</option>';
+        if (intermedio) intermedio.innerHTML = '<option value="">Ciudad Intermedia (opcional)</option>';
+        if (destino) destino.innerHTML = '<option value="">Ciudad Destino</option>';
         if (ciudad1Ruta) ciudad1Ruta.innerHTML = '<option value="">Origen</option>';
         if (ciudad2Ruta) ciudad2Ruta.innerHTML = '<option value="">Destino</option>';
 
+        // ✅ LLENAR CON CIUDADES
         Object.keys(this.ciudades).forEach(ciudad => {
             if (origen) origen.innerHTML += `<option value="${ciudad}">${ciudad}</option>`;
+            if (intermedio) intermedio.innerHTML += `<option value="${ciudad}">${ciudad}</option>`;
             if (destino) destino.innerHTML += `<option value="${ciudad}">${ciudad}</option>`;
             if (ciudad1Ruta) ciudad1Ruta.innerHTML += `<option value="${ciudad}">${ciudad}</option>`;
             if (ciudad2Ruta) ciudad2Ruta.innerHTML += `<option value="${ciudad}">${ciudad}</option>`;
         });
     }
+
+
+
 
     mostrarListaCiudades() {
         const lista = document.getElementById('lista-ciudades');
@@ -265,26 +274,31 @@ class SistemaRutas {
     }
 
 
-
-
-
-
     async calcularRuta() {
         const origen = document.getElementById('origen').value;
+        const intermedio = document.getElementById('intermedio').value;
         const destino = document.getElementById('destino').value;
 
+        // ✅ VALIDACIÓN CON PUNTO INTERMEDIO OPCIONAL
         if (!origen || !destino) {
-            alert('Por favor selecciona una ciudad de origen y una de destino');
+            alert('Por favor selecciona al menos ciudad de origen y destino');
             return;
         }
 
         if (origen === destino) {
-            alert('Por favor selecciona ciudades diferentes para origen y destino');
+            alert('Las ciudades de origen y destino deben ser diferentes');
             return;
         }
 
-        // ✅ DEBUG: Verificar criterio
-        console.log("🔍 DEBUG - Criterio actual:", this.criterioActual);
+        // ✅ VERIFICAR SI HAY PUNTO INTERMEDIO
+        const tieneIntermedio = intermedio && intermedio !== '';
+        
+        if (tieneIntermedio) {
+            if (origen === intermedio || intermedio === destino) {
+                alert('La ciudad intermedia debe ser diferente al origen y destino');
+                return;
+            }
+        }
 
         this.actualizarEstado("Calculando ruta óptima...");
         this.limpiarAnimaciones();
@@ -295,8 +309,9 @@ class SistemaRutas {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
                     origen, 
+                    intermedio: tieneIntermedio ? intermedio : null,
                     destino, 
-                    criterio: this.criterioActual // ← AQUÍ ESTÁ EL PROBLEMA
+                    criterio: this.criterioActual
                 })
             });
 
@@ -306,9 +321,6 @@ class SistemaRutas {
 
             const data = await response.json();
             
-            // ✅ DEBUG: Verificar respuesta
-            console.log("🔍 DEBUG - Respuesta del servidor:", data);
-            
             if (data.error) {
                 document.getElementById('resultado').innerHTML = 
                     `<strong>❌ Error:</strong> ${data.error}`;
@@ -316,7 +328,7 @@ class SistemaRutas {
             } else {
                 await this.animarDijkstra(data.pasos);
                 this.dibujarRutaOptima(data.camino);
-                this.mostrarResultado(data);
+                this.mostrarResultado(data, tieneIntermedio);
                 this.actualizarEstado("Ruta calculada correctamente");
             }
                 
@@ -328,19 +340,33 @@ class SistemaRutas {
     }
 
 
-    mostrarResultado(data) {
+
+    mostrarResultado(data, tieneIntermedio = false) {
         console.log("Datos recibidos:", data);
         const resultadoDiv = document.getElementById('resultado');
         
         const criterio = data.criterio === 'distancia' ? 'Distancia' : 'Tiempo';
         const unidad = data.criterio === 'distancia' ? 'km' : 'horas';
         
-        resultadoDiv.innerHTML = `
-            <h3>Ruta ${criterio.toLowerCase()} más corta</h3>
+        let html = `<h3>Ruta ${criterio.toLowerCase()} más corta</h3>`;
+        
+        if (tieneIntermedio) {
+            html += `<p><strong>📍 Ruta con parada intermedia:</strong></p>`;
+        }
+        
+        html += `
             <p><strong>Ruta:</strong> ${data.camino.join(' → ')}</p>
             <p><strong>${criterio} total:</strong> ${data.distancia} ${unidad}</p>
         `;
+        
+        resultadoDiv.innerHTML = html;
     }
+
+
+
+
+
+
 
     async animarDijkstra(pasos) {
         this.actualizarEstado("Animando algoritmo Dijkstra...");

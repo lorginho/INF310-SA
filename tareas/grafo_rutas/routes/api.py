@@ -36,14 +36,34 @@ def calcular_ruta():
         datos = request.get_json()
         origen = datos.get('origen')
         destino = datos.get('destino')
+        intermedio = datos.get('intermedio')
         criterio = datos.get('criterio', 'distancia')
 
         if not origen or not destino:
             return jsonify({'error': 'Origen y destino requeridos'}), 400
 
-        # ✅ OPCIÓN 1: Usar obtener_grafo() (más directo)
         grafo = controlador.obtener_grafo()
-        resultado = grafo.dijkstra(origen, destino, criterio)
+
+        # ✅ CALCULAR RUTA CON/SIN PUNTO INTERMEDIO
+        if intermedio:
+            # Origen → Intermedio → Destino
+            ruta1 = grafo.dijkstra(origen, intermedio, criterio)
+            ruta2 = grafo.dijkstra(intermedio, destino, criterio)
+
+            # COMBINAR RUTAS
+            camino_completo = ruta1['camino'][:-1] + \
+                ruta2['camino']  # Evitar duplicar intermedio
+            distancia_total = ruta1['distancia'] + ruta2['distancia']
+            pasos_combinados = ruta1['pasos'] + ruta2['pasos']
+
+            resultado = {
+                'camino': camino_completo,
+                'distancia': distancia_total,
+                'pasos': pasos_combinados
+            }
+        else:
+            # RUTA DIRECTA
+            resultado = grafo.dijkstra(origen, destino, criterio)
 
         return jsonify({
             'camino': resultado['camino'],
