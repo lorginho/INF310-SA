@@ -6,30 +6,33 @@
 </head>
 <body>
     <div class="container">
-        <h1>🗺️ Sistema de Rutas de Bolivia</h1>
+        <!-- HEADER PRINCIPAL CON TÍTULO Y CRITERIO -->
+        <div class="header-principal">
+            <h1>🗺️ Sistema de Rutas de Bolivia</h1>
+            <div class="criterio-header">
+                <span class="criterio-label">🎯 Criterio:</span>
+                <div class="botones-criterio">
+                    <button class="btn-criterio active" data-criterio="distancia">Distancia (km)</button>
+                    <button class="btn-criterio" data-criterio="tiempo">Tiempo (horas)</button>
+                </div>
+            </div>
+        </div>
         
         <div class="layout">
-            <!-- SIDEBAR IZQUIERDO - CONTROLES -->
+            <!-- SIDEBAR IZQUIERDO - SIN CRITERIO (MÁS LIMPIO) -->
             <div class="sidebar left-sidebar">
-                <!-- SELECTOR DE CRITERIO -->
-                <div class="criterios">
-                    <h3>🎯 Criterio de Ruta</h3>
-                    <div class="botones-criterio">
-                        <button class="btn-criterio active" data-criterio="distancia">Distancia (km)</button>
-                        <button class="btn-criterio" data-criterio="tiempo">Tiempo (horas)</button>
+                <!-- FORMULARIO AGREGAR CIUDAD -->
+
+
+                <div class="form-agregar-ciudad">
+                    <h3>➕ Agregar Ciudad</h3>
+                    <div class="instruccion-mapa">
+                        <p>📍 <strong>Haz click en el mapa</strong> para agregar una nueva ciudad en las coordenadas seleccionadas.</p>
                     </div>
                 </div>
 
-                <!-- FORMULARIO AGREGAR CIUDAD -->
-                <div class="form-agregar-ciudad">
-                    <h3>➕ Agregar Ciudad</h3>
-                    <form id="form-ciudad">
-                        <input type="text" id="nombre-ciudad" placeholder="Nombre de ciudad" required>
-                        <input type="number" id="x-ciudad" placeholder="Coordenada X" min="0" max="800" required>
-                        <input type="number" id="y-ciudad" placeholder="Coordenada Y" min="0" max="600" required>
-                        <button type="submit">Agregar Ciudad</button>
-                    </form>
-                </div>
+
+
 
 
                 <!-- FORMULARIO AGREGAR RUTA -->
@@ -48,8 +51,6 @@
                     </form>
                 </div>
 
-
-
                 <!-- CONTROLES CALCULAR RUTA -->
                 <div class="controles">
                     <h3>📍 Calcular Ruta</h3>
@@ -67,21 +68,6 @@
                         <button onclick="limpiarRuta()">Limpiar</button>                        
                     </div>
                 </div>
-
-
-                <!-- INFO ESTADO -->
-                <div class="info-estado">
-                    <h3>📊 Estado</h3>
-                    <div class="estado-item">
-                        <strong>Estado:</strong> <span id="estado">Cargando...</span>
-                    </div>
-                    <div class="estado-item">
-                        <strong>Ciudades:</strong> <span id="contador-ciudades">0</span>
-                    </div>
-                    <div class="estado-item">
-                        <strong>Rutas:</strong> <span id="contador-rutas">0</span>
-                    </div>
-                </div>
             </div>
 
             <!-- MAPA SVG (CENTRO) -->
@@ -94,8 +80,22 @@
                 </svg>
             </div>
 
-            <!-- SIDEBAR DERECHO - INFORMACIÓN -->
+            <!-- SIDEBAR DERECHO - SIN CAMBIOS -->
             <div class="sidebar right-sidebar">
+                <!-- ESTADO DEL SISTEMA -->
+                <div class="info-estado">
+                    <h3>📊 Estado del Sistema</h3>
+                    <div class="estado-item">
+                        <strong>Estado:</strong> <span id="estado">Cargando...</span>
+                    </div>
+                    <div class="estado-item">
+                        <strong>Ciudades:</strong> <span id="contador-ciudades">0</span>
+                    </div>
+                    <div class="estado-item">
+                        <strong>Rutas:</strong> <span id="contador-rutas">0</span>
+                    </div>
+                </div>
+
                 <!-- RESULTADOS -->
                 <div class="resultado-section">
                     <h3>📋 Resultados</h3>
@@ -104,23 +104,25 @@
                     </div>
                 </div>
 
-                <!-- LISTA CIUDADES -->
-                <div class="ciudades-lista">
-                    <h3>🏙️ Ciudades</h3>
-                    <div id="lista-ciudades"></div>
+                <!-- CIUDADES -->
+                <div class="eliminar-seccion">
+                    <h3>CIUDADES: Click para eliminar</h3>
+                    <div class="lista-contenedor">
+                        <div id="lista-ciudades" class="lista-scroll"></div>
+                    </div>
                 </div>
 
-                <!-- LISTA RUTAS -->
-                <div class="rutas-lista">
-                    <h3>🛣️ Rutas</h3>
-                    <div id="lista-rutas"></div>
+                <!-- RUTAS -->
+                <div class="eliminar-seccion">
+                    <h3>RUTAS: Click para eliminar</h3>
+                    <div id="lista-rutas" class="lista-scroll"></div>
                 </div>
 
-                <!-- CONTROLES SVG - Cerrar -->
+                <!-- CONTROLES -->
                 <div class="controles">                    
                     <div class="botones-ruta">                        
                         <button onclick="exportarMapa()">📸 Exportar SVG</button>
-                        <button onclick="cerrarAplicacion()">❌ Salir </button>
+                        <button onclick="cerrarAplicacion()">❌ Salir</button>
                     </div>
                 </div>
             </div>

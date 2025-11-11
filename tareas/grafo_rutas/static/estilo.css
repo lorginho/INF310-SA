@@ -1,4 +1,90 @@
-/* Agregar estos estilos al archivo CSS existente */
+/* ==================== HEADER PRINCIPAL ==================== */
+
+.header-principal {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 0 10px;
+}
+
+.header-principal h1 {
+    margin: 0;
+    color: #2c3e50;
+    font-size: 28px;
+}
+
+/* CRITERIO EN EL HEADER */
+.criterio-header {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Más espacio entre label y botones */
+    background: #f8f9fa;
+    padding: 12px 18px;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+}
+
+.criterio-label {
+    font-weight: bold;
+    color: #495057;
+    white-space: nowrap;
+    font-size: 20px; /* Aumentado para mejor visibilidad */
+}
+
+.botones-criterio {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-criterio {
+    background: #f0f0f0;
+    border: 2px solid #ddd;
+    padding: 12px 18px;
+    cursor: pointer;
+    border-radius: 6px;
+    font-size: 18px;
+    transition: all 0.3s ease;
+    font-weight: 500; /* Texto un poco más grueso */
+}
+
+.btn-criterio.active {
+    background: #007bff;
+    color: white;
+    border-color: #0056b3;
+    font-weight: 600; /* Texto un poco más grueso */
+}
+
+.btn-criterio:hover {
+    background: #e0e0e0;
+}
+
+.btn-criterio.active:hover {
+    background: #0056b3;
+}
+
+/* ==================== ELIMINAR CRITERIO DEL PANEL IZQUIERDO ==================== */
+
+/* Eliminar la sección de criterios del panel izquierdo */
+.left-sidebar .criterios {
+    display: none;
+}
+
+/* ==================== AJUSTES RESPONSIVOS ==================== */
+
+@media (max-width: 1400px) {
+    .header-principal {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+    }
+    
+    .criterio-header {
+        align-self: flex-end;
+    }
+}
+
+/* ... (MANTENER TODOS LOS ESTILOS ANTERIORES A PARTIR DE AQUÍ) ... */
 
 /* FONDO DE LA VENTANA PRINCIPAL */
 body {
@@ -15,57 +101,31 @@ body {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-/* ESTILOS PARA CRITERIOS */
-.criterios {
-    margin: 15px 0;
-    padding: 15px;
-    background: #f8f9fa;
-    border-radius: 8px;
-    border: 1px solid #dee2e6;
-}
-
-.botones-criterio {
-    display: flex;
-    gap: 10px;
-    margin-top: 10px;
-}
-
-.btn-criterio {
-    flex: 1;
-    background: #f0f0f0;
-    border: 2px solid #ddd;
-    padding: 10px;
-    cursor: pointer;
-    border-radius: 5px;
-    font-size: 14px;
-}
-
-.btn-criterio.active {
-    background: #007bff;
-    color: white;
-    border-color: #0056b3;
-}
-
-.btn-criterio:hover {
-    background: #e0e0e0;
-}
-
 .info-estado {
-    margin: 15px 0;
-    padding: 15px;
+    margin: 0;
+    padding: 20px;
     background: #e3f2fd;
     border: 2px solid #2196f3;
     border-radius: 8px;
     display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.info-estado h3 {
+    margin: 0 0 15px 0;
+    color: #1976d2;
+    font-size: 22px;
+    font-weight: bold;
 }
 
 .estado-item {
-    padding: 5px 10px;
-    background: rgb(143, 203, 233);
+    padding: 10px 15px;
+    background: white;
     border-radius: 5px;
-    border-left: 4px solid #65b6f8;
+    border-left: 4px solid #2196f3;
+    font-size: 18px;
+    font-weight: 500;
 }
 
 .ruta {
@@ -98,10 +158,10 @@ body {
     display: flex;
     gap: 15px;
     align-items: flex-start;
+    height: 95vh;
 }
 
 .sidebar {
-    width: 280px;
     background: #748ca3;
     padding: 15px;
     border-radius: 8px;
@@ -110,15 +170,18 @@ body {
 
 .left-sidebar {
     width: 380px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-height: 100%;
+    overflow-y: auto;
 }
 
 .right-sidebar {
     width: 500px;
-}
-
-/* SEPARACIÓN PARA CONTROLES INFERIORES DERECHA */
-.right-sidebar .controles:last-child {
-    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
 /* BORDE PARA EL MAPA - TAMAÑO MEJORADO */
@@ -134,18 +197,25 @@ body {
     margin: 5px;
     min-height: 100px;
     width: 1620px;
-    height: 1100px;
-    overflow: visible;
+    height: 850px;
+    overflow: hidden;
 }
 
-/* SVG MÁS GRANDE */
+
+/* SVG RESPONSIVE */
 #mapa {
     background: rgb(186, 214, 219);
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     display: block;
     cursor: crosshair;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
 }
+
+
 
 /* LETRAS MÁS GRANDES Y LEGIBLES */
 .nombre-ciudad {
@@ -170,8 +240,8 @@ body {
 
 /* FORMULARIO */
 .form-agregar-ciudad {
-    margin-bottom: 20px;
-    padding: 15px;
+    margin-bottom: 0;
+    padding: 12px;
     background: rgb(160, 184, 214);
     border-radius: 8px;
     border: 1px solid #ced4da;
@@ -184,8 +254,8 @@ body {
 
 .form-agregar-ciudad input {
     width: 100%;
-    padding: 15px;
-    margin: 5px 0;
+    padding: 8px;
+    margin: 4px 0;
     border: 1px solid #96a7b9;
     border-radius: 4px;
     box-sizing: border-box;
@@ -194,7 +264,7 @@ body {
 .form-agregar-ciudad select {
     width: 100%;
     padding: 8px;
-    margin: 5px 0;
+    margin: 4px 0;
     border: 1px solid #7798b9;
     border-radius: 4px;
     box-sizing: border-box;
@@ -215,10 +285,35 @@ body {
     background: #218838;
 }
 
+/* INSTRUCCIÓN PARA AGREGAR CIUDADES */
+.instruccion-mapa {
+    background: #e7f3ff;
+    border: 1px solid #b8d4f0;
+    border-radius: 6px;
+    padding: 18px;
+    text-align: center;
+}
+
+.instruccion-mapa p {
+    margin: 0;
+    font-size: 24px;
+    color: #2c5e9e;
+    line-height: 1.3;
+    font-weight: bold;
+}
+
+.instruccion-mapa strong {
+    color: #1a4d8c;
+    font-size: 24px; /* Un poco más grande para el énfasis */
+}
+
+
+
+
 /* CONTROLES RUTA */
 .controles {
-    margin-bottom: 20px;
-    padding: 15px;
+    margin-bottom: 0;
+    padding: 12px;
     background: rgb(157, 183, 218);
     border-radius: 8px;
     border: 1px solid #ced4da;
@@ -232,7 +327,7 @@ body {
 .controles select {
     width: 100%;
     padding: 8px;
-    margin: 5px 0;
+    margin: 4px 0;
     border: 1px solid #7798b9;
     border-radius: 4px;
     box-sizing: border-box;
@@ -268,81 +363,127 @@ body {
 
 /* SECCIONES DERECHA */
 .resultado-section {
-    margin-bottom: 20px;
-    padding: 15px;
-    background: rgb(159, 186, 207);
+    margin-bottom: 0;
+    padding: 12px;
+    background: #f0f8f0;
+    border: 1px solid #d4edda;
     border-radius: 8px;
-    border: 1px solid #ced4da;
 }
 
 .resultado-section h3 {
-    margin: 0 0 15px 0;
-    color: #495057;
+    margin: 0 0 10px 0;
+    color: #155724;
+    font-size: 16px;
 }
 
-.ciudades-lista {
-    padding: 15px;
-    background: rgb(192, 191, 151);
+/* LISTA CIUDADES Y RUTAS - NUEVO DISEÑO */
+.eliminar-seccion {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
     border-radius: 8px;
-    border: 1px solid #ced4da;
-    max-height: 400px;
-    overflow-y: auto;
+    padding: 0;
 }
 
-.ciudades-lista h3 {
-    margin: 0 0 15px 0;
+.eliminar-seccion h3 {
+    margin: 0;
+    padding: 12px 15px;
+    background: #e9ecef;
+    border-bottom: 1px solid #dee2e6;
+    font-size: 16px;
     color: #495057;
 }
 
-/* LISTA RUTAS */
-.rutas-lista {
-    margin-top: 20px;
-    padding: 15px;
-    background: rgb(196, 204, 174);
-    border-radius: 8px;
-    border: 1px solid #ced4da;
-    max-height: 300px;
+.lista-scroll {
+    max-height: 140px;
     overflow-y: auto;
+    padding: 8px 12px;
 }
 
-.rutas-lista h3 {
-    margin: 0 0 15px 0;
-    color: #495057;
-}
-
-.ruta-item {
+.ciudad-item, .ruta-item {
     display: flex;
-    justify-content: space-between;
     align-items: center;
     padding: 8px 0;
-    border-bottom: 1px solid #745555;
+    border-bottom: 1px solid #f1f1f1;
+    gap: 10px;
+    font-size: 20px;
 }
 
-.ruta-item:last-child {
+.ciudad-item:last-child, .ruta-item:last-child {
     border-bottom: none;
 }
 
 .btn-eliminar {
-    background: hsl(290, 58%, 38%);
-    color: rgb(26, 167, 96);
+    background: #dc3545;
+    color: white;
     border: none;
     border-radius: 4px;
-    padding: 4px 8px;
+    padding: 3px 5px;
     cursor: pointer;
-    font-size: 12px;
+    font-size: 11px;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
 }
 
 .btn-eliminar:hover {
     background: #c82333;
 }
 
+.ciudad-item span, .ruta-item span {
+    flex: 1;
+    text-align: left;
+}
 
+/* SCROLLBAR PERSONALIZADO */
+.lista-scroll::-webkit-scrollbar {
+    width: 20px;
+}
+
+.lista-scroll::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.lista-scroll::-webkit-scrollbar-thumb {
+    background: #a8a8a8;
+    border-radius: 10px;
+    border: 2px solid #f1f1f1;
+}
+
+.lista-scroll::-webkit-scrollbar-thumb:hover {
+    background: #8c8c8c;
+}
+
+/* PARA FIREFOX (compatibilidad) */
+.lista-scroll {
+    scrollbar-width: auto; /* Hace el scrollbar más ancho en Firefox */
+    scrollbar-color: #a8a8a8 #f1f1f1;
+}
+
+/* CONTROLES FINALES COMPACTOS */
+.controles:last-child {
+    margin-top: auto;
+    padding: 10px 0;
+}
+
+.controles:last-child .botones-ruta {
+    display: flex;
+    gap: 5px;
+}
+
+.controles:last-child .botones-ruta button {
+    flex: 1;
+    padding: 8px;
+}
 
 /* ESTILOS PARA SELECTORES MÚLTIPLES DE RUTA */
 .controles select {
     width: 100%;
-    padding: 10px;
-    margin: 8px 0;
+    padding: 8px;
+    margin: 4px 0;
     border: 2px solid #7798b9;
     border-radius: 6px;
     box-sizing: border-box;

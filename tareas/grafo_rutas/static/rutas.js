@@ -3,11 +3,7 @@ static/rutas.js
 
 Autor: Lorgio Añez J.
 Fecha: 2025-10-23
-
-Descripción: 
-El archivo rutas.js es el principal archivo JavaScript del frontend del proyecto.
-Conecta la interfaz gráfica con el backend, permitiendo que el usuario interactúe
-visualmente y en tiempo real con la mapa de ciudades y sus rutas.
+MODIFICADO: Implementación de limpieza automática contextual
 */
 
 class SistemaRutas {
@@ -24,7 +20,21 @@ class SistemaRutas {
         this.cargarMapa();
     }
 
+    // ==================== MÉTODOS DE LIMPIEZA AUTOMÁTICA ====================
+    
+    limpiarParaNuevaRuta() {
+        /* Limpieza específica para operaciones de cálculo de ruta */
+        document.getElementById('ruta-calculada').innerHTML = '';
+        this.limpiarAnimaciones();
+    }
+    
+    limpiarParaModificacionGrafo() {
+        /* Limpieza completa para operaciones que modifican la estructura del grafo */
+        this.limpiarParaNuevaRuta();
+        // Limpiar cualquier otro estado temporal aquí si es necesario
+    }
 
+    // ==================== CONFIGURACIÓN INICIAL ====================
 
     configurarCriterios() {
         document.querySelectorAll('.btn-criterio').forEach(btn => {
@@ -33,19 +43,15 @@ class SistemaRutas {
                 event.target.classList.add('active');
                 this.criterioActual = event.target.dataset.criterio;
                 
-                // ✅ ACTUALIZAR EL MAPA INMEDIATAMENTE
-                this.actualizarEstado(`Mostrando ${this.criterioActual === 'distancia' ? 'distancias (km)' : 'tiempos (horas)'}`);
-                this.dibujarRutas(); // ← REDIBUJAR RUTAS CON NUEVO CRITERIO
+                // LIMPIEZA AUTOMÁTICA: Al cambiar criterio, la ruta anterior ya no es válida
+                this.limpiarParaNuevaRuta();
                 
-                // ✅ ACTUALIZAR LISTA DE RUTAS TAMBIÉN
+                this.actualizarEstado(`Mostrando ${this.criterioActual === 'distancia' ? 'distancias (km)' : 'tiempos (horas)'}`);
+                this.dibujarRutas();
                 this.mostrarListaRutas();
             });
         });
     }
-
-
-
-
 
     actualizarEstado(mensaje) {
         const estadoElement = document.getElementById('estado');
@@ -84,6 +90,8 @@ class SistemaRutas {
         }
     }
 
+    // ==================== CARGA Y ACTUALIZACIÓN DEL MAPA ====================
+
     async cargarMapa() {
         try {
             this.actualizarEstado("Cargando datos del mapa...");
@@ -120,7 +128,6 @@ class SistemaRutas {
         }
     }
 
-
     actualizarSelects() {
         const origen = document.getElementById('origen');
         const intermedio = document.getElementById('intermedio');
@@ -128,14 +135,12 @@ class SistemaRutas {
         const ciudad1Ruta = document.getElementById('ciudad1-ruta');
         const ciudad2Ruta = document.getElementById('ciudad2-ruta');
         
-        // ✅ LIMPIAR TODOS LOS SELECTORES
         if (origen) origen.innerHTML = '<option value="">Ciudad Origen</option>';
         if (intermedio) intermedio.innerHTML = '<option value="">Ciudad Intermedia (opcional)</option>';
         if (destino) destino.innerHTML = '<option value="">Ciudad Destino</option>';
         if (ciudad1Ruta) ciudad1Ruta.innerHTML = '<option value="">Origen</option>';
         if (ciudad2Ruta) ciudad2Ruta.innerHTML = '<option value="">Destino</option>';
 
-        // ✅ LLENAR CON CIUDADES
         Object.keys(this.ciudades).forEach(ciudad => {
             if (origen) origen.innerHTML += `<option value="${ciudad}">${ciudad}</option>`;
             if (intermedio) intermedio.innerHTML += `<option value="${ciudad}">${ciudad}</option>`;
@@ -145,7 +150,256 @@ class SistemaRutas {
         });
     }
 
+    // ==================== OPERACIONES CON CIUDADES ====================
 
+    async agregarCiudad() {
+        // LIMPIEZA AUTOMÁTICA: Modificación estructural del grafo
+        this.limpiarParaModificacionGrafo();
+        
+        const nombre = document.getElementById('nombre-ciudad').value.trim();
+        const x = document.getElementById('x-ciudad').value;
+        const y = document.getElementById('y-ciudad').value;
+
+        if (!nombre || !x || !y) {
+            alert('Por favor completa todos los campos');
+            return;
+        }
+
+        this.actualizarEstado("Agregando ciudad...");
+
+        try {
+            const response = await fetch('/api/ciudad', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nombre, x, y })
+            });
+
+            const resultado = await response.json();
+
+            if (resultado.status === 'ok') {
+                document.getElementById('form-ciudad').reset();
+                await this.cargarMapa();
+                this.actualizarEstado("Ciudad agregada correctamente");
+            } else {
+                alert('Error: ' + resultado.message);
+                this.actualizarEstado("Error agregando ciudad");
+            }
+
+        } catch (error) {
+            alert('Error de conexión: ' + error.message);
+            this.actualizarEstado("Error de conexión");
+        }
+    }
+
+    async eliminarCiudad(nombre) {
+        if (!confirm(`¿Estás seguro de eliminar la ciudad "${nombre}" y todas sus rutas?`)) {
+            return;
+        }
+
+        // LIMPIEZA AUTOMÁTICA: Modificación estructural del grafo
+        this.limpiarParaModificacionGrafo();
+
+        this.actualizarEstado("Eliminando ciudad...");
+
+        try {
+            const response = await fetch('/api/ciudad', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nombre })
+            });
+
+            const resultado = await response.json();
+
+            if (resultado.status === 'ok') {
+                await this.cargarMapa();
+                this.actualizarEstado("Ciudad eliminada correctamente");
+            } else {
+                alert('Error: ' + resultado.message);
+                this.actualizarEstado("Error eliminando ciudad");
+            }
+
+        } catch (error) {
+            alert('Error de conexión: ' + error.message);
+            this.actualizarEstado("Error de conexión");
+        }
+    }
+
+    // ==================== OPERACIONES CON RUTAS ====================
+
+    async agregarRuta() {
+        // LIMPIEZA AUTOMÁTICA: Modificación estructural del grafo
+        this.limpiarParaModificacionGrafo();
+
+        const ciudad1 = document.getElementById('ciudad1-ruta').value;
+        const ciudad2 = document.getElementById('ciudad2-ruta').value;
+        const distancia = document.getElementById('distancia-ruta').value;
+        const tiempo = document.getElementById('tiempo-ruta').value;
+
+        if (!ciudad1 || !ciudad2 || !distancia || !tiempo) {
+            alert('Por favor completa todos los campos: ciudad origen, ciudad destino, distancia y tiempo');
+            return;
+        }
+
+        if (ciudad1 === ciudad2) {
+            alert('Las ciudades deben ser diferentes');
+            return;
+        }
+
+        this.actualizarEstado("Agregando ruta...");
+
+        try {
+            const datos = {
+                ciudad1: ciudad1,
+                ciudad2: ciudad2,
+                distancia: parseFloat(distancia),
+                tiempo: parseFloat(tiempo)
+            };
+
+            const response = await fetch('/api/ruta/nueva', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(datos)
+            });
+
+            const resultado = await response.json();
+
+            if (resultado.status === 'ok') {
+                document.getElementById('form-ruta').reset();
+                await this.cargarMapa();
+                this.actualizarEstado("Ruta agregada correctamente");
+            } else {
+                alert('Error: ' + resultado.message);
+                this.actualizarEstado("Error agregando ruta");
+            }
+
+        } catch (error) {
+            alert('Error de conexión: ' + error.message);
+            this.actualizarEstado("Error de conexión");
+        }
+    }
+
+    async eliminarRuta(ciudad1, ciudad2) {
+        if (!confirm(`¿Estás seguro de eliminar la ruta entre ${ciudad1} y ${ciudad2}?`)) {
+            return;
+        }
+
+        // LIMPIEZA AUTOMÁTICA: Modificación estructural del grafo
+        this.limpiarParaModificacionGrafo();
+
+        this.actualizarEstado("Eliminando ruta...");
+
+        try {
+            const response = await fetch('/api/ruta', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ciudad1, ciudad2 })
+            });
+
+            const resultado = await response.json();
+
+            if (resultado.status === 'ok') {
+                await this.cargarMapa();
+                this.actualizarEstado("Ruta eliminada correctamente");
+            } else {
+                alert('Error: ' + resultado.message);
+                this.actualizarEstado("Error eliminando ruta");
+            }
+
+        } catch (error) {
+            alert('Error de conexión: ' + error.message);
+            this.actualizarEstado("Error de conexión");
+        }
+    }
+
+    // ==================== CÁLCULO Y VISUALIZACIÓN DE RUTAS ====================
+
+    async calcularRuta() {
+        const origen = document.getElementById('origen').value;
+        const intermedio = document.getElementById('intermedio').value;
+        const destino = document.getElementById('destino').value;
+
+        if (!origen || !destino) {
+            alert('Por favor selecciona al menos ciudad de origen y destino');
+            return;
+        }
+
+        if (origen === destino) {
+            alert('Las ciudades de origen y destino deben ser diferentes');
+            return;
+        }
+
+        const tieneIntermedio = intermedio && intermedio !== '';
+        
+        if (tieneIntermedio) {
+            if (origen === intermedio || intermedio === destino) {
+                alert('La ciudad intermedia debe ser diferente al origen y destino');
+                return;
+            }
+        }
+
+        // LIMPIEZA AUTOMÁTICA: Preparar canvas para nueva ruta
+        this.limpiarParaNuevaRuta();
+        
+        this.actualizarEstado("Calculando ruta óptima...");
+
+        try {
+            const response = await fetch('/api/ruta', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    origen, 
+                    intermedio: tieneIntermedio ? intermedio : null,
+                    destino, 
+                    criterio: this.criterioActual
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`Error del servidor: ${response.status}`);
+            }
+
+            const data = await response.json();
+            
+            if (data.error) {
+                document.getElementById('resultado').innerHTML = 
+                    `<strong>❌ Error:</strong> ${data.error}`;
+                this.actualizarEstado("Error en cálculo de ruta");
+            } else {
+                await this.animarDijkstra(data.pasos);
+                this.dibujarRutaOptima(data.camino);
+                this.mostrarResultado(data, tieneIntermedio);
+                this.actualizarEstado("Ruta calculada correctamente");
+            }
+                
+        } catch (error) {
+            document.getElementById('resultado').innerHTML = 
+                `<strong>❌ Error:</strong> ${error.message}`;
+            this.actualizarEstado("Error de conexión");
+        }
+    }
+
+    mostrarResultado(data, tieneIntermedio = false) {
+        console.log("Datos recibidos:", data);
+        const resultadoDiv = document.getElementById('resultado');
+        
+        const criterio = data.criterio === 'distancia' ? 'Distancia' : 'Tiempo';
+        const unidad = data.criterio === 'distancia' ? 'km' : 'horas';
+        
+        let html = `<h3>Ruta ${criterio.toLowerCase()} más corta</h3>`;
+        
+        if (tieneIntermedio) {
+            html += `<p><strong>📍 Ruta con parada intermedia:</strong></p>`;
+        }
+        
+        html += `
+            <p><strong>Ruta:</strong> ${data.camino.join(' → ')}</p>
+            <p><strong>${criterio} total:</strong> ${data.distancia} ${unidad}</p>
+        `;
+        
+        resultadoDiv.innerHTML = html;
+    }
+
+    // ==================== MÉTODOS DE VISUALIZACIÓN ====================
 
 
     mostrarListaCiudades() {
@@ -154,21 +408,22 @@ class SistemaRutas {
         
         const ciudadesOrdenadas = Object.keys(this.ciudades).sort();
         
+        // MOSTRAR TODAS LAS CIUDADES - SIN LÍMITE
         ciudadesOrdenadas.forEach(ciudad => {
             const div = document.createElement('div');
             div.className = 'ciudad-item';
             div.innerHTML = `
-                <span>• ${ciudad}</span>
                 <button onclick="window.sistemaRutas.eliminarCiudad('${ciudad}')" 
                         class="btn-eliminar">🗑️</button>
+                <span>${ciudad}</span>
             `;
-            div.style.display = 'flex';
-            div.style.justifyContent = 'space-between';
-            div.style.alignItems = 'center';
-            div.style.padding = '5px 0';
             lista.appendChild(div);
         });
     }
+
+
+
+
 
     dibujarMapa() {
         this.actualizarEstado("Dibujando mapa...");
@@ -220,7 +475,6 @@ class SistemaRutas {
             
             if (!coord1 || !coord2) return;
             
-            // ✅ BUSCAR PESO SEGÚN CRITERIO ACTUAL
             let peso = null;
             const posiblesClaves = [
                 `${ciudad1}-${ciudad2}`,
@@ -229,11 +483,9 @@ class SistemaRutas {
             
             for (const clave of posiblesClaves) {
                 if (this.pesos[clave] !== undefined) {
-                    // ✅ SI ES DICCIONARIO (con distancia/tiempo), USAR CRITERIO ACTUAL
                     if (typeof this.pesos[clave] === 'object') {
                         peso = this.pesos[clave][this.criterioActual] || this.pesos[clave]['distancia'];
                     } else {
-                        // ✅ SI ES NÚMERO (viejo formato), usar directamente
                         peso = this.pesos[clave];
                     }
                     break;
@@ -244,7 +496,6 @@ class SistemaRutas {
                 peso = "?";
             }
 
-            // Dibujar línea
             const linea = document.createElementNS('http://www.w3.org/2000/svg', 'line');
             linea.setAttribute('x1', coord1[0]);
             linea.setAttribute('y1', coord1[1]);
@@ -255,7 +506,6 @@ class SistemaRutas {
             
             rutasGroup.appendChild(linea);
 
-            // Dibujar texto con peso
             if (peso !== "?") {
                 const texto = document.createElementNS('http://www.w3.org/2000/svg', 'text');
                 const midX = (coord1[0] + coord2[0]) / 2;
@@ -273,100 +523,49 @@ class SistemaRutas {
         });
     }
 
-
-    async calcularRuta() {
-        const origen = document.getElementById('origen').value;
-        const intermedio = document.getElementById('intermedio').value;
-        const destino = document.getElementById('destino').value;
-
-        // ✅ VALIDACIÓN CON PUNTO INTERMEDIO OPCIONAL
-        if (!origen || !destino) {
-            alert('Por favor selecciona al menos ciudad de origen y destino');
-            return;
-        }
-
-        if (origen === destino) {
-            alert('Las ciudades de origen y destino deben ser diferentes');
-            return;
-        }
-
-        // ✅ VERIFICAR SI HAY PUNTO INTERMEDIO
-        const tieneIntermedio = intermedio && intermedio !== '';
+    mostrarListaRutas() {
+        const lista = document.getElementById('lista-rutas');
+        lista.innerHTML = '';
         
-        if (tieneIntermedio) {
-            if (origen === intermedio || intermedio === destino) {
-                alert('La ciudad intermedia debe ser diferente al origen y destino');
-                return;
-            }
-        }
-
-        this.actualizarEstado("Calculando ruta óptima...");
-        this.limpiarAnimaciones();
-
-        try {
-            const response = await fetch('/api/ruta', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    origen, 
-                    intermedio: tieneIntermedio ? intermedio : null,
-                    destino, 
-                    criterio: this.criterioActual
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error(`Error del servidor: ${response.status}`);
-            }
-
-            const data = await response.json();
+        const rutasOrdenadas = [...this.conexiones].sort(([ciudad1A, ciudad2A], [ciudad1B, ciudad2B]) => {
+            const rutaA = `${ciudad1A} ↔ ${ciudad2A}`;
+            const rutaB = `${ciudad1B} ↔ ${ciudad2B}`;
+            return rutaA.localeCompare(rutaB);
+        });
+        
+        // MOSTRAR TODAS LAS RUTAS - SIN LÍMITE
+        rutasOrdenadas.forEach(([ciudad1, ciudad2]) => {
+            let peso = "?";
+            const clave = `${ciudad1}-${ciudad2}`;
+            const claveInversa = `${ciudad2}-${ciudad1}`;
             
-            if (data.error) {
-                document.getElementById('resultado').innerHTML = 
-                    `<strong>❌ Error:</strong> ${data.error}`;
-                this.actualizarEstado("Error en cálculo de ruta");
-            } else {
-                await this.animarDijkstra(data.pasos);
-                this.dibujarRutaOptima(data.camino);
-                this.mostrarResultado(data, tieneIntermedio);
-                this.actualizarEstado("Ruta calculada correctamente");
-            }
+            if (this.pesos[clave] !== undefined || this.pesos[claveInversa] !== undefined) {
+                const datosPeso = this.pesos[clave] || this.pesos[claveInversa];
                 
-        } catch (error) {
-            document.getElementById('resultado').innerHTML = 
-                `<strong>❌ Error:</strong> ${error.message}`;
-            this.actualizarEstado("Error de conexión");
-        }
-    }
-
-
-
-    mostrarResultado(data, tieneIntermedio = false) {
-        console.log("Datos recibidos:", data);
-        const resultadoDiv = document.getElementById('resultado');
-        
-        const criterio = data.criterio === 'distancia' ? 'Distancia' : 'Tiempo';
-        const unidad = data.criterio === 'distancia' ? 'km' : 'horas';
-        
-        let html = `<h3>Ruta ${criterio.toLowerCase()} más corta</h3>`;
-        
-        if (tieneIntermedio) {
-            html += `<p><strong>📍 Ruta con parada intermedia:</strong></p>`;
-        }
-        
-        html += `
-            <p><strong>Ruta:</strong> ${data.camino.join(' → ')}</p>
-            <p><strong>${criterio} total:</strong> ${data.distancia} ${unidad}</p>
-        `;
-        
-        resultadoDiv.innerHTML = html;
+                if (typeof datosPeso === 'object') {
+                    peso = datosPeso[this.criterioActual] || datosPeso['distancia'];
+                } else {
+                    peso = datosPeso;
+                }
+            }
+            
+            const unidad = this.criterioActual === 'distancia' ? 'km' : 'horas';
+            
+            const div = document.createElement('div');
+            div.className = 'ruta-item';
+            div.innerHTML = `
+                <button onclick="window.sistemaRutas.eliminarRuta('${ciudad1}', '${ciudad2}')" 
+                        class="btn-eliminar">🗑️</button>
+                <span>${ciudad1} ↔ ${ciudad2} (${peso} ${unidad})</span>
+            `;
+            lista.appendChild(div);
+        });
     }
 
 
 
 
-
-
+    // ==================== ANIMACIONES Y ESTADOS TEMPORALES ====================
 
     async animarDijkstra(pasos) {
         this.actualizarEstado("Animando algoritmo Dijkstra...");
@@ -427,215 +626,7 @@ class SistemaRutas {
         }
     }
 
-    limpiarRuta() {
-        document.getElementById('ruta-calculada').innerHTML = '';
-        this.limpiarAnimaciones();
-        document.getElementById('resultado').innerHTML = 
-            '✅ <strong>Mapa listo:</strong> ' + 
-            Object.keys(this.ciudades).length + ' ciudades y ' + 
-            this.conexiones.length + ' rutas cargadas';
-        this.actualizarEstado("Listo");
-    }
-
-    async agregarCiudad() {
-        const nombre = document.getElementById('nombre-ciudad').value.trim();
-        const x = document.getElementById('x-ciudad').value;
-        const y = document.getElementById('y-ciudad').value;
-
-        if (!nombre || !x || !y) {
-            alert('Por favor completa todos los campos');
-            return;
-        }
-
-        this.actualizarEstado("Agregando ciudad...");
-
-        try {
-            const response = await fetch('/api/ciudad', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ nombre, x, y })
-            });
-
-            const resultado = await response.json();
-
-            if (resultado.status === 'ok') {
-                document.getElementById('form-ciudad').reset();
-                await this.cargarMapa();
-                this.actualizarEstado("Ciudad agregada correctamente");
-            } else {
-                alert('Error: ' + resultado.message);
-                this.actualizarEstado("Error agregando ciudad");
-            }
-
-        } catch (error) {
-            alert('Error de conexión: ' + error.message);
-            this.actualizarEstado("Error de conexión");
-        }
-    }
-
-    async eliminarCiudad(nombre) {
-        if (!confirm(`¿Estás seguro de eliminar la ciudad "${nombre}" y todas sus rutas?`)) {
-            return;
-        }
-
-        this.actualizarEstado("Eliminando ciudad...");
-
-        try {
-            const response = await fetch('/api/ciudad', {
-                method: 'DELETE',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ nombre })
-            });
-
-            const resultado = await response.json();
-
-            if (resultado.status === 'ok') {
-                await this.cargarMapa();
-                this.actualizarEstado("Ciudad eliminada correctamente");
-            } else {
-                alert('Error: ' + resultado.message);
-                this.actualizarEstado("Error eliminando ciudad");
-            }
-
-        } catch (error) {
-            alert('Error de conexión: ' + error.message);
-            this.actualizarEstado("Error de conexión");
-        }
-    }
-
-
-
-    async agregarRuta() {
-        // ✅ OBTENER VALORES DEL FORMULARIO
-        const ciudad1 = document.getElementById('ciudad1-ruta').value;
-        const ciudad2 = document.getElementById('ciudad2-ruta').value;
-        const distancia = document.getElementById('distancia-ruta').value;
-        const tiempo = document.getElementById('tiempo-ruta').value;
-
-        // ✅ VERIFICAR QUE TODOS LOS CAMPOS ESTÁN LLENOS
-        if (!ciudad1 || !ciudad2 || !distancia || !tiempo) {
-            alert('Por favor completa todos los campos: ciudad origen, ciudad destino, distancia y tiempo');
-            return;
-        }
-
-        if (ciudad1 === ciudad2) {
-            alert('Las ciudades deben ser diferentes');
-            return;
-        }
-
-        this.actualizarEstado("Agregando ruta...");
-
-        try {
-            // ✅ PREPARAR DATOS PARA ENVIAR
-            const datos = {
-                ciudad1: ciudad1,
-                ciudad2: ciudad2,
-                distancia: parseFloat(distancia),
-                tiempo: parseFloat(tiempo)
-            };
-
-            // ✅ ENVIAR AL ENDPOINT CORRECTO
-            const response = await fetch('/api/ruta/nueva', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(datos)
-            });
-
-            const resultado = await response.json();
-
-            if (resultado.status === 'ok') {
-                // ✅ LIMPIAR FORMULARIO Y ACTUALIZAR MAPA
-                document.getElementById('form-ruta').reset();
-                await this.cargarMapa();
-                this.actualizarEstado("Ruta agregada correctamente");
-            } else {
-                alert('Error: ' + resultado.message);
-                this.actualizarEstado("Error agregando ruta");
-            }
-
-        } catch (error) {
-            alert('Error de conexión: ' + error.message);
-            this.actualizarEstado("Error de conexión");
-        }
-    }
-
-
-
-    mostrarListaRutas() {
-        const lista = document.getElementById('lista-rutas');
-        lista.innerHTML = '';
-        
-        const rutasOrdenadas = [...this.conexiones].sort(([ciudad1A, ciudad2A], [ciudad1B, ciudad2B]) => {
-            const rutaA = `${ciudad1A} ↔ ${ciudad2A}`;
-            const rutaB = `${ciudad1B} ↔ ${ciudad2B}`;
-            return rutaA.localeCompare(rutaB);
-        });
-        
-        rutasOrdenadas.forEach(([ciudad1, ciudad2]) => {
-            let peso = "?";
-            const clave = `${ciudad1}-${ciudad2}`;
-            const claveInversa = `${ciudad2}-${ciudad1}`;
-            
-            // ✅ USAR CRITERIO ACTUAL PARA MOSTRAR PESOS
-            if (this.pesos[clave] !== undefined || this.pesos[claveInversa] !== undefined) {
-                const datosPeso = this.pesos[clave] || this.pesos[claveInversa];
-                
-                if (typeof datosPeso === 'object') {
-                    peso = datosPeso[this.criterioActual] || datosPeso['distancia'];
-                } else {
-                    peso = datosPeso;
-                }
-            }
-            
-            const unidad = this.criterioActual === 'distancia' ? 'km' : 'horas';
-            
-            const div = document.createElement('div');
-            div.className = 'ruta-item';
-            div.innerHTML = `
-                <span>${ciudad1} ↔ ${ciudad2} (${peso} ${unidad})</span>
-                <button onclick="window.sistemaRutas.eliminarRuta('${ciudad1}', '${ciudad2}')" 
-                        class="btn-eliminar">🗑️</button>
-            `;
-            div.style.display = 'flex';
-            div.style.justifyContent = 'space-between';
-            div.style.alignItems = 'center';
-            div.style.padding = '5px 0';
-            div.style.borderBottom = '1px solid #eee';
-            lista.appendChild(div);
-        });
-    }
-
-
-
-    async eliminarRuta(ciudad1, ciudad2) {
-        if (!confirm(`¿Estás seguro de eliminar la ruta entre ${ciudad1} y ${ciudad2}?`)) {
-            return;
-        }
-
-        this.actualizarEstado("Eliminando ruta...");
-
-        try {
-            const response = await fetch('/api/ruta', {
-                method: 'DELETE',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ciudad1, ciudad2 })
-            });
-
-            const resultado = await response.json();
-
-            if (resultado.status === 'ok') {
-                await this.cargarMapa();
-                this.actualizarEstado("Ruta eliminada correctamente");
-            } else {
-                alert('Error: ' + resultado.message);
-                this.actualizarEstado("Error eliminando ruta");
-            }
-
-        } catch (error) {
-            alert('Error de conexión: ' + error.message);
-            this.actualizarEstado("Error de conexión");
-        }
-    }
+    // ==================== INTERACCIÓN CON EL MAPA ====================
 
     configurarClicksMapa() {
         const mapa = document.getElementById('mapa');
@@ -666,6 +657,9 @@ class SistemaRutas {
     }
 
     async agregarCiudadDesdeClick(nombre, x, y) {
+        // LIMPIEZA AUTOMÁTICA: Modificación estructural del grafo
+        this.limpiarParaModificacionGrafo();
+
         this.actualizarEstado("Agregando ciudad...");
 
         try {
@@ -689,6 +683,19 @@ class SistemaRutas {
             alert('Error de conexión: ' + error.message);
             this.actualizarEstado("Error de conexión");
         }
+    }
+
+    // ==================== UTILIDADES ====================
+
+    limpiarRuta() {
+        /* Método manual - ahora usa los mismos métodos automáticos */
+        this.limpiarParaNuevaRuta();
+        
+        document.getElementById('resultado').innerHTML = 
+            '✅ <strong>Mapa listo:</strong> ' + 
+            Object.keys(this.ciudades).length + ' ciudades y ' + 
+            this.conexiones.length + ' rutas cargadas';
+        this.actualizarEstado("Mapa limpiado y listo");
     }
     
     async exportarMapa() {
@@ -766,6 +773,8 @@ class SistemaRutas {
         this.actualizarEstado("Mapa exportado como SVG");
     }
 }
+
+// ==================== FUNCIONES GLOBALES ====================
 
 document.addEventListener('DOMContentLoaded', () => {
     window.sistemaRutas = new SistemaRutas();

@@ -1,38 +1,45 @@
 README.md
 
-- Implementación Visual de una Estructura Grafo a traves de una
-  Aplicacion WEB de Mapa de Rutas, usando Arquitectura MVC
+- Implementación Visual de una Estructura Grafo a través de una Aplicación WEB de Mapa de Rutas, usando Arquitectura MVC
 - Autor: `Lorgio Añez J.`
-- Fecha: 2025-10-23
+- Fecha: 2025-11-11
 - Materia: Estructura de Datos II, INF310
 
 # 🗺️ Sistema de Rutas de Bolivia - Grafos
 
-## Ruta multiple : Ciudad Origen, Intermedia y Destino Final
+### Ruta múltiple: Ciudad Origen, Intermedia y Destino
 
-Probar en : https://lorginho.pythonanywhere.com/
+### Animación de Búsqueda (Dijkstra)
+
+### Doble Criterio de Optimización: Distancia y Tiempo
+
+Probar en: https://lorginho.pythonanywhere.com/
 
 ![Interfaz del Sistema de Rutas de Bolivia](sistema_rutas.png)
 
-## En Tiempo
+## Mejor ruta: En Tiempo
 
 ![Interfaz del Sistema de Rutas de Bolivia](sistema_rutas3.png)
 
-## En Distancia
+## Mejor ruta: En Distancia
 
 ![Interfaz del Sistema de Rutas de Bolivia](sistema_rutas2.png)
 
 ## 📋 Descripción
 
-Sistema web interactivo para visualizar y calcular rutas óptimas entre ciudades de Bolivia usando teoría de grafos y algoritmo Dijkstra para caminos mínimos.
+Sistema web interactivo para visualizar y calcular rutas óptimas entre ciudades de Bolivia usando teoría de grafos y algoritmo Dijkstra para caminos mínimos con **doble criterio de optimización**.
 
 ## 🚀 Características Principales
 
 - **Visualización interactiva** con SVG
-- **Cálculo de ruta óptima** con Dijkstra
+- **Cálculo de ruta óptima** con Dijkstra para **distancia y tiempo**
 - **Gestión completa** de ciudades y rutas
 - **Exportación SVG** del mapa
 - **Arquitectura MVC** con Flask
+- **Interfaz moderna** con controles intuitivos
+- **Animación en tiempo real** del algoritmo Dijkstra
+- **Doble criterio** de búsqueda (distancia/tiempo)
+- **Rutas con puntos intermedios** para planificación compleja
 
 ## 🛠️ Tecnologías
 
@@ -48,7 +55,7 @@ sistema_rutas/
 ├── 📁 controllers/ # Lógica de aplicación
 │ └── 📄 mapa_controller.py # Coordina modelo y vista
 ├── 📁 models/ # Datos y algoritmos
-│ └── 📄 grafo_rutas.py # Grafo y algoritmo Dijkstra
+│ └── 📄 grafo_rutas.py # Grafo y algoritmo Dijkstra con doble peso
 ├── 📁 views/ # Formateo de respuestas
 │ └── 📄 mapa_view.py # Formatea datos para frontend
 ├── 📁 routes/ # Endpoints API
@@ -59,27 +66,97 @@ sistema_rutas/
 ├── 📄 estilo.css # Estilos y diseño visual
 └── 📄 rutas.js # Lógica del frontend
 
+## 🎨 Interfaz de Usuario
+
+### Header Principal
+
+- **Título del sistema** + Selector de criterio (Distancia/Tiempo) alineado a la derecha
+- **Criterios de búsqueda:** Botones grandes y visibles para alternar entre distancia (km) y tiempo (horas)
+
+### Panel Izquierdo (Controles)
+
+- **Agregar Ruta:** Formulario para conectar ciudades existentes con distancia y tiempo
+- **Calcular Ruta:** Selectores para origen, destino y punto intermedio opcional
+- **Instrucciones:** Guía visual prominente para agregar ciudades haciendo click en el mapa
+
+### Panel Central (Mapa Interactivo)
+
+- **Visualización SVG:** Mapa escalable de Bolivia con ciudades y rutas
+- **Pesos dinámicos:** Las rutas muestran distancia o tiempo según el criterio seleccionado
+- **Interacción:** Click en cualquier área del mapa para agregar nuevas ciudades
+- **Animaciones:** Visualización en tiempo real del algoritmo Dijkstra
+
+### Panel Derecho (Información y Gestión)
+
+- **Estado del Sistema:** Información en tiempo real del grafo con texto grande
+- **Resultados:** Detalles de rutas calculadas según criterio seleccionado
+- **Listas gestionables:** Ciudades y rutas con opciones de eliminación y scroll optimizado
+- **Controles globales:** Exportación SVG y cierre de aplicación
+
 ## 📊 Componentes Clave
 
 ### Backend (Python/Flask)
 
-- **GrafoRutas:** Representa ciudades y conexiones
-- **Dijkstra:** Encuentra camino mínimo con heapq
+- **GrafoRutas:** Representa ciudades y conexiones con pesos duales (distancia/tiempo)
+- **Dijkstra parametrizado:** Encuentra camino mínimo según criterio seleccionado
 - **API REST:** /api/mapa, /api/ruta, /api/ciudad
 
 ### Frontend (JavaScript/SVG)
 
-- **SistemaRutas:** Gestiona interacción completa
-- **SVG integrado:** Mapa manipulable dinámicamente
+- **SistemaRutas:** Gestiona interacción completa con cambio dinámico de criterios
+- **SVG responsive:** Mapa manipulable dinámicamente con actualización de pesos
 - **Animaciones:** Visualización de Dijkstra en tiempo real
+- **Gestión de estado:** Limpieza automática entre operaciones
 
 ## 🎯 Uso Rápido
 
 1. **Instalar:** `pip install -r requirements.txt`
 2. **Ejecutar:** `python app.py`
 3. **Acceder:** `http://localhost:5000`
-4. **Calcular ruta:** Seleccionar origen/destino
-5. **Exportar:** Click en "Exportar SVG"
+4. **Seleccionar criterio:** Usar botones en el header (Distancia/Tiempo)
+5. **Agregar ciudades:** Hacer click en el mapa en la ubicación deseada
+6. **Agregar rutas:** Usar formulario en panel izquierdo para conectar ciudades (ingresar distancia y tiempo)
+7. **Calcular ruta:** Seleccionar origen, destino (y opcionalmente punto intermedio)
+8. **Exportar:** Click en "Exportar SVG" para guardar el mapa
+
+## 🔧 Funcionalidades Avanzadas
+
+### Doble Criterio de Optimización
+
+- **Distancia:** Optimiza por menor kilometraje total (km)
+- **Tiempo:** Optimiza por menor duración del viaje (horas)
+- **Cambio instantáneo:** Actualización en tiempo real de toda la visualización
+- **Persistencia visual:** El mapa y listas se redibujan automáticamente al cambiar criterio
+
+### Estructura de Grafo con Pesos Duales
+
+```python
+# Ejemplo de estructura de datos para rutas
+rutas = {
+    'La Paz-Cochabamba': {
+        'distancia': 375,  # en kilómetros
+        'tiempo': 6.3      # en horas
+    },
+    'Cochabamba-Santa Cruz': {
+        'distancia': 480,
+        'tiempo': 8.0
+    }
+}
+```
+
+### Cálculo de Rutas con Punto Intermedio
+
+- Seleccionar ciudad origen, intermedia y destino
+- El sistema calcula la ruta óptima considerando la parada intermedia
+- Visualización unificada del camino completo
+- Compatible con ambos criterios (distancia/tiempo)
+
+### Gestión Intuitiva del Grafo
+
+- **Agregar ciudades:** Click directo en el mapa (sin formulario manual)
+- **Eliminar elementos:** Botones 🗑️ en listas del panel derecho
+- **Scroll optimizado:** Listas compactas con scrollbars anchos (14px)
+- **Feedback visual:** Animaciones y estados claros con texto de gran tamaño
 
 ## 👥 Autor
 
@@ -89,112 +166,29 @@ Lorgio Añez J. - Proyecto para Estructura de Datos II
 
 ## 🏗️ Arquitectura y Desarrollo
 
-**MVC (Modelo-Vista-Controlador)**
+**MVC (Modelo-Vista-Controlador)**  
 Patrón arquitectónico que separa la lógica de negocio (Modelo), la interfaz de usuario (Vista) y el control de flujo (Controlador).
 
-**API REST**
+**API REST**  
 Interfaz que permite comunicación entre frontend y backend usando protocolo HTTP y formatos JSON.
-
-**Full-Stack**
-Desarrollo que abarca tanto el frontend (cliente) como el backend (servidor) de una aplicación.
 
 ## 📊 Estructuras de Datos
 
-**Grafo**
-Estructura compuesta por vértices (nodos) y aristas (conexiones) que representan relaciones entre elementos.
+**Grafo con Pesos Múltiples**  
+Estructura compuesta por vértices (nodos) y aristas (conexiones) que almacena múltiples valores de peso para cada conexión.
 
-**Vértice/Nodo**
-Elemento fundamental del grafo. En el proyecto: ciudades.
-
-**Arista**
-Conexión entre dos vértices. En el proyecto: rutas entre ciudades.
-
-**Peso**
-Valor numérico asociado a una arista. En el proyecto: distancia en kilómetros.
-
-**Grafo No Dirigido**
-Grafo donde las aristas no tienen dirección (bidireccionales).
+**Peso Dual**  
+Valores numéricos asociados a una arista. En el proyecto: distancia en kilómetros Y tiempo en horas.
 
 ## 🧠 Algoritmos
 
-**Dijkstra**
-Algoritmo para encontrar el camino de costo mínimo entre nodos en un grafo con pesos no negativos.
-
-**Heapq**
-Módulo de Python que implementa colas de prioridad usando min-heap para eficiencia.
-
-## 🌐 Frontend y Visualización
-
-**SVG (Scalable Vector Graphics)**
-Formato de gráficos vectoriales que permite escalado sin pérdida de calidad.
-
-**DOM (Document Object Model)**
-Representación en memoria de la estructura HTML que permite manipulación dinámica.
-
-**JSON (JavaScript Object Notation)**
-Formato ligero para intercambio de datos entre frontend y backend.
-
-**Event Listener**
-Mecanismo que detecta y responde a interacciones del usuario (clics, movimientos).
-
-## 🔧 Tecnologías Específicas
-
-**Flask**
-Microframework de Python para desarrollo web rápido y sencillo.
-
-**Python**
-Lenguaje de programación utilizado para el backend y algoritmos.
-
-**JavaScript**
-Lenguaje de programación para la interactividad del frontend.
-
-**CSS3**
-Lenguaje de estilos para diseño y presentación visual.
-
-## 📈 Conceptos de Grafos
-
-**Camino Más Corto**
-Ruta con menor número de aristas entre dos nodos.
-
-**Costo Mínimo**
-Ruta con menor suma de pesos entre dos nodos.
-
-**Conectividad**
-Propiedad que indica si existe camino entre dos nodos cualesquiera.
-
-**Bidireccionalidad**
-Característica donde las conexiones funcionan en ambos sentidos.
+**Dijkstra Parametrizado**  
+Algoritmo para encontrar el camino de costo mínimo entre nodos en un grafo, configurable por tipo de peso (distancia o tiempo).
 
 ## 🎯 Términos de la Aplicación
 
-**Ruta Óptima**
-Camino con menor distancia total entre origen y destino.
-
-**Exportación SVG**
-Funcionalidad para guardar el mapa actual como archivo vectorial.
-
-**Coordenadas**
-Posiciones (x, y) que definen la ubicación de ciudades en el mapa.
-
-**Animación Dijkstra**
-Visualización en tiempo real del algoritmo encontrando la ruta óptima.
-
-**Cola de Prioridad**
-Estructura que siempre devuelve el elemento de mayor prioridad (menor distancia).
-
-## 🔄 Flujos y Procesos
-
-**Request-Response**
-Ciclo donde el frontend envía peticiones y el backend devuelve respuestas.
-
-**Serialización**
-Proceso de convertir estructuras de datos en formatos transmitibles (como JSON).
-
-**Validación**
-Verificación de que los datos de entrada cumplan con los requisitos esperados.
-
-**Renderizado**
-Proceso de generar la visualización a partir de los datos.
+**Ruta Óptima Configurable**  
+Camino con menor distancia total O menor tiempo total entre origen y destino, según selección del usuario.
 
 # 🔄 Flujos de Código - Casos de Uso
 
@@ -202,54 +196,70 @@ Proceso de generar la visualización a partir de los datos.
 
 **Flujo:**
 
-1. Usuario completa formulario o hace click en el mapa
-2. Frontend captura datos y envía POST /api/ciudad
-3. Backend ejecuta MapaController.agregar_ciudad()
-4. Se valida datos con MapaView.validar_datos_ciudad()
-5. Modelo ejecuta GrafoRutas.agregar_ciudad()
-6. Se retorna respuesta JSON con éxito/error
-7. Frontend recarga el mapa completo
+1. Usuario hace click en el mapa
+2. Frontend captura coordenadas (x, y) y solicita nombre de ciudad
+3. Frontend envía POST /api/ciudad con {nombre, x, y}
+4. Backend ejecuta MapaController.agregar_ciudad()
+5. Se valida datos con MapaView.validar_datos_ciudad()
+6. Modelo ejecuta GrafoRutas.agregar_ciudad(nombre, x, y)
+7. Se retorna respuesta JSON con éxito/error
+8. Frontend recarga el mapa completo
 
-## 2. 🛣️ Agregar Ruta
+## 2. 🛣️ Agregar Ruta con Pesos Duales
 
 **Flujo:**
 
-1. Usuario selecciona ciudades e ingresa distancia
-2. Frontend envía POST /api/ruta/nueva
+1. Usuario selecciona ciudad1, ciudad2 e ingresa distancia (km) y tiempo (horas)
+2. Frontend envía POST /api/ruta/nueva con {ciudad1, ciudad2, distancia, tiempo}
 3. Backend valida existencia de ambas ciudades
-4. Modelo ejecuta GrafoRutas.agregar_ruta() bidireccional
+4. Modelo ejecuta GrafoRutas.agregar_ruta() bidireccional con objeto de pesos
 5. Se retorna confirmación y actualiza interfaz
+6. Frontend redibuja rutas según criterio actual
 
-## 3. 🧠 Algoritmo Dijkstra
+## 3. 🧠 Algoritmo Dijkstra con Criterio Configurable
 
 **Flujo:**
 
-1. Inicialización: distancias infinitas, origen en 0
-2. Heap: cola prioridad con (0, origen)
-3. Procesamiento mientras heap no vacío:
-   - Extraer nodo actual (menor distancia)
-   - Si es destino → Terminar
-   - Para cada vecino calcular nueva distancia
-   - Si mejora → Actualizar y agregar a heap
-4. Reconstrucción: seguir nodos anteriores desde destino
+1. Usuario selecciona criterio (distancia/tiempo) en frontend
+2. Inicialización: distancias infinitas, origen en 0
+3. Heap: cola prioridad con (0, origen)
+4. Procesamiento mientras heap no vacío:
 
-## 4. 🗑️ Eliminar Elementos
+   - Extraer nodo actual (menor distancia/tiempo según criterio)
+   - Si es destino → Terminar
+   - Para cada vecino calcular nueva distancia/tiempo usando peso correspondiente
+   - Si mejora → Actualizar y agregar a heap
+
+5. Reconstrucción: seguir nodos anteriores desde destino
+
+## 4. 🔄 Cambio de Criterio de Visualización
+
+**Flujo:**
+
+1. Usuario hace click en botón "Distancia" o "Tiempo" en header
+2. Frontend actualiza variable criterioActual y estilos de botones
+3. Se ejecuta limpieza automática de ruta anterior
+4. Se redibujan todas las rutas en el mapa con nuevos pesos
+5. Se actualiza lista de rutas en panel derecho con nuevos valores
+6. Los pesos mostrados cambian instantáneamente en toda la interfaz
+
+## 5. 🗑️ Eliminar Elementos
 
 **Eliminar Ciudad:**
 
 1. Usuario click 🗑️ en lista ciudades
-2. Frontend envía DELETE /api/ciudad
+2. Frontend envía DELETE /api/ciudad con {nombre}
 3. Backend elimina ciudad y TODAS sus rutas conexas
 4. Frontend recarga interfaz completa
 
 **Eliminar Ruta:**
 
 1. Usuario click 🗑️ en lista rutas
-2. Frontend envía DELETE /api/ruta
+2. Frontend envía DELETE /api/ruta con {ciudad1, ciudad2}
 3. Backend elimina ambas direcciones de la ruta
-4. Frontend remueve línea del SVG
+4. Frontend actualiza la visualización
 
-## 5. 📤 Exportar Mapa SVG
+## 6. 📤 Exportar Mapa SVG
 
 **Flujo:**
 
@@ -259,65 +269,83 @@ Proceso de generar la visualización a partir de los datos.
 4. Serializa a string XML
 5. Crea blob y trigger descarga automática
 
-## 6. 🎯 Calcular Ruta Óptima
+## 7. 🎯 Calcular Ruta Óptima con Criterio
 
 **Flujo:**
 
-1. Usuario selecciona origen y destino
-2. Frontend envía POST /api/ruta al backend
-3. Backend ejecuta Dijkstra en Python
-4. Frontend muestra animación en tiempo real
-5. Se muestra ruta roja + información detallada
+1. Usuario selecciona origen y destino (opcionalmente punto intermedio)
+2. Usuario selecciona criterio (distancia/tiempo)
+3. Frontend envía POST /api/ruta al backend con {origen, destino, intermedio, criterio}
+4. Backend ejecuta Dijkstra en Python usando el criterio especificado
+5. Frontend muestra animación en tiempo real
+6. Se muestra ruta roja + información detallada según criterio
 
-**Visualización:** Nodos amarillos (visitados) → Nodos verdes (actualizados) → Línea roja (ruta óptima)
+**Visualización:** Nodos amarillos (visitados) → Nodos verdes (actualizados) → Línea roja (ruta óptima)
 
-## 7. 🔄 Comunicación Frontend-Backend
+## 8. 🔄 Comunicación Frontend-Backend
 
 **Flujo API:**
 
-1. Frontend (JavaScript) → fetch('/api/ruta')
-2. Backend (Python/Flask) → Dijkstra()
-3. Backend procesa algoritmo → JSON response
+1. Frontend (JavaScript) → fetch('/api/ruta') con criterio
+2. Backend (Python/Flask) → Dijkstra(criterio)
+3. Backend procesa algoritmo con pesos correspondientes → JSON response
 4. Frontend actualiza SVG → CSS animaciones
-5. Usuario ve resultado final
+5. Usuario ve resultado final según criterio seleccionado
 
 # 📚 Glosario de Términos - Sistema de Rutas
 
-## 🎯 Cola de Prioridad
+## 🎯 Cola de Prioridad con Criterio
 
-**Definición:** Estructura de datos que siempre devuelve el elemento de mayor prioridad (en Dijkstra: menor distancia).
-**En el proyecto:** Implementada con `heapq` en Python para el algoritmo Dijkstra.
+**Definición:** Estructura de datos que siempre devuelve el elemento de mayor prioridad (en Dijkstra: menor distancia O menor tiempo según criterio).  
+**En el proyecto:** Implementada con `heapq` en Python para el algoritmo Dijkstra parametrizado.  
 **Funcionamiento:**
 
-- Los elementos se insertan como tuplas `(distancia, ciudad)`
-- `heapq.heappop()` siempre extrae el de menor distancia
+- Los elementos se insertan como tuplas `(valor, ciudad)` donde valor es distancia o tiempo
+- `heapq.heappop()` siempre extrae el de menor valor según el criterio activo
 - Mantiene el orden automáticamente para eficiencia O(log n)
-  **Ejemplo:** Cola = `[(0, 'La Paz'), (375, 'Cochabamba'), (240, 'Oruro')]` → Extrae primero `(0, 'La Paz')`
 
-## 🧠 Dijkstra (Algoritmo)
+**Ejemplo con distancia:** Cola = `[(0, 'La Paz'), (375, 'Cochabamba'), (240, 'Oruro')]` → Extrae primero `(0, 'La Paz')`  
+**Ejemplo con tiempo:** Cola = `[(0, 'La Paz'), (6.3, 'Cochabamba'), (4.0, 'Oruro')]` → Extrae primero `(0, 'La Paz')`
 
-**Definición:** Algoritmo para encontrar el camino de costo mínimo en grafos con pesos no negativos.
-**En el proyecto:** Implementado en `GrafoRutas.dijkstra()` para calcular rutas óptimas entre ciudades bolivianas.
-**Características:** Usa cola de prioridad (heap), retorna camino, distancia y pasos para animación.
-**Ejemplo:** La Paz → Santa Cruz = ['La Paz', 'Cochabamba', 'Santa Cruz'], 855 km
+## 🧠 Dijkstra Parametrizado (Algoritmo)
 
-## 📤 Serializar a String XML
+**Definición:** Algoritmo para encontrar el camino de costo mínimo en grafos con pesos múltiples, configurable por tipo de peso.  
+**En el proyecto:** Implementado en `GrafoRutas.dijkstra(origen, destino, criterio)` para calcular rutas óptimas según distancia o tiempo.  
+**Características:** Usa cola de prioridad (heap), retorna camino, valor total y pasos para animación.  
+**Ejemplo distancia:** La Paz → Santa Cruz = ['La Paz', 'Cochabamba', 'Santa Cruz'], 855 km  
+**Ejemplo tiempo:** La Paz → Santa Cruz = ['La Paz', 'Cochabamba', 'Santa Cruz'], 14.3 horas
 
-**Definición:** Convertir estructura SVG en memoria a texto XML para guardar como archivo.
-**En el proyecto:** Usado en `SistemaRutas.exportarMapa()` para exportar el mapa interactivo como archivo .svg descargable.
-**Implementación:** `XMLSerializer().serializeToString(clone)` genera texto con etiquetas `<svg><circle>...</svg>`
+## 📊 Estructura de Pesos Duales
+
+**Definición:** Objeto que almacena múltiples métricas para cada conexión en el grafo.  
+**En el proyecto:** Implementado como diccionario con claves 'distancia' y 'tiempo' para cada ruta.  
+**Ejemplo:**
+
+python
+
+pesos_ruta = {
+'distancia': 375, # kilómetros
+'tiempo': 6.3 # horas
+}
 
 ## 🔄 Reconstrucción (Dijkstra)
 
-**Definición:** Proceso de armado del camino final usando el diccionario de nodos anteriores.
-**En el proyecto:** `GrafoRutas._reconstruir_camino()` sigue la cadena desde destino hasta origen y invierte el orden.
-**Ejemplo:** `previos = {'Santa Cruz': 'Cochabamba', 'Cochabamba': 'La Paz'}` → Camino: `['La Paz', 'Cochabamba', 'Santa Cruz']`
+**Definición:** Proceso de armado del camino final usando el diccionario de nodos anteriores.  
+**En el proyecto:** `GrafoRutas._reconstruir_camino()` sigue la cadena desde destino hasta origen y invierte el orden.  
+**Ejemplo:** `previos = {'Santa Cruz': 'Cochabamba', 'Cochabamba': 'La Paz'}` → Camino: `['La Paz', 'Cochabamba', 'Santa Cruz']`
+
+## 📤 Serializar a String XML
+
+**Definición:** Convertir estructura SVG en memoria a texto XML para guardar como archivo.  
+**En el proyecto:** Usado en `SistemaRutas.exportarMapa()` para exportar el mapa interactivo como archivo .svg descargable.  
+**Implementación:** `XMLSerializer().serializeToString(clone)` genera texto con etiquetas `<svg><circle>...</svg>`
 
 ## 📊 Estructura de Retorno Dijkstra
 
-**Definición:** Diccionario con tres componentes del resultado del algoritmo.
+**Definición:** Diccionario con tres componentes del resultado del algoritmo.  
 **Componentes:**
 
 - `camino`: Lista ordenada de ciudades (origen → destino)
-- `distancia`: Suma total de kilómetros del recorrido óptimo
+- `distancia`/`tiempo`: Suma total del recorrido óptimo según criterio
 - `pasos`: Registro detallado para animación en frontend
+- `criterio`: Tipo de optimización utilizada (distancia/tiempo)
