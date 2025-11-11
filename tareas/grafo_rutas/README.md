@@ -8,7 +8,13 @@ README.md
 
 # 🗺️ Sistema de Rutas de Bolivia - Grafos
 
+## En Tiempo
+
 ![Interfaz del Sistema de Rutas de Bolivia](sistema_rutas.png)
+
+## En Distancia
+
+![Interfaz del Sistema de Rutas de Bolivia](sistema_rutas2.png)
 
 ## 📋 Descripción
 
