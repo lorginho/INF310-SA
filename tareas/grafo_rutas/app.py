@@ -33,5 +33,6 @@ def index():
 if __name__ == '__main__':
     print("🚀 Servidor Flask - Arquitectura con Blueprints")
     print("📍 Usando MapaController → GrafoRutas → MapaView")
+    print("📍 Usable en red local: http://192.168.100.37:5000")
     print("🌐 Accede en: http://localhost:5000")
-    app.run(debug=True, port=5000)
+    app.run(debug=True, host='0.0.0.0', port=5000)
