@@ -526,19 +526,25 @@ body {
     padding: 8px;
 }
 
-/* DESTACAR SELECTOR INTERMEDIO */
+/* DESTACAR COLORES EN SELECTOR  */
+
+
 #intermedio {
-    border-left: 4px solid #28a745;
+    border-left: 4px solid #f59e0b;  /* Ámbar */
     background: #f8fff9;
 }
 
 #origen {
-    border-left: 4px solid #007bff;
+    border-left: 4px solid #10b981;  /* Verde esmeralda */
 }
 
 #destino {
-    border-left: 4px solid #dc3545;
+    border-left: 4px solid #991b1b;  /* Borgonia */
 }
+
+
+
+
 
 @media (max-width: 768px) {
     .container {

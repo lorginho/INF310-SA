@@ -40,6 +40,12 @@ class SistemaRutas {
         this.limpiarAnimaciones();
     }
 
+    limpiarParaModificacionGrafo() {
+        /* Limpieza completa para operaciones que modifican la estructura del grafo */
+        this.limpiarParaNuevaRuta();
+        // Limpiar cualquier otro estado temporal aquí si es necesario
+    }
+
 
     // ==================== CONFIGURACIÓN INICIAL ====================
 
@@ -605,18 +611,16 @@ class SistemaRutas {
         Object.keys(this.ciudades).forEach(ciudad => {
             const circulo = document.getElementById(`circulo-${ciudad}`);
             if (circulo) {
-                // Solo limpiar si no es parte de la ruta óptima
                 const currentFill = circulo.style.fill;
-                if (currentFill !== 'rgb(40, 167, 69)' &&    // Verde origen
-                    currentFill !== 'rgb(220, 53, 69)' &&    // Rojo destino  
-                    currentFill !== 'rgb(255, 193, 7)') {    // Amarillo intermedia
+                if (currentFill !== 'rgb(16, 185, 129)' &&    // Verde esmeralda
+                    currentFill !== 'rgb(153, 27, 27)' &&     // Borgonia
+                    currentFill !== 'rgb(245, 158, 11)') {    // Ámbar
                     circulo.style.fill = '#4745b1';
                     circulo.style.stroke = '#260829';
                 }
             }
         });
     }
-
 
 
     dibujarRutaOptima(camino) {
@@ -630,17 +634,17 @@ class SistemaRutas {
             const circulo = document.getElementById(`circulo-${ciudad}`);
             if (circulo) {
                 if (index === 0) {
-                    // Ciudad origen - VERDE
-                    circulo.style.fill = '#28a745';
-                    circulo.style.stroke = '#1e7e34';
+                    // Ciudad origen - VERDE ESMERALDA
+                    circulo.style.fill = '#10b981';
+                    circulo.style.stroke = '#104130ff';                    
                 } else if (index === camino.length - 1) {
-                    // Ciudad destino - ROJO
-                    circulo.style.fill = '#dc3545';
-                    circulo.style.stroke = '#c82333';
+                    // Ciudad destino - BORGONIA
+                    circulo.style.fill = '#991b1b';
+                    circulo.style.stroke = '#361515ff';
                 } else if (ciudad === intermedio) {
-                    // Ciudad intermedia específica - AMARILLO/NARANJA
-                    circulo.style.fill = '#ffc107';
-                    circulo.style.stroke = '#e0a800';
+                    // Ciudad intermedia - ÁMBAR
+                    circulo.style.fill = '#f59e0b';
+                    circulo.style.stroke = '#6b461cff';
                 }
             }
         });
@@ -832,6 +836,11 @@ function limpiarRuta() {
 
 function exportarMapa() {
     window.sistemaRutas.exportarMapa();
+}
+
+function abrirDocumentacion() {
+    // Abre el README.md en una nueva pestaña
+    window.open('/api/documentacion', '_blank');
 }
 
 function cerrarAplicacion() {

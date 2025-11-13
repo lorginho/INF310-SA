@@ -6,6 +6,7 @@ DESCRIPCIÓN: Define endpoints REST API para comunicación frontend-backend.
              Maneja requests de mapa, rutas y ciudades.
 """
 
+import markdown
 from flask import Blueprint, jsonify, request
 from controllers.mapa_controller import MapaController
 from models.grafo_rutas import GrafoRutas
@@ -172,3 +173,74 @@ def eliminar_ruta():
         return jsonify(resultado)
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)})
+
+
+@api_bp.route('/documentacion')
+def documentacion():
+    try:
+        with open('README.md', 'r', encoding='utf-8') as file:
+            contenido = file.read()
+
+        # Convertir con librería markdown
+        html_content = markdown.markdown(contenido, extensions=['extra'])
+
+        return f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Documentación</title>
+            <meta charset="utf-8">
+            <style>
+                body {{
+                    font-family: Arial, sans-serif;
+                    line-height: 1.6;
+                    margin: 40px;
+                    color: #333;
+                    background: #f5f5f5;
+                }}
+                .container {{
+                    max-width: 1200px;
+                    margin: 0 auto;
+                    background: white;
+                    padding: 40px;
+                    border-radius: 8px;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                }}
+                img {{ 
+                    max-width: 100%; 
+                    height: auto; 
+                    border: 1px solid #ddd; 
+                    border-radius: 4px; 
+                    margin: 15px 0;
+                }}
+                code {{
+                    background: #f4f4f4;
+                    padding: 2px 6px;
+                    border-radius: 3px;
+                }}
+                pre {{
+                    background: #f8f8f8;
+                    padding: 15px;
+                    border-radius: 5px;
+                    overflow: auto;
+                }}
+                table {{
+                    border-collapse: collapse;
+                    width: 100%;
+                    margin: 15px 0;
+                }}
+                th, td {{
+                    border: 1px solid #ddd;
+                    padding: 8px;
+                }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                {html_content}
+            </div>
+        </body>
+        </html>
+        """
+    except Exception as e:
+        return f"Error: {str(e)}", 404

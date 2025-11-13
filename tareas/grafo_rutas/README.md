@@ -13,17 +13,17 @@ README.md
 
 ### Doble Criterio de Optimización: Distancia y Tiempo
 
-Probar en: https://lorginho.pythonanywhere.com/
+Probar en: <a href="https://lorginho.pythonanywhere.com/" target="_blank">https://lorginho.pythonanywhere.com/</a>
 
-![Interfaz del Sistema de Rutas de Bolivia](sistema_rutas.png)
+![Interfaz del Sistema de Rutas de Bolivia](/static/sistema_rutas.png)
 
 ## Mejor ruta: En Tiempo
 
-![Interfaz del Sistema de Rutas de Bolivia](sistema_rutas3.png)
+![Interfaz del Sistema de Rutas de Bolivia](/static/sistema_rutas_tiempo.png)
 
 ## Mejor ruta: En Distancia
 
-![Interfaz del Sistema de Rutas de Bolivia](sistema_rutas2.png)
+![Interfaz del Sistema de Rutas de Bolivia](/static/sistema_rutas_distancia.png)
 
 ## 📋 Descripción
 
@@ -40,6 +40,7 @@ Sistema web interactivo para visualizar y calcular rutas óptimas entre ciudades
 - **Animación en tiempo real** del algoritmo Dijkstra
 - **Doble criterio** de búsqueda (distancia/tiempo)
 - **Rutas con puntos intermedios** para planificación compleja
+- **Colores distintivos en rutas:** Visualización con colores específicos para origen (verde esmeralda), intermedia (ámbar) y destino (borgonia)
 
 ## 🛠️ Tecnologías
 
@@ -85,6 +86,10 @@ sistema_rutas/
 - **Pesos dinámicos:** Las rutas muestran distancia o tiempo según el criterio seleccionado
 - **Interacción:** Click en cualquier área del mapa para agregar nuevas ciudades
 - **Animaciones:** Visualización en tiempo real del algoritmo Dijkstra
+- **Colores de ruta óptima:**
+  - 🟢 **Origen:** Verde esmeralda (#10b981)
+  - 🟡 **Intermedia:** Ámbar (#f59e0b)
+  - 🔴 **Destino:** Borgonia (#991b1b)
 
 ### Panel Derecho (Información y Gestión)
 
@@ -107,6 +112,8 @@ sistema_rutas/
 - **SVG responsive:** Mapa manipulable dinámicamente con actualización de pesos
 - **Animaciones:** Visualización de Dijkstra en tiempo real
 - **Gestión de estado:** Limpieza automática entre operaciones
+- **Sistema de colores:** Identificación visual instantánea de roles en rutas calculadas
+- **Armonización cromática:** Colores coordinados entre selectores del panel y nodos del mapa
 
 ## 🎯 Uso Rápido
 
@@ -127,6 +134,13 @@ sistema_rutas/
 - **Tiempo:** Optimiza por menor duración del viaje (horas)
 - **Cambio instantáneo:** Actualización en tiempo real de toda la visualización
 - **Persistencia visual:** El mapa y listas se redibujan automáticamente al cambiar criterio
+
+### Sistema de Colores para Rutas
+
+- **Identificación visual inmediata** de ciudades en rutas calculadas
+- **Colores armonizados** con la interfaz existente
+- **Persistencia visual** que sobrevive a animaciones y limpiezas
+- **Coordinación** entre bordes de selectores y colores de nodos
 
 ### Estructura de Grafo con Pesos Duales
 
@@ -280,7 +294,9 @@ Camino con menor distancia total O menor tiempo total entre origen y destino, se
 5. Frontend muestra animación en tiempo real
 6. Se muestra ruta roja + información detallada según criterio
 
-**Visualización:** Nodos amarillos (visitados) → Nodos verdes (actualizados) → Línea roja (ruta óptima)
+**Visualización Animacion:** Nodos amarillos (visitados) → Nodos verdes (actualizados) → Línea roja (ruta óptima)
+
+**Visualización Caculo de Ruta :** Nodos con colores según rol → 🟢 Origen → 🟡 Intermedia → 🔴 Destino
 
 ## 8. 🔄 Comunicación Frontend-Backend
 
