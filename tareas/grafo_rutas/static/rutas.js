@@ -22,17 +22,24 @@ class SistemaRutas {
 
     // ==================== MÉTODOS DE LIMPIEZA AUTOMÁTICA ====================
     
+
+
     limpiarParaNuevaRuta() {
         /* Limpieza específica para operaciones de cálculo de ruta */
         document.getElementById('ruta-calculada').innerHTML = '';
+        
+        // Restaurar colores originales de todas las ciudades
+        Object.keys(this.ciudades).forEach(ciudad => {
+            const circulo = document.getElementById(`circulo-${ciudad}`);
+            if (circulo) {
+                circulo.style.fill = '#4745b1';
+                circulo.style.stroke = '#260829';
+            }
+        });
+        
         this.limpiarAnimaciones();
     }
-    
-    limpiarParaModificacionGrafo() {
-        /* Limpieza completa para operaciones que modifican la estructura del grafo */
-        this.limpiarParaNuevaRuta();
-        // Limpiar cualquier otro estado temporal aquí si es necesario
-    }
+
 
     // ==================== CONFIGURACIÓN INICIAL ====================
 
@@ -366,6 +373,7 @@ class SistemaRutas {
                 this.actualizarEstado("Error en cálculo de ruta");
             } else {
                 await this.animarDijkstra(data.pasos);
+                this.limpiarAnimaciones();
                 this.dibujarRutaOptima(data.camino);
                 this.mostrarResultado(data, tieneIntermedio);
                 this.actualizarEstado("Ruta calculada correctamente");
@@ -592,20 +600,52 @@ class SistemaRutas {
         }, 10);
     }
 
+
     limpiarAnimaciones() {
         Object.keys(this.ciudades).forEach(ciudad => {
             const circulo = document.getElementById(`circulo-${ciudad}`);
             if (circulo) {
-                circulo.style.fill = '#4745b1ff';
-                circulo.style.stroke = '#f2f700';
+                // Solo limpiar si no es parte de la ruta óptima
+                const currentFill = circulo.style.fill;
+                if (currentFill !== 'rgb(40, 167, 69)' &&    // Verde origen
+                    currentFill !== 'rgb(220, 53, 69)' &&    // Rojo destino  
+                    currentFill !== 'rgb(255, 193, 7)') {    // Amarillo intermedia
+                    circulo.style.fill = '#4745b1';
+                    circulo.style.stroke = '#260829';
+                }
             }
         });
     }
+
+
 
     dibujarRutaOptima(camino) {
         const rutaGroup = document.getElementById('ruta-calculada');
         rutaGroup.innerHTML = '';
 
+        const intermedio = document.getElementById('intermedio').value;
+
+        // Aplicar colores a los nodos según su posición en el camino
+        camino.forEach((ciudad, index) => {
+            const circulo = document.getElementById(`circulo-${ciudad}`);
+            if (circulo) {
+                if (index === 0) {
+                    // Ciudad origen - VERDE
+                    circulo.style.fill = '#28a745';
+                    circulo.style.stroke = '#1e7e34';
+                } else if (index === camino.length - 1) {
+                    // Ciudad destino - ROJO
+                    circulo.style.fill = '#dc3545';
+                    circulo.style.stroke = '#c82333';
+                } else if (ciudad === intermedio) {
+                    // Ciudad intermedia específica - AMARILLO/NARANJA
+                    circulo.style.fill = '#ffc107';
+                    circulo.style.stroke = '#e0a800';
+                }
+            }
+        });
+
+        // Dibujar líneas de la ruta
         for (let i = 0; i < camino.length - 1; i++) {
             const ciudad1 = camino[i];
             const ciudad2 = camino[i + 1];
@@ -625,6 +665,8 @@ class SistemaRutas {
             }
         }
     }
+
+
 
     // ==================== INTERACCIÓN CON EL MAPA ====================
 
