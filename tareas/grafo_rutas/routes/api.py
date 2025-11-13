@@ -178,11 +178,24 @@ def eliminar_ruta():
 @api_bp.route('/documentacion')
 def documentacion():
     try:
-        with open('README.md', 'r', encoding='utf-8') as file:
+        import os
+        # Usar ruta absoluta para encontrar README.md
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        readme_path = os.path.join(base_dir, 'README.md')
+
+        with open(readme_path, 'r', encoding='utf-8') as file:
             contenido = file.read()
 
-        # Convertir con librería markdown
+        import markdown
         html_content = markdown.markdown(contenido, extensions=['extra'])
+
+        # Forzar enlaces externos a abrir en nueva pestaña
+        import re
+        html_content = re.sub(
+            r'<a href="(https?://[^"]+)">',
+            r'<a href="\1" target="_blank" rel="noopener">',
+            html_content
+        )
 
         return f"""
         <!DOCTYPE html>
@@ -206,32 +219,19 @@ def documentacion():
                     border-radius: 8px;
                     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
                 }}
-                img {{ 
-                    max-width: 100%; 
-                    height: auto; 
-                    border: 1px solid #ddd; 
-                    border-radius: 4px; 
-                    margin: 15px 0;
+                a {{
+                    color: #007bff;
+                    text-decoration: none;
                 }}
-                code {{
-                    background: #f4f4f4;
-                    padding: 2px 6px;
-                    border-radius: 3px;
+                a:hover {{
+                    text-decoration: underline;
                 }}
-                pre {{
-                    background: #f8f8f8;
-                    padding: 15px;
-                    border-radius: 5px;
-                    overflow: auto;
-                }}
-                table {{
-                    border-collapse: collapse;
-                    width: 100%;
-                    margin: 15px 0;
-                }}
-                th, td {{
+                img {{
+                    max-width: 100%;
+                    height: auto;
                     border: 1px solid #ddd;
-                    padding: 8px;
+                    border-radius: 4px;
+                    margin: 15px 0;
                 }}
             </style>
         </head>
