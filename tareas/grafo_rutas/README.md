@@ -52,20 +52,99 @@ Sistema web interactivo para visualizar y calcular rutas óptimas entre ciudades
 ## 🏗️ Arquitectura del Sistema
 
 sistema_rutas/
-├── 📄 app.py # Punto de entrada principal
-├── 📁 controllers/ # Lógica de aplicación
-│ └── 📄 mapa_controller.py # Coordina modelo y vista
-├── 📁 models/ # Datos y algoritmos
-│ └── 📄 grafo_rutas.py # Grafo y algoritmo Dijkstra con doble peso
-├── 📁 views/ # Formateo de respuestas
-│ └── 📄 mapa_view.py # Formatea datos para frontend
-├── 📁 routes/ # Endpoints API
-│ └── 📄 api.py # Definición de rutas REST
-├── 📁 templates/ # Interfaz de usuario
-│ └── 📄 mapa.html # Página principal HTML
-└── 📁 static/ # Recursos estáticos
-├── 📄 estilo.css # Estilos y diseño visual
-└── 📄 rutas.js # Lógica del frontend
+
+- ├── 📄 app.py # Punto de entrada principal
+- ├── 📁 controllers/ # Lógica de aplicación
+- └── 📄 mapa_controller.py # Coordina modelo y vista
+- ├── 📁 models/ # Datos y algoritmos
+- │ └── 📄 grafo_rutas.py # Grafo y algoritmo Dijkstra con doble peso
+- ├── 📁 views/ # Formateo de respuestas
+- │ └── 📄 mapa_view.py # Formatea datos para frontend
+- ├── 📁 routes/ # Endpoints API
+- │ └── 📄 api.py # Definición de rutas REST
+- ├── 📁 templates/ # Interfaz de usuario
+- │ └── 📄 mapa.html # Página principal HTML
+- └── 📁 static/ # Recursos estáticos
+- ├── 📄 estilo.css # Estilos y diseño visual
+- └── 📄 rutas.js # Lógica del frontend
+
+# 📘 Glosario de la Arquitectua
+
+---
+
+## `app.py`
+
+Archivo principal de la aplicación. Actúa como **punto de entrada**, inicializando la configuración, los servicios y el servidor web.
+
+## 📁 controllers/
+
+Contiene la **lógica de aplicación**, coordinando la interacción entre modelos y vistas.
+
+### `mapa_controller.py`
+
+Gestiona la comunicación entre el **grafo de rutas** (modelo) y la **vista**, procesando solicitudes y preparando datos para el frontend.
+
+---
+
+## 📁 models/
+
+Incluye las definiciones de **estructuras de datos, lógica central y algoritmos**.
+
+### `grafo_rutas.py`
+
+Implementa el **grafo de rutas** y el algoritmo **Dijkstra con doble peso** (por ejemplo, distancia y tiempo). Maneja cálculos y relaciones.
+
+---
+
+## 📁 views/
+
+Define el **formateo de la salida** enviada al usuario o frontend.
+
+### `mapa_view.py`
+
+Convierte los datos procesados por el controlador a un formato adecuado (generalmente JSON) para el cliente web.
+
+---
+
+## 📁 routes/
+
+Contiene la definición de los **endpoints de la API**, siguiendo el estilo REST.
+
+### Estilo `REST`
+
+El estilo REST (Transferencia de Estado Representacional) es un estilo arquitectónico para diseñar sistemas distribuidos, comúnmente utilizado para crear APIs web. Sus principios incluyen la interfaz uniforme, la ausencia de estado (el estado se guarda en el cliente), la escalabilidad, la posibilidad de crear arquitecturas en capas y el uso de REST, que establece una serie de restricciones para que los sistemas se comuniquen usando métodos como GET y POST sobre recursos identificados por URLs, y con representaciones de datos en formatos como JSON.
+
+---
+
+### `api.py`
+
+Configura las **rutas del servidor**, mapeando URLs a funciones controladoras y definiendo los métodos HTTP disponibles.
+
+---
+
+## 📁 templates/
+
+Guarda las **plantillas HTML** que componen la interfaz gráfica de usuario.
+
+### `mapa.html`
+
+Página principal de la aplicación. Muestra el mapa y la interfaz interactiva.
+
+---
+
+## 📁 static/
+
+Carpeta de **recursos estáticos** usados por el frontend (CSS, JS, imágenes).
+
+### `estilo.css`
+
+Define la **apariencia visual**: colores, diseño, espaciados y estilos generales.
+
+### `rutas.js`
+
+Contiene la **lógica del frontend**, obtiene datos de la API y actualiza la interfaz del mapa.
+
+---
 
 ## 🎨 Interfaz de Usuario
 
