@@ -19,11 +19,11 @@ Probar en: <a href="https://lorginho.pythonanywhere.com/" target="_blank">https:
 
 ## Mejor ruta: En Tiempo
 
-![Interfaz del Sistema de Rutas de Bolivia](/static/sistema_rutas_tiempo.png)
+![Interfaz del Sistema de Rutas de Bolivia](./static/sistema_rutas_tiempo.png)
 
 ## Mejor ruta: En Distancia
 
-![Interfaz del Sistema de Rutas de Bolivia](/static/sistema_rutas_distancia.png)
+![Interfaz del Sistema de Rutas de Bolivia](static/sistema_rutas_distancia.png)
 
 ## 📋 Descripción
 
