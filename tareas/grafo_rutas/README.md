@@ -15,15 +15,33 @@ README.md
 
 Probar en: <a href="https://lorginho.pythonanywhere.com/" target="_blank">https://lorginho.pythonanywhere.com/</a>
 
-![Interfaz del Sistema de Rutas de Bolivia](/static/sistema_rutas.png)
+![Sistema de Rutas de Bolivia: Animacion Dijkstra](/static/sistema_rutas.png)
+
+<!--
+    rutas absolutas para ver las imagenes en Flask : pythonanywere, localhost, etc
+    Absoluta (siempre desde root):
+    /static/sistema_rutas_distancia.png
+
+    VS Code: Funciona con cualquier ruta que exista localmente
+-->
+
+<!--
+    rutas relativas para ver las imagenes en git hub
+    Relativa (desde ubicación actual):
+    ./static/sistema_rutas_distancia.png
+    static/sistema_rutas_distancia.png
+
+
+
+-->
 
 ## Mejor ruta: En Tiempo
 
-![Interfaz del Sistema de Rutas de Bolivia](./static/sistema_rutas_tiempo.png)
+![Sistema de Rutas de Bolivia: Tiempo](/static/sistema_rutas_tiempo.png)
 
 ## Mejor ruta: En Distancia
 
-![Interfaz del Sistema de Rutas de Bolivia](static/sistema_rutas_distancia.png)
+![Sistema de Rutas de Bolivia: Distancia](/static/sistema_rutas_distancia.png)
 
 ## 📋 Descripción
 
