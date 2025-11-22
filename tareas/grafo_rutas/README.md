@@ -16,14 +16,19 @@ README.md
 Probar en: <a href="https://lorginho.pythonanywhere.com/" target="_blank">https://lorginho.pythonanywhere.com/</a>
 
 ![Interfaz del Sistema de Rutas de Bolivia](./static/sistema_rutas.png)
-
+<!-- rutas relativas para ver las imagenes en git hub -->
 ## Mejor ruta: En Tiempo
 
 ![Interfaz del Sistema de Rutas de Bolivia](./static/sistema_rutas_tiempo.png)
+<!-- rutas relativas para ver las imagenes en git hub -->
 
 ## Mejor ruta: En Distancia
 
 ![Interfaz del Sistema de Rutas de Bolivia](./static/sistema_rutas_distancia.png)
+<!--
+rutas relativas para ver las imagenes en git hub
+./static/sistema_rutas_distancia.png
+-->
 
 ## 📋 Descripción
 
