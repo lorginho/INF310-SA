@@ -15,7 +15,7 @@ README.md
 
 Probar en: <a href="https://lorginho.pythonanywhere.com/" target="_blank">https://lorginho.pythonanywhere.com/</a>
 
-![Interfaz del Sistema de Rutas de Bolivia](/static/sistema_rutas.png)
+![Interfaz del Sistema de Rutas de Bolivia](./static/sistema_rutas.png)
 
 ## Mejor ruta: En Tiempo
 
