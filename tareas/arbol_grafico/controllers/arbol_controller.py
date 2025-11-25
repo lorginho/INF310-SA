@@ -212,24 +212,24 @@ def eliminar_rama():
     try:
         valor_int = int(valor)
 
-        # Solo una verificación de existencia
-        nodo_existe = arbol.buscar_x(valor_int) is not None
-        if not nodo_existe:
+        # Obtener la rama antes de eliminar
+        rama_eliminada = arbol.obtener_rama(valor_int)
+        if rama_eliminada is None:
             return jsonify({
                 'exito': False,
                 'mensaje': f'Nodo {valor_int} no encontrado'
             })
 
-        # Un solo recorrido para eliminar
+        # Eliminar la rama
         exito = arbol.eliminar_rama(valor_int)
 
-        # Si necesitas información de la rama eliminada, obtenerla después
-        # pero normalmente solo necesitas confirmación
         invalidar_cache()
 
         return jsonify({
             'exito': exito,
             'mensaje': 'Rama eliminada correctamente' if exito else 'No se pudo eliminar la rama',
+            'rama_eliminada': rama_eliminada,
+            'cantidad_nodos': len(rama_eliminada),
             'estadisticas': obtener_estadisticas()
         })
 

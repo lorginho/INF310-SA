@@ -3,6 +3,7 @@ static/js/script.js
 Controlador frontend para visualización de árbol binario
 */
 
+
 // Configuración global
 const CONFIG = {
     nodeRadius: 25,
@@ -11,8 +12,47 @@ const CONFIG = {
     
 };
 
-// Variables de control global
 
+// Diccionario de definiciones de funciones
+const definicionesFunciones = {
+    // INGRESO DE NODOS
+    'insertarIndividual': 'Inserta un nodo con el valor numérico especificado. No se permiten valores duplicados.',
+    'insertarSerie': 'Inserta múltiples nodos a partir de una serie de valores numéricos separados por espacios. Ignora valores duplicados y no numéricos.',
+    
+    // OPERACIONES
+    'eliminarNodo': 'Elimina un nodo específico manteniendo la propiedad de árbol binario de búsqueda. Reorganiza los hijos para preservar la estructura.',
+    'eliminarRama': 'Elimina un nodo y toda su descendencia (subárbol completo). La rama completa se removerá del árbol.',
+    'buscarNodo': 'Encuentra y resalta un nodo específico en el árbol. Si existe, se muestra temporalmente en color verde.',
+    
+    // RECORRIDOS
+    'inorden': 'InOrden: Recorrido que procesa primero el subárbol izquierdo, luego la raíz y finalmente el subárbol derecho. Produce los valores en orden ascendente.',
+    'preorden': 'PreOrden: Recorrido que procesa primero la raíz, luego el subárbol izquierdo y finalmente el subárbol derecho. Útil para copiar la estructura del árbol.',
+    'postorden': 'PostOrden: Procesa primero los hijos y luego el padre. Ideal para eliminaciones seguras de árboles.',
+    'amplitud': 'Por Niveles: Recorrido por Amplitud, visita los nodos nivel por nivel, de izquierda a derecha. Comienza en la raíz y recorre cada nivel completo antes de pasar al siguiente.',
+    'generarAleatorio': 'Arbol Aleatorio: Crea un árbol con N nodos de valores aleatorios entre 1 y 300. La cantidad de nodos (N) se puede ajustar con el control deslizante (2-20 nodos).',
+    'limpiarArbol': 'Limpiar Arbol: Elimina todos los nodos del árbol, reiniciando completamente la estructura. El árbol queda vacío (raíz = null).',
+    'mostrarArbol': 'Mostrar Normal: Restablece la visualización del árbol a colores estándar, desactivando cualquier modo especial como el análisis de simetría por niveles.',
+    
+    // BALANCEO AVL
+    'verificarBalanceo': 'Verificar Balanceo: Comprueba si el árbol cumple la propiedad AVL: para cada nodo, la diferencia de alturas entre sus subárboles izquierdo y derecho es como máximo 1.',
+    'balancearArbol': 'Balancear Arbol: Reconstruye el árbol como un árbol perfectamente balanceado de altura mínima, utilizando una estrategia de divide y vencerás sobre los elementos ordenados.',
+    
+    // SIMETRÍA
+    'verificarSimetria': 'Verificar Simetria: Analiza si el árbol es estructuralmente simétrico (espejo). Un árbol es simétrico si el subárbol izquierdo es reflejo del derecho.',
+    'verSimetriaNiveles': 'Ver Simetria por Niveles: Analiza la simetría nivel por nivel. En la visualización: 🟢 VERDE = nivel simétrico, 🔴 ROJO = nivel asimétrico. Identifica exactamente dónde falla la simetría.'
+
+
+};
+
+// Función para mostrar información contextual
+function mostrarInformacionFuncion(nombreFuncion) {
+    const infoDiv = document.getElementById('info-funcion');
+    if (definicionesFunciones[nombreFuncion]) {
+        infoDiv.innerHTML = definicionesFunciones[nombreFuncion];
+    } else {
+        infoDiv.innerHTML = 'ℹ️ Selecciona una operación para ver su descripción...';
+    }
+}
 
 // Variable de control global
 let animacionEnCurso = false;
@@ -30,8 +70,29 @@ let estado = {
 let modoSimetria = false;
 let infoNiveles = [];
 
+
+// Control de velocidad de animación
+let velocidadAnimacion = 800; // Valor por defecto (ms)
+const velocidadSlider = document.getElementById('velocidad-animacion');
+const velocidadDisplay = document.getElementById('velocidad-valor');
+
+// Configurar slider
+if (velocidadSlider) {
+    velocidadSlider.value = velocidadAnimacion;
+    velocidadSlider.addEventListener('input', function() {
+        velocidadAnimacion = parseInt(this.value);
+        velocidadDisplay.textContent = `${velocidadAnimacion} ms`;
+    });
+}
+
+// Control de árbol aleatorio
+let cantidadNodosAleatorio = 4;
+const rangoValores = { min: 1, max: 300 };
+
+
 // Inicialización
 document.addEventListener('DOMContentLoaded', function() {
+    inicializarSliderAleatorio();
     cargarEstadisticas();
     setInterval(cargarEstadisticas, 3000);
 });
@@ -45,6 +106,32 @@ function mostrarMensaje(mensaje, tipo = 'info') {
     }, TIEMPO_MENSAJES); // ✅ Usar variable global
 }
 
+
+// Inicializar y configurar slider
+function inicializarSliderAleatorio() {
+    const slider = document.getElementById('cantidad-nodos');
+    const display = document.getElementById('cantidad-nodos-valor');
+    
+    if (slider) {
+        // Configurar valores del slider
+        slider.min = 2;
+        slider.max = 20;
+        slider.value = cantidadNodosAleatorio;
+        
+        // Aplicar incrementos de 2 mediante JavaScript
+        slider.addEventListener('input', function() {
+            let valor = parseInt(this.value);
+            // Forzar incrementos de 2
+            valor = Math.round(valor / 2) * 2;
+            // Asegurar que esté en el rango
+            valor = Math.max(2, Math.min(20, valor));
+            
+            this.value = valor;
+            cantidadNodosAleatorio = valor;
+            display.textContent = valor;
+        });
+    }
+}
 
 
 // Funciones de comunicación con el backend
@@ -71,6 +158,7 @@ async function fetchAPI(endpoint, options = {}) {
 
 // Funciones principales de la interfaz
 async function insertarIndividual() {
+    mostrarInformacionFuncion('insertarIndividual');
     if (estado.animacionActiva) return;
     
     const input = document.getElementById('nodoIndividual');
@@ -104,6 +192,7 @@ async function insertarIndividual() {
 }
 
 async function insertarSerie() {
+    mostrarInformacionFuncion('insertarSerie');
     if (estado.animacionActiva) return;
     
     const input = document.getElementById('nodoSerie');
@@ -155,6 +244,7 @@ async function insertarSerie() {
 }
 
 async function eliminarNodo() {
+    mostrarInformacionFuncion('eliminarNodo');
     if (estado.animacionActiva) return;
     
     const input = document.getElementById('eliminarNodo');
@@ -188,6 +278,7 @@ async function eliminarNodo() {
 }
 
 async function buscarNodo() {
+    mostrarInformacionFuncion('buscarNodo');
     const input = document.getElementById('buscarNodo');
     const valor = input.value.trim();
     
@@ -214,8 +305,8 @@ async function buscarNodo() {
     }
 }
 
-
 async function realizarRecorrido(tipo) {
+    mostrarInformacionFuncion(tipo);
     // ✅ BLOQUEO: Verificar si ya hay animación en curso
     if (animacionEnCurso) {
         mostrarMensaje('⏳ Espere a que termine la animación actual', 'warning');
@@ -223,7 +314,8 @@ async function realizarRecorrido(tipo) {
     }
     
     animacionEnCurso = true;
-    
+    setEstadoBotonesRecorrido(true); // Deshabilitar otros botones
+
     try {
         // 1. Obtener y mostrar lista en panel de resultados
         const data = await fetchAPI(`/recorrido/${tipo}`);
@@ -241,11 +333,14 @@ async function realizarRecorrido(tipo) {
     } finally {
         // ✅ DESBLOQUEO: Siempre liberar, incluso si hay error
         animacionEnCurso = false;
+        setEstadoBotonesRecorrido(false); // Rehabilitar botones
     }
 }
 
 
+
 async function limpiarArbol() {
+    mostrarInformacionFuncion('limpiarArbol');
     try {
         const data = await fetchAPI('/limpiar', { method: 'POST' });
         mostrarMensaje(data.mensaje, 'success');
@@ -260,6 +355,7 @@ async function limpiarArbol() {
     }
 }
 
+/*
 async function mostrarArbol2() {
     try {
         // Reset visual completo
@@ -277,11 +373,12 @@ async function mostrarArbol2() {
         mostrarMensaje('Error al mostrar árbol: ' + error.message, 'error');
     }
 }
-
+*/
 
 async function mostrarArbol() {
     try {
         // Reset visual completo
+        mostrarInformacionFuncion('mostrarArbol');
         modoSimetria = false;
         infoNiveles = [];
         estado.mapaNodosNivel.clear();
@@ -303,20 +400,22 @@ async function mostrarArbol() {
 
 
 
-
-
+// Función modificada de generarAleatorio
 async function generarAleatorio() {
-    const N = 4;
-    const valores = Array.from({ length: N }, () => 
-        Math.floor(Math.random() * 200) + 1
+    mostrarInformacionFuncion('generarAleatorio');
+    const valores = Array.from({ length: cantidadNodosAleatorio }, () => 
+        Math.floor(Math.random() * (rangoValores.max - rangoValores.min + 1)) + rangoValores.min
     );
     
     document.getElementById('nodoSerie').value = valores.join(' ');
     await insertarSerie();
 }
 
+
+
 // Funciones de simetría
 async function verSimetriaNiveles() {
+    mostrarInformacionFuncion('verSimetriaNiveles');
     try {
         const data = await fetchAPI('/simetria-niveles');
         infoNiveles = data.niveles_simetria;
@@ -332,6 +431,7 @@ async function verSimetriaNiveles() {
 }
 
 async function verificarSimetria() {
+    mostrarInformacionFuncion('verificarSimetria');
     try {
         const data = await fetchAPI('/simetrico');
         
@@ -564,6 +664,7 @@ function resaltarNodo(valor) {
 }
 
 async function eliminarRama() {
+    mostrarInformacionFuncion('eliminarRama');
     const input = document.getElementById('eliminarRama');
     const valor = input.value.trim();
     
@@ -636,6 +737,7 @@ async function cargarEstadisticas() {
 
 
 async function verificarBalanceo() {
+    mostrarInformacionFuncion('verificarBalanceo');
     try {
         const data = await fetchAPI('/verificar-balanceo');
         
@@ -659,6 +761,7 @@ async function verificarBalanceo() {
 }
 
 async function balancearArbol() {
+    mostrarInformacionFuncion('balancearArbol');
     if (estado.animacionActiva) return;
     
     try {
@@ -751,7 +854,7 @@ async function animarRecorrido(tipo) {
             // ✅ Verificar periódicamente si debemos cancelar
             if (!animacionEnCurso) break;
             
-            await new Promise(resolve => setTimeout(resolve, 800));
+            await new Promise(resolve => setTimeout(resolve, velocidadAnimacion));
             
             // Agregar nodo actual a visitados
             nodosVisitados.add(nodos[i]);
@@ -809,27 +912,6 @@ function resetearColoresAnimacion() {
 
 
 
-
-
-function aplicarColoresRecorrido(nodosVisitados, nodoActual) {
-    const elementos = document.querySelectorAll('[data-valor]');
-    
-    elementos.forEach(nodo => {
-        const valor = parseInt(nodo.getAttribute('data-valor'));
-        
-        if (valor === nodoActual) {
-            // Nodo actual - Naranja
-            nodo.style.fill = '#FFA500';
-            nodo.style.stroke = '#FF8C00';
-        } else if (nodosVisitados.has(valor)) {
-            // Nodo visitado - Verde
-            nodo.style.fill = '#4CAF50';
-            nodo.style.stroke = '#45a049';
-        }
-        // Los no visitados mantienen colores normales
-    });
-}
-
 function resetearColoresAnimacion() {
     const elementos = document.querySelectorAll('[data-valor]');
     elementos.forEach(nodo => {
@@ -837,8 +919,6 @@ function resetearColoresAnimacion() {
         nodo.style.stroke = '';
     });
 }
-
-
 
 
 
@@ -867,5 +947,15 @@ function resaltarNodoAnimado(valor, orden) {
     });
 }
 
+
+function setEstadoBotonesRecorrido(deshabilitar) {
+    const botones = document.querySelectorAll('button[onclick*="realizarRecorrido"]');
+    botones.forEach(boton => {
+        boton.disabled = deshabilitar;
+        // Cambiar estilo visual para indicar estado
+        boton.style.opacity = deshabilitar ? 0.5 : 1;
+        boton.style.cursor = deshabilitar ? 'not-allowed' : 'pointer';
+    });
+}
 
 

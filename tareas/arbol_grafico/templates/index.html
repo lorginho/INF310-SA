@@ -41,14 +41,25 @@
                         <button onclick="buscarNodo()">Buscar</button>
                     </div>
                 </div>
-
+                
                 <div class="section">
                     <h3>Utilidades Generales</h3>
-                    <button class="btn-special" onclick="generarAleatorio()">Árbol Aleatorio</button>                    
-                    <button class="btn-special" onclick="limpiarArbol()">Limpiar Árbol</button>
-                    <button class="btn-special" onclick="mostrarArbol()">Mostrar Normal</button> 
-                    
+                    <div class="section">
+                    <h4>Configuración Arbol Aleatorio</h4>
+                    <div class="input-group">
+                        <label for="cantidad-nodos">Cantidad de nodos: </label>
+                        <input type="range" id="cantidad-nodos" min="2" max="20" value="4">
+                        <span id="cantidad-nodos-valor">4</span>
+                    </div>
+                    <!--  
+                    <button class="btn-special" onclick="generarAleatorio()">Generar Árbol Aleatorio</button>
+                    -->
+                </div>
+                    <button class="btn-special" onclick="generarAleatorio()">Agregar Arbol Aleatorio</button>                    
+                    <button class="btn-special" onclick="limpiarArbol()">Limpiar Arbol</button>
+                    <button class="btn-special" onclick="mostrarArbol()">Mostrar Normal</button>                     
                 </div>                
+
 
                 <div class="section">
                     <h3>Balanceo (AVL)</h3>
@@ -80,6 +91,15 @@
             <div class="panel right-panel">
 
                 <div class="section">
+                    <h3>Control de Animación</h3>
+                    <div class="input-group">
+                        <label for="velocidad-animacion">Velocidad: </label>
+                        <input type="range" id="velocidad-animacion" min="100" max="2000" step="100" value="800">
+                        <span id="velocidad-valor">800 ms</span>
+                    </div>
+                </div>
+
+                <div class="section">
                     <h3>Recorridos</h3>
                     <button onclick="realizarRecorrido('inorden')">Inorden</button>
                     <button onclick="realizarRecorrido('preorden')">Preorden</button>
@@ -97,6 +117,19 @@
                     <h3>Estadísticas</h3>
                     <div id="estadisticas" class="estadisticas-area"> </div>
                 </div>
+
+                <div class="section">
+                    <h3>Información de Función</h3>
+                    <div id="info-funcion" class="info-area">
+                        ℹ️ Selecciona una operación para ver su descripción...
+                    </div>
+                </div>
+
+
+
+
+
+
             </div>
         </div>
     </div>
