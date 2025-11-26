@@ -15,7 +15,7 @@ README.md
 
 Probar en: <a href="https://lorginho.pythonanywhere.com/" target="_blank">https://lorginho.pythonanywhere.com/</a>
 
-![Sistema de Rutas de Bolivia: Animacion Dijkstra](/static/sistema_rutas.png)
+![Sistema de Rutas de Bolivia: Animacion Dijkstra](./static/sistema_rutas.png)
 
 <!--
     rutas absolutas para ver las imagenes en Flask : pythonanywere, localhost, etc
@@ -37,11 +37,11 @@ Probar en: <a href="https://lorginho.pythonanywhere.com/" target="_blank">https:
 
 ## Mejor ruta: En Tiempo
 
-![Sistema de Rutas de Bolivia: Tiempo](/static/sistema_rutas_tiempo.png)
+![Sistema de Rutas de Bolivia: Tiempo](./static/sistema_rutas_tiempo.png)
 
 ## Mejor ruta: En Distancia
 
-![Sistema de Rutas de Bolivia: Distancia](/static/sistema_rutas_distancia.png)
+![Sistema de Rutas de Bolivia: Distancia](./static/sistema_rutas_distancia.png)
 
 ## 📋 Descripción
 
